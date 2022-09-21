@@ -132,7 +132,7 @@ class Node final
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] string_type to_str() const
+    [[nodiscard]] string_type string() const
        {
         string_type s;
         if( is_leaf() )
@@ -146,13 +146,13 @@ class Node final
             //if( ip!=i_childs.end() ) // Already true if here
             s += ip->first;
             s += ':';
-            s += ip->second.to_str();
+            s += ip->second.string();
             while( ++ip!=i_childs.end() )
                {
                 s += ',';
                 s += ip->first;
                 s += ':';
-                s += ip->second.to_str();
+                s += ip->second.string();
                }
             s += '}';
            }

@@ -14,6 +14,10 @@
 using namespace std::literals; // "..."sv
 
 
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+{
+
 /////////////////////////////////////////////////////////////////////////////
 class MachineType final
 {
@@ -58,7 +62,7 @@ class MachineType final
        };
 
     // Strato machines cut bridge recognized sizes
-    enum class cutbridgesiz : std::uint8_t
+    enum class cutbridgedim : std::uint8_t
        {
         undefined=0,
         c37, // ⎫ StratoS
@@ -69,8 +73,8 @@ class MachineType final
         size
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(cutbridgesiz::size)>
-    cutbridgesiz_ids =
+    static constexpr std::array<std::string_view, std::to_underlying(cutbridgedim::size)>
+    cutbridgedim_ids =
        {
         ""sv,    // undefined
         "3.7"sv, // c37
@@ -81,7 +85,7 @@ class MachineType final
        };
 
     // Strato machines align recognized sizes
-    enum class alignsiz : std::uint8_t
+    enum class aligndim : std::uint8_t
        {
         undefined=0,
         a32, // StratoS/W
@@ -89,8 +93,8 @@ class MachineType final
         size
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(alignsiz::size)>
-    alignsiz_ids =
+    static constexpr std::array<std::string_view, std::to_underlying(aligndim::size)>
+    aligndim_ids =
        {
         ""sv,    // undefined
         "3.2"sv, // a32
@@ -98,70 +102,38 @@ class MachineType final
        };
 
  public:
-    explicit MachineType(const std::string_view s) noexcept
-       {// From strings like "StratoWR-4.9/4.6"
-        // La stringa indentificativa è composta da un prefisso
-        // che determinano la tipologia di macchina, seguito da
-        // una o più dimensioni.
+    MachineType() noexcept = default;
+    explicit MachineType(const std::string_view s) { *this = recognize_machine(s); }
 
-        // Machine type
-        std::size_t i = 0;
-        while( i<s.size() && !std::isalpha(s[i]) ) ++i;
-        std::size_t i_start = i;
-        while( i<s.size() && !std::ispunct(s[i]) ) ++i;
-        i_type = recognize_machine_type( std::string_view(s.data()+i_start, i-i_start) );
-
-        // Possible given first dimension (cut bridge in case of strato machines)
-        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
-        if( i<s.size() )
-           {
-            const double dim = extract_num(s, i);
-            if( is_strato() )
-               {
-                i_cutbridgesiz = recognize_strato_cutbridge_size( dim );
-               }
-           }
-
-        // Possible given second dimension (align max in case of strato machines)
-        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
-        if( i<s.size() )
-           {
-            const double dim = extract_num(s, i);
-            if( is_strato() )
-               {
-                i_algnsiz = recognize_strato_align_size( dim );
-               }
-           }
-       }
-
-    [[nodiscard]] constexpr bool is_undefined() const noexcept { return i_type == type::undefined; }
+    [[nodiscard]] operator bool() const noexcept { return i_type != type::undefined; }
+    //[[nodiscard]] constexpr bool is_undefined() const noexcept { return i_type == type::undefined; }
     [[nodiscard]] constexpr bool is_float() const noexcept { return i_type>type::undefined && i_type<type::s; }
     [[nodiscard]] constexpr bool is_strato() const noexcept { return i_type>type::undefined && i_type>=type::s; }
     [[nodiscard]] constexpr bool is_strato_s() const noexcept { return i_type==type::s; }
     [[nodiscard]] constexpr std::string_view mach_id() const noexcept { return mach_ids[std::to_underlying(i_type)]; }
     [[nodiscard]] constexpr std::string_view mach_name() const noexcept { return mach_names[std::to_underlying(i_type)]; }
 
-    [[nodiscard]] constexpr bool has_cutbridge_size() const noexcept { return i_cutbridgesiz!=cutbridgesiz::undefined; }
-    [[nodiscard]] constexpr bool has_align_size() const noexcept { return i_algnsiz!=alignsiz::undefined; }
+    [[nodiscard]] constexpr bool has_cutbridge_dim() const noexcept { return i_cutbridgedim!=cutbridgedim::undefined; }
+    [[nodiscard]] constexpr bool has_align_dim() const noexcept { return i_algndim!=aligndim::undefined; }
 
-    [[nodiscard]] constexpr std::string_view cutbridge_size() const noexcept { return cutbridgesiz_ids[std::to_underlying(i_cutbridgesiz)]; }
-    [[nodiscard]] constexpr std::string_view align_size() const noexcept { return alignsiz_ids[std::to_underlying(i_algnsiz)]; }
+    [[nodiscard]] constexpr std::string_view cutbridge_dim() const noexcept { return cutbridgedim_ids[std::to_underlying(i_cutbridgedim)]; }
+    [[nodiscard]] constexpr std::string_view align_dim() const noexcept { return aligndim_ids[std::to_underlying(i_algndim)]; }
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::string to_str() const
+    [[nodiscard]] std::string string() const
        {
         std::string s{ mach_name() };
         if( is_strato() )
            {
-            if( has_cutbridge_size() )
+            if( has_cutbridge_dim() )
                {
                 s += '-';
-                s += cutbridge_size();
-                if( has_align_size() )
+                s += cutbridge_dim();
+                if( has_align_dim() )
                    {
                     s += '/';
-                    s += align_size();
+                    s += align_dim();
                    }
                }
            }
@@ -170,9 +142,49 @@ class MachineType final
 
  private:
     type i_type = type::undefined;
-    cutbridgesiz i_cutbridgesiz = cutbridgesiz::undefined;
-    alignsiz i_algnsiz = alignsiz::undefined;
+    cutbridgedim i_cutbridgedim = cutbridgedim::undefined;
+    aligndim i_algndim = aligndim::undefined;
 
+    static MachineType recognize_machine(const std::string_view s)
+       {// From strings like "StratoWR-4.9/4.6"
+        // La stringa identificativa è composta da un prefisso
+        // che determinano la tipologia di macchina, seguito da
+        // una o più dimensioni.
+        MachineType mach;
+
+        // Machine type
+        std::size_t i = 0;
+        while( i<s.size() && !std::isalpha(s[i]) ) ++i;
+        std::size_t i_start = i;
+        while( i<s.size() && !std::ispunct(s[i]) ) ++i;
+        mach.i_type = recognize_machine_type( std::string_view(s.data()+i_start, i-i_start) );
+
+        // Possible given first dimension (cut bridge in case of strato machines)
+        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
+        if( i<s.size() )
+           {
+            const double dim = extract_num(s, i);
+            if( mach.is_strato() )
+               {
+                mach.i_cutbridgedim = recognize_strato_cutbridge_dim( dim );
+               }
+           }
+
+        // Possible given second dimension (align max in case of strato machines)
+        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
+        if( i<s.size() )
+           {
+            const double dim = extract_num(s, i);
+            if( mach.is_strato() )
+               {
+                mach.i_algndim = recognize_strato_align_dim( dim );
+               }
+           }
+
+        // If here, all ok
+        return mach;
+       }
+       
     //-----------------------------------------------------------------------
     static type recognize_machine_type(const std::string_view s)
        {
@@ -188,7 +200,7 @@ class MachineType final
        }
 
     //-----------------------------------------------------------------------
-    cutbridgesiz recognize_strato_cutbridge_size(const double dim) const
+    static cutbridgedim recognize_strato_cutbridge_dim(const MachineType& mach, const double dim)
        {
         // Le misure riconosciute sono: 4.0, 4.9, 6.0 (W)
         //                              3.7, 4.6 (S)
@@ -197,22 +209,22 @@ class MachineType final
             return std::fabs(dim-other_dim) < 0.2;
            };
 
-        if( is_strato_s() )
+        if( mach.is_strato_s() )
            {// Macchine piccole
-            if( matches(3.7) ) cutbridgesiz::c37;
-            else if( matches(4.6) ) cutbridgesiz::c46;
+            if( matches(3.7) ) cutbridgedim::c37;
+            else if( matches(4.6) ) cutbridgedim::c46;
            }
         else
            {// Tutte le altre
-            if( matches(4.0) ) return cutbridgesiz::c40;
-            else if( matches(4.9) ) return cutbridgesiz::c49;
-            else if( matches(6.0) ) return cutbridgesiz::c60;
+            if( matches(4.0) ) return cutbridgedim::c40;
+            else if( matches(4.9) ) return cutbridgedim::c49;
+            else if( matches(6.0) ) return cutbridgedim::c60;
            }
-        throw std::runtime_error( fmt::format("Unrecognized {} align size: {}", mach_name(), dim) );
+        throw std::runtime_error( fmt::format("Unrecognized {} cut bridge size: {}", mach.mach_name(), dim) );
        }
 
     //-----------------------------------------------------------------------
-    static alignsiz recognize_strato_align_size(const double dim)
+    static aligndim recognize_strato_align_dim(const double dim)
        {
         // Le misure riconosciute sono: 3.2, 4.6 (W)
         //                              3.2 (S)
@@ -221,14 +233,14 @@ class MachineType final
             return std::fabs(dim-other_dim) < 0.2;
            };
 
-        if( matches(3.2) ) return alignsiz::a32;
-        else if( matches(4.6) ) return alignsiz::a46;
+        if( matches(3.2) ) return aligndim::a32;
+        else if( matches(4.6) ) return aligndim::a46;
         throw std::runtime_error( fmt::format("Unrecognized align size: {}",dim) );
        }
 
     //-----------------------------------------------------------------------
     // Extract a simple (base10, no sign, no exponent) floating point number
-    static [[nodiscard]] double extract_num(const std::string_view s, std::size_t& i)
+    static [[nodiscard]] double extract_num(const std::string_view s, std::size_t& i) noexcept
        {
         //assert( i<s.size() && std::isdigit(s[i]) );
 
@@ -255,6 +267,9 @@ class MachineType final
         return mantissa;
        }
 };
+
+
+}//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 

@@ -1,6 +1,6 @@
 ## [m32-pars-adapt](https://github.com/matgat/m32-pars-adapt.git)
 
-This is a tool to help the proper parametrization of m32 based machines,
+A tool to help the proper parametrization of m32 based machines,
 using a json-like database that collects the proper parameters for the
 various machine types.
 
@@ -16,7 +16,7 @@ To print usage info:
 To properly valorize a `MachSettings.udt` given a machine type:
 ```
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
-> m32-pars-adapt --tgt MachSettings.udt --machine StratoWR-4.9/4.6 --db configs\machsettings-overlays.txt
+> m32-pars-adapt --tgt MachSettings.udt --db configs\machsettings-overlays.txt --machine StratoWR-4.9/4.6
 ```
 
 To update an old `MachSettings.udt` to a new one:
@@ -27,7 +27,7 @@ To update an old `MachSettings.udt` to a new one:
 To valorize a Sipro parameter file:
 ```
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\param
-> m32-pars-adapt --tgt par2kax.txt --machine StratoWR-4.9/4.6 --db par2kax-overlays.txt
+> m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --machine StratoHP-6.0/4.6
 ```
 
 Normally no file will be overwritten: the program will create a temporary
@@ -96,11 +96,11 @@ Recognized second level keys are:
 
 Recognized  dimensions:
 
-	"S": "CutBridge" : "3.7", "4.6"
-	"S": "AlgnSpan" : "3.2"
+	S: CutBridge : 3.7, 4.6
+	S: AlgnSpan : 3.2
 
-	"W","WR","HP": "CutBridge" : "4.0", "4.9", "6.0"
-	"W","WR","HP": "AlgnSpan" : "3.2", "4.6"
+	W,WR,HP: CutBridge : 4.0, 4.9, 6.0
+	W,WR,HP: AlgnSpan : 3.2, 4.6
 
 
 

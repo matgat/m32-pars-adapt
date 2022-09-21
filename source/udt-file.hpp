@@ -26,23 +26,17 @@ class File final
      public:
         explicit Assignment(const sipro::Assignment a, const std::size_t l) : i_Assignment(a), i_LineIdx(l) {}
 
-        [[nodiscard]] operator bool() const noexcept { return static_cast<bool>(i_Assignment); }
-    
         //[[nodiscard]] std::string build_line(const std::string_view orig_line) const noexcept
         //   {
-        //    return fmt::format("{}"sv, indent);
+        //    return i_Assignment.has_added_label() ? fmt::format("{} = {} # {} '{}'"sv, i_Assignment.var_name(), i_NewVal, i_Assignment.comment(), i_Assignment.added_label())
+        //                                          : fmt::format("{} = {} # {}"sv, i_Assignment.var_name(), i_NewVal, i_Assignment.comment() );
         //   }
 
         [[nodiscard]] std::string_view var_name() const noexcept { return i_Assignment.var_name(); }
+        [[nodiscard]] std::string_view value() const noexcept { return i_NewVal.empty() ? i_Assignment.value() : i_NewVal; }
+        [[nodiscard]] std::string_view comment() const noexcept { return i_Assignment.comment(); }
+        [[nodiscard]] std::string_view added_label() const noexcept { return i_Assignment.added_label(); }
 
-        //[[nodiscard]] std::string_view value() const noexcept
-        //   {
-        //    if( i_NewVal.empty() )
-        //       {
-        //        return i_Assignment.value();
-        //       }
-        //    return i_NewVal;
-        //   }
         [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
         [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
         void modify_value(const std::string& new_val) { i_NewVal = new_val; }
@@ -59,8 +53,8 @@ class File final
     class Line final
     {
      public:
-        explicit Line(const std::string_view l, Assignment* const pa) : i_LineSpan(l), i_AssignmentPtr(a) {}
-     
+        explicit Line(const std::string_view l, Assignment* const pa) : i_LineSpan(l), i_AssignmentPtr(pa) {}
+
         [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
         [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
 
@@ -84,7 +78,7 @@ class File final
                {
                 const sipro::Line line = parser.next_line();
                 Assignment* asgnm_ptr = nullptr;
-                   
+
                 if( parser.is_inside_note_block() )
                    {// Ignoring notes
                    }
@@ -109,7 +103,7 @@ class File final
                        }
                    }
 
-                i_lines.push_back( line.span(), asgnm_ptr );
+                i_lines.emplace_back( line.span(), asgnm_ptr );
                }
            }
         catch( parse_error& e)
@@ -130,14 +124,28 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    void modify_value(const std::string_view varnam, const std::string& new_val)
+    [[nodiscard]] auto get_value_of(const std::string_view varlbl) const
        {
-        auto it = i_assignments.find(varnam);
+        const auto it = i_assignments.find(varlbl);
         if( it==i_assignments.end() )
            {
-            throw std::runtime_error( fmt::format("Variable {} not found in {}", varnam, file_buf.path()) );
+            throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
            }
-        it->second.modify_value(new_val);
+        return it->second.value();
+       }
+
+    //-----------------------------------------------------------------------
+    void modify_value(const std::string_view varlbl, const std::string& new_val)
+       {
+        const auto it = i_assignments.find(varlbl);
+        if( it==i_assignments.end() )
+           {
+            throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
+           }
+        else
+           {
+            it->second.modify_value(new_val);
+           }
        }
 
     //-----------------------------------------------------------------------
@@ -146,17 +154,56 @@ class File final
         sys::file_write fw( outpth.string() );
         for( const auto& line : i_lines )
            {
-            fw << line.span();
+            if( line.assignment_ptr() && line.assignment_ptr()->is_value_modified() )
+               {// This line is an assignment with modified value
+                // I'll rebuild the assignment with the modified value
+                fw << std::string_view(line.span().data(), line.assignment_ptr()->var_name().data()-line.span().data()) // Indent
+                   << line.assignment_ptr()->var_name()
+                   << " = "sv
+                   << line.assignment_ptr()->value();
+
+                if( !line.assignment_ptr()->comment().empty() )
+                   {
+                    fw << " # "sv << line.assignment_ptr()->comment();
+                   }
+
+                if( !line.assignment_ptr()->added_label().empty() )
+                   {
+                    fw << " '"sv << line.assignment_ptr()->added_label() << '\'';
+                   }
+
+                // Respect the original line break
+                assert( line.span().length()>0 && line.span()[line.span().length()-1]=='\n' );
+                if( line.span().length()>1 && line.span()[line.span().length()-2]=='\r' )
+                   {// Windows line break
+                    fw << '\r';
+                   }
+                fw << '\n';
+               }
+            else
+               {// Write line as it was
+                fw << line.span();
+               }
            }
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} assignments", i_lines.size(), i_assignments.size()); }
+    [[nodiscard]] std::size_t modified_values_count() const noexcept
+       {
+        std::size_t count = 0;
+        for( const auto& [key, ass] : i_assignments )
+           {
+            if( ass.is_value_modified() ) ++count;
+           }
+        return count;
+       }
+
+    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} assignments ({} modified)", i_lines.size(), i_assignments.size(), modified_values_count()); }
 
 
  private:
     const sys::MemoryMappedFile file_buf; // File buffer
-    std::vector<std::string_view> i_lines; // Collected lines
+    std::vector<Line> i_lines; // Collected lines
     std::map<std::string_view,Assignment> i_assignments; // Assignments (name = value)
 };
 

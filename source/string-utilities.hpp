@@ -20,30 +20,6 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
 //---------------------------------------------------------------------------
-bool contains_wildcards(const std::string& s) noexcept
-{
-    //return std::regex_search(s, std::regex("*?")); // Seems slow
-    //return s.rfind('*') != std::string::npos || s.rfind('?') != std::string::npos;
-    // Two loops? I'd rather loop once
-    auto i = s.length();
-    while( i>0 )
-       {
-        const char c = s[--i];
-        if( c=='*' || c=='?' ) return true;
-       }
-    return false;
-}
-
-
-//---------------------------------------------------------------------------
-std::string replace_extension( const std::string& pth, std::string_view newext ) noexcept
-{
-    const std::string::size_type i_extpos = pth.rfind('.'); // std::string::npos
-    return pth.substr(0,i_extpos).append(newext);
-}
-
-
-//---------------------------------------------------------------------------
 // Change string to lowercase
 inline std::string tolower(std::string s)
 {
@@ -55,13 +31,57 @@ inline std::string tolower(std::string s)
 
 
 //---------------------------------------------------------------------------
+// Put a string between double quotes
+inline std::string quoted(const std::string& s)
+{
+    if( s.contains('\"') )
+       {// TODO: Should escape internal double quotes
+        throw std::runtime_error( fmt::format("Won't quote {}: contains double quotes"sv,s) );
+       }
+    return fmt::format("\"{}\""sv,s);
+}
+
+
+//---------------------------------------------------------------------------
+// Remove double quotes
+inline std::string_view unquoted(const std::string_view s) noexcept
+{
+    auto i_first = s.cbegin();
+    while(i_first!=s.cend() && std::isspace(*i_first)) ++i_first;
+    if( *i_first=='\"' )
+       {
+        auto i_last = s.cend()-1;
+        while(i_last>i_first && std::isspace(*i_last)) --i_last;
+        if( i_last>i_first && *i_last=='\"' )
+           {
+            return std::string_view(++i_first,i_last);
+           }
+       }
+    return s;
+}
+
+
+
+//---------------------------------------------------------------------------
+// See also std::filesystem::path::replace_extension
+std::string replace_extension( const std::string& pth, std::string_view newext ) noexcept
+{
+    const std::string::size_type i_extpos = pth.rfind('.'); // std::string::npos
+    return pth.substr(0,i_extpos).append(newext);
+}
+
+
+
+
+
+//---------------------------------------------------------------------------
 //std::string repeat(const std::string& input, size_t num)
 //{
 //    std::ostringstream os;
 //    std::fill_n(std::ostream_iterator<std::string>(os), num, input);
 //    return os.str();
 //}
- 
+
 
 //---------------------------------------------------------------------------
 // Convert a character to string, escaping it if necessary
@@ -112,7 +132,7 @@ std::string escape(const std::string_view sv) noexcept
 
 
 //---------------------------------------------------------------------------
-// replace all occurrences in a string
+// Replace all occurrences in a string
 void replace_all(std::string& s, const std::string& from, const std::string& to)
 {
     //std::string::size_type i = 0;
@@ -171,6 +191,23 @@ std::size_t hash(const std::string_view s)
 }
 
 
+
+//---------------------------------------------------------------------------
+bool contains_wildcards(const std::string& s) noexcept
+{
+    //return std::regex_search(s, std::regex("*?")); // Seems slow
+    //return s.rfind('*') != std::string::npos || s.rfind('?') != std::string::npos;
+    // Two loops? I'd rather loop once
+    auto i = s.length();
+    while( i>0 )
+       {
+        const char c = s[--i];
+        if( c=='*' || c=='?' ) return true;
+       }
+    return false;
+}
+
+
 //-----------------------------------------------------------------------
 // Returns true if text matches glob-like pattern with wildcards (*, ?)
 bool glob_match(const char* text, const char* glob, const char dont_match ='/')
@@ -215,7 +252,7 @@ std::string iso_latin1_to_utf8(const std::string_view ansi)
     utf8.reserve( (3 * ansi.size()) / 2 );
     for( std::size_t i=0; i<ansi.size(); ++i )
        {
-        if(ansi[i] < 128)
+        if( ansi[i] < 128 )
            {
             utf8 += ansi[i];
            }

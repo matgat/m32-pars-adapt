@@ -11,7 +11,6 @@
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::edit_text_file
 #include "json-parser.hpp" // json::parse()
-#include "machine-type.hpp" // MachineType
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -47,7 +46,7 @@ class ParsDB final
 
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string info() const { return fmt::format("{} first level nodes ({} values)", i_root.direct_childs_count(), i_root.overall_leafs_count()); }
-    [[nodiscard]] std::string to_str() const { return i_root.to_str(); }
+    [[nodiscard]] std::string string() const { return i_root.string(); }
     void print() const { return i_root.print(); }
 
  private:
