@@ -40,13 +40,14 @@ the file will be overwritten after performing a backup in the same directory.
 
 _________________________________________________________________________
 ## Requirements
-The manual merging is performed by the external utility *WinMerge*.
-The program will check the paths:
+In Windows for the manual merging is performed
+invoking the external utility *WinMerge*.
+The program will try the following paths:
 ```
 "C:\Macotec\Apps\WinMerge\WinMergeU.exe"
 "%PROGRAMFILES%\WinMerge\WinMergeU.exe"
 ```
-And as fallback the program associated with the extension `.WinMerge`
+And as fallback the association with the extension `.WinMerge`
 
 
 
@@ -59,8 +60,8 @@ The format is a simplified json syntax:
 * Multiple keys support
 * Supported double slash line comments (`//`) at blocks start and after values
 
-```json
-"key1", "key2" :
+```js
+"key1", key2 :
    {// Subchilds comment
 
     "subkey1" :
@@ -69,7 +70,7 @@ The format is a simplified json syntax:
         name2: 2.4 // Value comment
        }
 
-    "subkey2" :
+    subkey2 :
        {// Subchilds comment
         name3: "a quoted value" // Value comment
         name4: unquoted // Value comment
@@ -79,28 +80,28 @@ The format is a simplified json syntax:
 ### Recognized keys
 First level keys are the machine type:
 
-| *id*    | *Machine*  | *Type*    |
-|---------|------------|-----------|
-| `"STC"` |  StarCut   |  *Float*  |
-| `"FR"`  |  MasterFR  |  *Float*  |
-| `"FRV"` |  MasterFRV |  *Float*  |
-| `"S"`   |  ActiveE/F |  *Strato* |
-| `"W"`   |  ActiveW   |  *Strato* |
-| `"WR"`  |  ActiveWR  |  *Strato* |
-| `"HP"`  |  ActiveHP  |  *Strato* |
+| *id*  | *Machine*  | *Type*    |
+|-------|------------|-----------|
+| `STC` |  StarCut   |  *Float*  |
+| `FR`  |  MasterFR  |  *Float*  |
+| `FRV` |  MasterFRV |  *Float*  |
+| `S`   |  ActiveE/F |  *Strato* |
+| `W`   |  ActiveW   |  *Strato* |
+| `WR`  |  ActiveWR  |  *Strato* |
+| `HP`  |  ActiveHP  |  *Strato* |
 
 
 Recognized second level keys are:
 
-	"Common", "CutBridge", "AlgnSpan"
+	"common", "cut-bridge", "algn-span"
 
 Recognized  dimensions:
 
-	S: CutBridge : 3.7, 4.6
-	S: AlgnSpan : 3.2
+	S: cut-bridge : 3.7, 4.6
+	S: algn-span  : 3.2
 
-	W,WR,HP: CutBridge : 4.0, 4.9, 6.0
-	W,WR,HP: AlgnSpan : 3.2, 4.6
+	W,WR,HP: cut-bridge : 4.0, 4.9, 6.0
+	W,WR,HP: algn-span  : 3.2, 4.6
 
 
 
