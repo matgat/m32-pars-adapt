@@ -11,7 +11,7 @@
 #include "system.hpp" // sys::*, fs::*
 #include "string-utilities.hpp" // str::tolower, str::unquoted
 
-#include "winmerge.hpp" // winmerge::*
+#include "text-files-tools.hpp" // sys::edit_text_file, sys::compare
 #include "machine-type.hpp" // macotec::MachineType
 #include "pars-db.hpp" // ParsDB
 #include "udt-file.hpp" // udt::File
@@ -199,7 +199,7 @@ class Arguments final
                     "       --help (Just print help info and abort)\n"
                     "\n" );
        }
-    
+
     [[nodiscard]] const auto& job() const noexcept { return i_job; }
     [[nodiscard]] auto& modify_job() noexcept { return i_job; }
     [[nodiscard]] bool quiet() const noexcept { return i_quiet; }
@@ -272,7 +272,7 @@ int main( const int argc, const char* const argv[] )
 
             fs::path tmp_udt_pth{ args.job().target_file().path().parent_path() / fmt::format("~{}.tmp", args.job().target_file().path().filename().string()) };
             udt_file.write( tmp_udt_pth );
-            winmerge::compare(args.job().target_file().path().string(), tmp_udt_pth.string());
+            sys::compare(args.job().target_file().path().string(), tmp_udt_pth.string());
             sys::sleep_ms(1500);
             sys::delete_file( tmp_udt_pth.string() );
             fmt::print("UDT file: {}\n", udt_file.info());

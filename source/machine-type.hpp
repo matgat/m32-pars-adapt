@@ -13,6 +13,14 @@
 
 using namespace std::literals; // "..."sv
 
+  #if !defined(__cpp_lib_to_underlying)
+    template<typename E> constexpr auto to_underlying(const E e) noexcept
+       {
+        return static_cast<std::underlying_type_t<E>>(e);
+       }
+  #else
+    using std::to_underlying;
+  #endif
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -35,7 +43,7 @@ class MachineType final
         size
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(type::size)>
+    static constexpr std::array<std::string_view, to_underlying(type::size)>
     mach_ids =
        {
         ""sv,    // type::undefined
@@ -48,7 +56,7 @@ class MachineType final
         "HP"sv   // type::hp
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(type::size)>
+    static constexpr std::array<std::string_view, to_underlying(type::size)>
     mach_names =
        {
         ""sv,          // type::undefined
@@ -73,7 +81,7 @@ class MachineType final
         size
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(cutbridgedim::size)>
+    static constexpr std::array<std::string_view, to_underlying(cutbridgedim::size)>
     cutbridgedim_ids =
        {
         ""sv,    // undefined
@@ -93,7 +101,7 @@ class MachineType final
         size
        };
 
-    static constexpr std::array<std::string_view, std::to_underlying(aligndim::size)>
+    static constexpr std::array<std::string_view, to_underlying(aligndim::size)>
     aligndim_ids =
        {
         ""sv,    // undefined
@@ -105,19 +113,21 @@ class MachineType final
     MachineType() noexcept = default;
     explicit MachineType(const std::string_view s) { *this = recognize_machine(s); }
 
+    void assign(const std::string_view s) { *this = recognize_machine(s); }
+
     [[nodiscard]] operator bool() const noexcept { return i_type != type::undefined; }
     //[[nodiscard]] constexpr bool is_undefined() const noexcept { return i_type == type::undefined; }
     [[nodiscard]] constexpr bool is_float() const noexcept { return i_type>type::undefined && i_type<type::s; }
     [[nodiscard]] constexpr bool is_strato() const noexcept { return i_type>type::undefined && i_type>=type::s; }
     [[nodiscard]] constexpr bool is_strato_s() const noexcept { return i_type==type::s; }
-    [[nodiscard]] constexpr std::string_view mach_id() const noexcept { return mach_ids[std::to_underlying(i_type)]; }
-    [[nodiscard]] constexpr std::string_view mach_name() const noexcept { return mach_names[std::to_underlying(i_type)]; }
+    [[nodiscard]] constexpr std::string_view mach_id() const noexcept { return mach_ids[to_underlying(i_type)]; }
+    [[nodiscard]] constexpr std::string_view mach_name() const noexcept { return mach_names[to_underlying(i_type)]; }
 
     [[nodiscard]] constexpr bool has_cutbridge_dim() const noexcept { return i_cutbridgedim!=cutbridgedim::undefined; }
     [[nodiscard]] constexpr bool has_align_dim() const noexcept { return i_algndim!=aligndim::undefined; }
 
-    [[nodiscard]] constexpr std::string_view cutbridge_dim() const noexcept { return cutbridgedim_ids[std::to_underlying(i_cutbridgedim)]; }
-    [[nodiscard]] constexpr std::string_view align_dim() const noexcept { return aligndim_ids[std::to_underlying(i_algndim)]; }
+    [[nodiscard]] constexpr std::string_view cutbridge_dim() const noexcept { return cutbridgedim_ids[to_underlying(i_cutbridgedim)]; }
+    [[nodiscard]] constexpr std::string_view align_dim() const noexcept { return aligndim_ids[to_underlying(i_algndim)]; }
 
 
     //-----------------------------------------------------------------------
@@ -166,7 +176,7 @@ class MachineType final
             const double dim = extract_num(s, i);
             if( mach.is_strato() )
                {
-                mach.i_cutbridgedim = recognize_strato_cutbridge_dim( dim );
+                mach.i_cutbridgedim = recognize_strato_cutbridge_dim( mach, dim );
                }
            }
 
@@ -184,9 +194,9 @@ class MachineType final
         // If here, all ok
         return mach;
        }
-       
+
     //-----------------------------------------------------------------------
-    static type recognize_machine_type(const std::string_view s)
+    [[nodiscard]] static type recognize_machine_type(const std::string_view s)
        {
              if( s.ends_with("HP") ) return type::hp;
         else if( s.ends_with("WR") ) return type::wr;
@@ -200,7 +210,7 @@ class MachineType final
        }
 
     //-----------------------------------------------------------------------
-    static cutbridgedim recognize_strato_cutbridge_dim(const MachineType& mach, const double dim)
+    [[nodiscard]] static cutbridgedim recognize_strato_cutbridge_dim(const MachineType& mach, const double dim)
        {
         // Le misure riconosciute sono: 4.0, 4.9, 6.0 (W)
         //                              3.7, 4.6 (S)
@@ -211,8 +221,8 @@ class MachineType final
 
         if( mach.is_strato_s() )
            {// Macchine piccole
-            if( matches(3.7) ) cutbridgedim::c37;
-            else if( matches(4.6) ) cutbridgedim::c46;
+            if( matches(3.7) ) return cutbridgedim::c37;
+            else if( matches(4.6) ) return cutbridgedim::c46;
            }
         else
            {// Tutte le altre
@@ -224,7 +234,7 @@ class MachineType final
        }
 
     //-----------------------------------------------------------------------
-    static aligndim recognize_strato_align_dim(const double dim)
+    [[nodiscard]] static aligndim recognize_strato_align_dim(const double dim)
        {
         // Le misure riconosciute sono: 3.2, 4.6 (W)
         //                              3.2 (S)
@@ -240,7 +250,7 @@ class MachineType final
 
     //-----------------------------------------------------------------------
     // Extract a simple (base10, no sign, no exponent) floating point number
-    static [[nodiscard]] double extract_num(const std::string_view s, std::size_t& i) noexcept
+    [[nodiscard]] static double extract_num(const std::string_view s, std::size_t& i) noexcept
        {
         //assert( i<s.size() && std::isdigit(s[i]) );
 

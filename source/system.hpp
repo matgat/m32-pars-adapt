@@ -30,10 +30,11 @@ namespace fs = std::filesystem;
   #include <shellapi.h> // FindExecutableA
   #include <shlwapi.h> // AssocQueryString
 #else
+  #include <unistd.h> // unlink, exec*, fork, ...
   #include <fcntl.h> // open
   #include <sys/mman.h> // mmap, munmap
   #include <sys/stat.h> // fstat
-  #include <unistd.h> // unlink
+  #include <time.h>   // nanosleep
 #endif
 
 
@@ -43,11 +44,15 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //---------------------------------------------------------------------------
-void sleep_ms( const DWORD ms )
+void sleep_ms( const int ms )
 {
   #ifdef MS_WINDOWS
     ::Sleep(ms);
   #else
+    timespec ts;
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+    nanosleep(&ts, NULL);
   #endif
 }
 
@@ -154,20 +159,10 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
     ShExecInfo.hInstApp = NULL;
     ::ShellExecuteEx(&ShExecInfo);
   #else
-    //g_spawn_command_line_sync ?
-    //#include <unistd.h> // 'exec*'
-    // v: take an array parameter to specify the argv[] array of the new program. The end of the arguments is indicated by an array element containing NULL.
-    // l: take the arguments of the new program as a variable-length argument list to the function itself. The end of the arguments is indicated by a (char *)NULL argument. You should always include the type cast, because NULL is allowed to be an integer constant, and default argument conversions when calling a variadic function won't convert that to a pointer.
-    // e: take an extra argument (or arguments in the l case) to provide the environment of the new program; otherwise, the program inherits the current process's environment. This is provided in the same way as the argv array: an array for execve(), separate arguments for execle().
-    // p: search the PATH environment variable to find the program if it doesn't have a directory in it (i.e. it doesn't contain a / character). Otherwise, the program name is always treated as a path to the executable.
-    //int execvp (const char *file, char *const argv[]);
-    //int execlp(const char *file, const char *arg,.../* (char  *) NULL */);
-
-    //pid = fork();
-    //if( pid == 0 )
-    //   {
-    //    execlp("/usr/bin/xdg-open", "xdg-open", pth.c_str(), nullptr);
-    //   }
+    if( const auto pid = fork(); pid==0 )
+       {
+        execlp("/usr/bin/xdg-open", "xdg-open", pth.c_str(), args.c_str(), nullptr);
+       }
   #endif
 }
 
@@ -226,87 +221,13 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
        }
 
     return ret;
+  #else
+    execlp("/usr/bin/xdg-open", "xdg-open", pth.c_str(), args.c_str(), nullptr);
+    return 0;
   #endif
 }
 
 
-//#include <unistd.h>
-//#include <sys/types.h>
-//int foo(char *adr[])
-//{
-//        pid_t pid;
-//
-//        pid=fork();
-//        if (pid==0)
-//        {
-//                if (execv("/usr/bin/mozilla",adr)<0)
-//                        return -1;
-//                else
-//                        return 1;
-//        }
-//        else if(pid>0)
-//                return 2;
-//        else
-//                return 0;
-//}
-
-// sh_cmd() - executes a command in the background
-// returns TRUE is command was executed (not the result of the command though..)
-//static gint sh_cmd (gchar * path, gchar * cmd, gchar * args)
-//{
-//  gchar     cmd_line[256];
-//  gchar   **argv;
-//  gint      argp;
-//  gint      rc = 0;
-//
-//  if (cmd == NULL)
-//    return FALSE;
-//
-//  if (cmd[0] == '\0')
-//    return FALSE;
-//
-//  if (path != NULL)
-//    chdir (path);
-//
-//  snprintf (cmd_line, sizeof (cmd_line), "%s %s", cmd, args);
-//
-//  rc = g_shell_parse_argv (cmd_line, &argp, &argv, NULL);
-//  if (!rc)
-//  {
-//    g_strfreev (argv);
-//    return rc;
-//  }
-//
-//  rc = g_spawn_async (path, argv, NULL,
-//          G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_SEARCH_PATH,
-//          NULL, NULL, NULL, NULL);
-//
-//  g_strfreev (argv);
-//
-//  return rc;
-//}
-
-// static gint get_new_ptable (P_Fah_monitor fm)
-// {
-//  gint   i_retcode = 0, i_exitcode = 0;
-//  gchar cv_filename[384];
-//
-// #ifdef DLOGIC
-//   g_message (CONFIG_NAME":> Entered get_new_ptable(%d)...\n",fm->cb_id);
-// #endif
-//
-//   if ( fm->i_stanford_points )   // TRUE if point table IS out of date
-//   {
-//     chdir ( fm->path_string );
-//
-//     i_retcode = g_spawn_command_line_sync (
-//                      g_strdup_printf ("wget -N %s", STANDFORD_FAHPOINTS_URL),
-//                                          NULL, NULL, &i_exitcode, NULL);
-//
-//     if( i_retcode )
-//     {
-//      ... good if retcode = 0
-//     }
 
 //#include <stdlib.h>
 //#include <unistd.h>
@@ -359,21 +280,6 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
 //    }
 //}
 
-
-//---------------------------------------------------------------------------
-void edit_text_file(const std::string& pth, const std::size_t offset) noexcept
-{
-  #ifdef MS_WINDOWS
-    const std::string exe_pth = find_executable_by_file(pth);
-    //if( exe_pth.contains("notepad++") ) args = fmt::format(" -n{} -c{} -multiInst -nosession \"{}\"", line, column, pth);
-    //else if( exe_pth.contains("subl") ) args = fmt::format(" \"{}\":{}:{}", pth, line, column);
-    //else if( exe_pth.contains("scite") ) args = fmt::format("-open:\"{}\" goto:{},{}", pth, line, column);
-    //else if( exe_pth.contains("uedit") ) args = fmt::format(" \"{}\" -l{} -c{}", pth, line, column);
-    //else args =  fmt::format("\"{}\"", pth);
-    launch(exe_pth, fmt::format("-nosession -p{} \"{}\"", offset, pth) ); // npp
-  #else
-  #endif
-}
 
 
 

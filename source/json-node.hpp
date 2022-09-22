@@ -7,6 +7,7 @@
 #include <string_view>
 #include <map>
 #include <iterator> // std::prev
+#include <concepts> // std::same_as
 #include <fmt/core.h> // fmt::format, fmt::print
 
 
@@ -19,26 +20,27 @@ namespace json //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 class Node final
 {
  public:
-    using string_type = std::string;
-    using childs_type = std::map<string_type,Node>;
+    using value_type = std::string;
+    using key_type = std::string;
+    using childs_type = std::map<key_type,Node>;
 
 
     //-----------------------------------------------------------------------
-    void set_value(const std::string_view val)
+    void set_value(const std::string_view newval)
        {
         if( !i_childs.empty() )
            {
-            throw std::runtime_error( fmt::format("Cannot assign value \"{}\" to a parent node", val) );
+            throw std::runtime_error( fmt::format("Cannot assign value \"{}\" to a parent node", newval) );
            }
         if( !i_value.empty() )
            {
-            throw std::runtime_error( fmt::format("Cannot overwrite value \"{}\" on already existing \"{}\"", val, i_value) );
+            throw std::runtime_error( fmt::format("Cannot overwrite value \"{}\" on already existing \"{}\"", newval, i_value) );
            }
-        i_value = val;
+        i_value = newval;
        }
 
     //-----------------------------------------------------------------------
-    const string_type& value() const noexcept
+    const value_type& value() const noexcept
        {
         return i_value;
        }
@@ -59,7 +61,7 @@ class Node final
     //-----------------------------------------------------------------------
     [[maybe_unused]] Node& ensure_child(const std::string_view key)
        {
-        const auto [it, success] = i_childs.insert({string_type(key), Node()});
+        const auto [it, success] = i_childs.insert({key_type(key), Node()});
         //if( !success )
         //   {
         //    throw std::runtime_error( fmt::format("Cannot insert child \"{}\"", key) );
@@ -69,14 +71,33 @@ class Node final
 
     //-----------------------------------------------------------------------
     // Access childs
-    [[nodiscard]] const Node& operator[](const string_type& key) const
+    //[[nodiscard]] const Node& operator[](const key_type& key) const
+    //   {
+    //    const auto it = i_childs.find(key);
+    //    if( it==i_childs.end() )
+    //       {
+    //        throw std::runtime_error( fmt::format("child \"{}\" not found", key) );
+    //       }
+    //    return it->second;
+    //   }
+
+    //-----------------------------------------------------------------------
+    // Access childs
+    //template<typename... Args> const Node& get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
+    template<std::same_as<key_type>... Args> const Node& get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
        {
-        const auto it = i_childs.find(key);
-        if( it==i_childs.end() )
-           {
-            throw std::runtime_error( fmt::format("child \"{}\" not found", key) );
-           }
-        return it->second;
+        if( const auto it_child = i_childs.find(childname); it_child!=i_childs.end() )
+            {
+            if constexpr( sizeof...(subchilds) > 0 )
+               {
+                return it_child->second.get_descendant(std::forward<Args>(subchilds)...);
+               }
+            else
+               {
+                return it_child->second;
+               }
+            }
+        return empty_node;
        }
 
     //-----------------------------------------------------------------------
@@ -132,9 +153,9 @@ class Node final
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] string_type string() const
+    [[nodiscard]] std::string string() const
        {
-        string_type s;
+        std::string s;
         if( is_leaf() )
            {
             s += i_value;
@@ -186,10 +207,11 @@ class Node final
 
  private:
     childs_type i_childs;
-    string_type i_value;
+    value_type i_value;
+    static const Node empty_node;
 };
 
-
+inline const Node Node::empty_node;
 
 
 #ifndef NDEBUG
@@ -215,6 +237,33 @@ class Node final
 
     return a;
 }
+
+//---------------------------------------------------------------------------
+//[[nodiscard]] json::Node create_test_tree2()
+//{
+//    // root┐
+//    //     ├a┐
+//    //     │  ├b┐
+//    //     │  │  └c
+//    //     │  └d
+//    //     ├e┐
+//    //     │  ├f┐
+//    //     │  │  └g
+//    //     │  └h
+//    //     └i
+//    json::Node root;
+//    json::Node& a = root.ensure_child("a");
+//        json::Node& b = a.ensure_child("b");
+//            json::Node& c = b.ensure_child("c");
+//        json::Node& d = a.ensure_child("d");
+//    json::Node& e = root.ensure_child("e");
+//        json::Node& f = e.ensure_child("f");
+//            json::Node& g = f.ensure_child("g");
+//        json::Node& h = e.ensure_child("h");
+//    json::Node& i = root.ensure_child("i");
+//
+//    return root;
+//}
 #endif
 
 
