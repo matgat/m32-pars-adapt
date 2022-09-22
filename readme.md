@@ -10,7 +10,7 @@ _________________________________________________________________________
 ## Usage
 To print usage info:
 ```
-> m32-pars-adapt -help
+> m32-pars-adapt --help
 ```
 
 To properly valorize a `MachSettings.udt` given a machine type:
