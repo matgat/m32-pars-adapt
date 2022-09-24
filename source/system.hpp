@@ -3,13 +3,15 @@
 //  ---------------------------------------------
 //  System utilities
 //  ---------------------------------------------
+#include <stdexcept>
+#include <concepts>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <stdexcept>
+#include <array>
+//#include <fstream>
 #include <cstdio> // std::fopen, ...
 #include <cstdlib> // std::getenv
-//#include <fstream>
 //#include <chrono> // std::chrono::system_clock
 //using namespace std::chrono_literals; // 1s, 2h, ...
 #include <ctime> // std::time_t, std::strftime
@@ -20,16 +22,21 @@ namespace fs = std::filesystem;
 
 #if defined(_WIN32) || defined(_WIN64)
   #define MS_WINDOWS 1
+  #undef POSIX
+#elif defined(__unix__) || defined(__linux__)
+  #undef MS_WINDOWS
+  #define POSIX 1
 #else
   #undef MS_WINDOWS
+  #undef POSIX
 #endif
 
-#ifdef MS_WINDOWS
+#if defined(MS_WINDOWS)
   #include <Windows.h>
   //#include <unistd.h> // _stat
   #include <shellapi.h> // FindExecutableA
   #include <shlwapi.h> // AssocQueryString
-#else
+#elif defined(POSIX)
   #include <unistd.h> // unlink, exec*, fork, ...
   #include <fcntl.h> // open
   #include <sys/mman.h> // mmap, munmap
@@ -46,9 +53,9 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //---------------------------------------------------------------------------
 void sleep_ms( const int ms )
 {
-  #ifdef MS_WINDOWS
+  #if defined(MS_WINDOWS)
     ::Sleep(ms);
-  #else
+  #elif defined(POSIX)
     timespec ts;
     ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000000;
@@ -87,7 +94,7 @@ void sleep_ms( const int ms )
 }
 
 
-#ifdef MS_WINDOWS
+#if defined(MS_WINDOWS)
 //---------------------------------------------------------------------------
 // Format system error message
 [[nodiscard]] std::string get_lasterr_msg(DWORD e =0) noexcept
@@ -112,7 +119,6 @@ void sleep_ms( const int ms )
     return siz>0 ? fmt::format("[{}] {}", e, std::string(buf, siz))
                  : fmt::format("[{}] Unknown error", e);
 }
-
 
 //---------------------------------------------------------------------------
 [[nodiscard]] std::string find_executable_by_file(const std::string& doc) noexcept
@@ -140,37 +146,26 @@ void sleep_ms( const int ms )
        }
     return std::string(buf,buf_len);
 }
-#endif
-
 
 //---------------------------------------------------------------------------
-void launch(const std::string& pth, const std::string& args ="") noexcept
+void shell_execute(const char* const pth, const char* const args =nullptr) noexcept
 {
-  #ifdef MS_WINDOWS
     SHELLEXECUTEINFOA ShExecInfo = {0};
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFOA);
     ShExecInfo.fMask = 0;
     ShExecInfo.hwnd = NULL;
     ShExecInfo.lpVerb = "open";
-    ShExecInfo.lpFile = pth.c_str();
-    ShExecInfo.lpParameters = args.c_str();
+    ShExecInfo.lpFile = pth;
+    ShExecInfo.lpParameters = args;
     ShExecInfo.lpDirectory = NULL;
     ShExecInfo.nShow = SW_SHOW;
     ShExecInfo.hInstApp = NULL;
     ::ShellExecuteEx(&ShExecInfo);
-  #else
-    if( const auto pid = fork(); pid==0 )
-       {
-        execlp("/usr/bin/xdg-open", "xdg-open", pth.c_str(), args.c_str(), nullptr);
-       }
-  #endif
 }
 
-
 //---------------------------------------------------------------------------
-[[maybe_unused]] int launch_wait(const std::string& pth, const std::string& args ="")
+[[maybe_unused]] int shell_execute_wait(const char* const pth, const char* const args =nullptr)
 {
-  #ifdef MS_WINDOWS
     const bool show = true;
     const bool wait = true;
 
@@ -182,8 +177,8 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
                        | (show ? 0 : SEE_MASK_FLAG_NO_UI);
     ShExecInfo.hwnd = NULL;
     ShExecInfo.lpVerb = NULL;
-    ShExecInfo.lpFile = pth.c_str();
-    ShExecInfo.lpParameters = args.empty() ? NULL : args.c_str();
+    ShExecInfo.lpFile = pth;
+    ShExecInfo.lpParameters = args;
     ShExecInfo.lpDirectory = NULL; // base_dir.empty() ? NULL : base_dir.c_str();
     ShExecInfo.nShow = show ? SW_SHOW : SW_HIDE;
     ShExecInfo.hInstApp = NULL;
@@ -221,9 +216,57 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
        }
 
     return ret;
-  #else
-    execlp("/usr/bin/xdg-open", "xdg-open", pth.c_str(), args.c_str(), nullptr);
-    return 0;
+}
+#endif
+
+
+//---------------------------------------------------------------------------
+// Same effect as double click on a file
+void launch_file(const std::string& pth) noexcept
+{
+  #if defined(MS_WINDOWS)
+    shell_execute( pth.c_str() );
+  #elif defined(POSIX)
+    if( const auto pid = fork(); pid==0 )
+       {
+        execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
+       }
+  #endif
+}
+
+//---------------------------------------------------------------------------
+//void print_strings(std::convertible_to<std::string_view> auto&& ...s)
+//{
+//    for(const auto sv : std::initializer_list<std::string_view>{ s... }) std::cout << sv << '\n';
+//}
+
+
+//---------------------------------------------------------------------------
+//void execute(const char* const exe, std::convertible_to<std::string> auto ... args)
+template<std::convertible_to<std::string> ...Args> void execute(const char* const exe, Args&&... args)
+{
+  #if defined(MS_WINDOWS)
+    const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+    const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
+
+    //std::ostringstream os;
+    //[[maybe_unused]] int temp[] = { ((os << ' ' << std::forward<Args>(args)),0)... };
+    //const std::string joined_args = os.str();
+
+    shell_execute( exe, joined_args.c_str() );
+  #elif defined(POSIX)
+    if( const auto pid = fork(); pid==0 )
+       {
+        // Posix functions exec* work with pointers to char, so...
+        struct loc
+           {
+            static const char* c_str(const char* const s) noexcept { return s; }
+            static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
+           };
+        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+        //const char* arg_list[] = { exe, loc::c_str(std::forward<Args>(args))..., nullptr };
+        //execvp(arg_list[0], (char**) arg_list);
+       }
   #endif
 }
 
@@ -235,49 +278,49 @@ void launch(const std::string& pth, const std::string& args ="") noexcept
 //#include <sys/wait.h>
 //#include <errno.h>
 // Launch preferred application (in parallel) to open the specified file.
-// The function returns errno for (apparent) success,
-// and nonzero error code otherwise.
-// Note that error cases are visually reported by xdg-open to the user,
-// so that there is no need to provide error messages to user.
-//int open_preferred(const char *const filename)
+//int open_preferred(const char *const pth)
 //{
-//    const char *const args[3] = { "xdg-open", filename, NULL };
-//    pid_t child, p;
-//    int status;
-//
-//    if (!filename || !*filename)
+//    if (!pth || !*pth)
 //        return errno = EINVAL; // Invalid file name
 //
 //    // Fork a child process.
-//    child = fork();
+//    const pid_t child = fork();
 //    if (child == (pid_t)-1)
 //        return errno = EAGAIN; // Out of resources, or similar
 //
-//    if (!child) {
-//        // Child process. Execute.
-//        execvp(args[0], (char **)args);
-//        // Failed. Return 3, "a required too could not be found".
-//        exit(3);
-//    }
+//    if( !child )
+//       {// Child process: launch file there
+//        const char *const args[3] = { "xdg-open", pth, nullptr };
+//        const int status_code = execvp(args[0], (char **)args);
+//        if( status_code == -1 )
+//           {// Terminated Incorrectly
+//            return 1;
+//           }
+//       }
+//    else
+//       {// Parent process: Wait for child to exit
+//        pid_t p;
+//        int status;
+//        do {
+//            p = waitpid(child, &status, 0);
+//           }
+//        while(p == (pid_t)-1 && errno == EINTR);
+//        if (p != child)
+//            return errno = ECHILD; // Failed; child process vanished
 //
-//    // Parent process. Wait for child to exit.
-//    do {
-//        p = waitpid(child, &status, 0);
-//    } while (p == (pid_t)-1 && errno == EINTR);
-//    if (p != child)
-//        return errno = ECHILD; // Failed; child process vanished
+//        // Did the child process exit normally?
+//        if( !WIFEXITED(status) )
+//            return errno = ECHILD; // Child process was aborted
 //
-//    // Did the child process exit normally?
-//    if (!WIFEXITED(status))
-//        return errno = ECHILD; // Child process was aborted
-//
-//    switch (WEXITSTATUS(status)) {
-//    case 0:  return errno = 0;       // Success
-//    case 1:  return errno = EINVAL;  // Error in command line syntax
-//    case 2:  return errno = ENOENT;  // File not found
-//    case 3:  return errno = ENODEV;  // Application not found
-//    default: return errno = EAGAIN;  // Failed for other reasons.
-//    }
+//        switch( WEXITSTATUS(status) )
+//           {
+//            case 0:  return errno = 0;       // Success
+//            case 1:  return errno = EINVAL;  // Error in command line syntax
+//            case 2:  return errno = ENOENT;  // File not found
+//            case 3:  return errno = ENODEV;  // Application not found
+//            default: return errno = EAGAIN;  // Failed for other reasons
+//           }
+//       }
 //}
 
 
@@ -290,7 +333,7 @@ class MemoryMappedFile final
     explicit MemoryMappedFile( std::string&& pth )
       : i_path(pth)
        {
-      #ifdef MS_WINDOWS
+      #if defined(MS_WINDOWS)
         hFile = ::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
         if(hFile == INVALID_HANDLE_VALUE)
            {
@@ -312,7 +355,7 @@ class MemoryMappedFile final
             ::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't create view of {} ({})", i_path, get_lasterr_msg()) );
            }
-      #else
+      #elif defined(POSIX)
         const int fd = open(i_path.c_str(), O_RDONLY);
         if(fd == -1) throw std::runtime_error( fmt::format("Couldn't open {}", i_path) );
 
@@ -334,11 +377,11 @@ class MemoryMappedFile final
        {
         if(i_buf)
            {
-          #ifdef MS_WINDOWS
+          #if defined(MS_WINDOWS)
             ::UnmapViewOfFile(i_buf);
             if(hMapping) ::CloseHandle(hMapping);
             if(hFile!=INVALID_HANDLE_VALUE) ::CloseHandle(hFile);
-          #else
+          #elif defined(POSIX)
             /* const int ret = */ munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
             //if(ret==-1) std::cerr << "munmap() failed\n";
           #endif
@@ -354,14 +397,14 @@ class MemoryMappedFile final
       : i_bufsiz(other.i_bufsiz)
       , i_buf(other.i_buf)
       , i_path(std::move(other.i_path))
-    #ifdef MS_WINDOWS
+    #if defined(MS_WINDOWS)
       , hFile(other.hFile)
       , hMapping(other.hMapping)
     #endif
        {
         other.i_bufsiz = 0;
         other.i_buf = nullptr;
-      #ifdef MS_WINDOWS
+      #if defined(MS_WINDOWS)
         other.hFile = INVALID_HANDLE_VALUE;
         other.hMapping = nullptr;
       #endif
@@ -380,7 +423,7 @@ class MemoryMappedFile final
     std::size_t i_bufsiz = 0;
     const char* i_buf = nullptr;
     std::string i_path;
-  #ifdef MS_WINDOWS
+  #if defined(MS_WINDOWS)
     HANDLE hFile = INVALID_HANDLE_VALUE;
     HANDLE hMapping = nullptr;
   #endif
@@ -395,10 +438,10 @@ class file_write final
  public:
     explicit file_write(const std::string& pth)
        {
-      #ifdef MS_WINDOWS
+      #if defined(MS_WINDOWS)
         const errno_t err = fopen_s(&i_File, pth.c_str(), "wb"); // "a" for append
         if(err) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
-      #else
+      #elif defined(POSIX)
         i_File = fopen(pth.c_str(), "wb"); // "a" for append
         if(!i_File) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
       #endif
@@ -442,16 +485,16 @@ class file_write final
 void delete_file(const std::string& pth) noexcept
 {
     //std::filesystem::remove(pth);
-  #ifdef MS_WINDOWS
+  #if defined(MS_WINDOWS)
     ::DeleteFile( pth.c_str() );
-  #else
+  #elif defined(POSIX)
     unlink( pth.c_str() );
   #endif
 }
 
 
 //---------------------------------------------------------------------------
-void backup_file_same_dir(const fs::path src_pth)
+[[maybe_unused]] fs::path backup_file_same_dir(const fs::path src_pth)
 {
     fs::path dst_pth{ src_pth.parent_path() / fmt::format("~{}.~1", src_pth.filename().string()) };
     int k = 1;
@@ -460,6 +503,7 @@ void backup_file_same_dir(const fs::path src_pth)
         dst_pth.replace_extension( fmt::format(".~{}", ++k) );
        }
     std::filesystem::copy_file(src_pth, dst_pth);
+    return dst_pth;
 }
 
 

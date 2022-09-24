@@ -3,7 +3,7 @@
 //  ---------------------------------------------
 //  Launch external program winmerge
 //  ---------------------------------------------
-#include "system.hpp" // sys::find_executable(), sys::launch(), sys::expand_env_variables(), sys::file_write
+#include "system.hpp" // sys::find_executable(), sys::shell_execute(), sys::expand_env_variables(), sys::file_write
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -89,7 +89,7 @@ void compare(const std::string& pth1, const std::string& pth2, const std::string
         const std::string winmerge_exe = find_exe();
         const std::string args = pth3.empty() ? fmt::format(" /e /u \"{}\" \"{}\"", pth1, pth2)
                                               : fmt::format(" /e /u \"{}\" \"{}\" \"{}\"", pth1, pth2, pth3);
-        sys::launch(winmerge_exe, args);
+        sys::shell_execute(winmerge_exe.c_str(), args.c_str());
        }
 }
 

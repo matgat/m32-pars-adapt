@@ -108,7 +108,7 @@ class File final
            }
         catch( parse_error& e)
            {
-            sys::edit_text_file( e.file_path(), e.pos() );
+            sys::edit_text_file( e.file_path(), e.line(), e.pos() );
             throw;
            }
 
@@ -155,9 +155,12 @@ class File final
         for( const auto& line : i_lines )
            {
             if( line.assignment_ptr() && line.assignment_ptr()->is_value_modified() )
-               {// This line is an assignment with modified value
-                // I'll rebuild the assignment with the modified value
-                fw << std::string_view(line.span().data(), line.assignment_ptr()->var_name().data()-line.span().data()) // Indent
+               {// This line is an assignment with modified value, reconstructing the line
+                // Detect indentation
+                const std::ptrdiff_t indent_len = line.assignment_ptr()->var_name().data() - line.span().data();
+                assert(indent_len>=0);
+
+                fw << std::string_view(line.span().data(), static_cast<std::size_t>(indent_len))
                    << line.assignment_ptr()->var_name()
                    << " = "sv
                    << line.assignment_ptr()->value();

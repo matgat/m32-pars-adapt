@@ -269,13 +269,22 @@ int main( const int argc, const char* const argv[] )
             // First of all I'll ensure the correct machine name
             udt_file.modify_value("vaMachName", str::quoted(args.job().machine_type().string()));
 
-
-            fs::path tmp_udt_pth{ args.job().target_file().path().parent_path() / fmt::format("~{}.tmp", args.job().target_file().path().filename().string()) };
+            const fs::path tmp_udt_pth{ args.job().target_file().path().parent_path() / fmt::format("~{}.tmp", args.job().target_file().path().filename().string()) };
             udt_file.write( tmp_udt_pth );
-            sys::compare(args.job().target_file().path().string(), tmp_udt_pth.string());
-            sys::sleep_ms(1500);
-            sys::delete_file( tmp_udt_pth.string() );
-            fmt::print("UDT file: {}\n", udt_file.info());
+
+            if( args.quiet() )
+               {
+                sys::backup_file_same_dir( args.job().target_file().path() );
+                fs::remove( args.job().target_file().path() );
+                fs::rename( tmp_udt_pth, args.job().target_file().path() );
+               }
+            else
+               {
+                sys::compare(args.job().target_file().path().string().c_str(), tmp_udt_pth.string().c_str());
+                sys::sleep_ms(1500);
+                sys::delete_file( tmp_udt_pth.string() );
+                fmt::print("UDT file: {}\n", udt_file.info());
+               }
            }
 
         else if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )

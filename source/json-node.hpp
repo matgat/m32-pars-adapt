@@ -83,8 +83,7 @@ class Node final
 
     //-----------------------------------------------------------------------
     // Access childs
-    //template<typename... Args> const Node& get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
-    template<std::same_as<key_type>... Args> const Node& get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
+    template<std::same_as<key_type>... Args> const Node* get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
        {
         if( const auto it_child = i_childs.find(childname); it_child!=i_childs.end() )
             {
@@ -94,10 +93,10 @@ class Node final
                }
             else
                {
-                return it_child->second;
+                return &(it_child->second);
                }
             }
-        return empty_node;
+        return nullptr;
        }
 
     //-----------------------------------------------------------------------
@@ -208,10 +207,8 @@ class Node final
  private:
     childs_type i_childs;
     value_type i_value;
-    static const Node empty_node;
 };
 
-inline const Node Node::empty_node;
 
 
 #ifndef NDEBUG

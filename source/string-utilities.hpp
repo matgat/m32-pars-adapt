@@ -48,7 +48,7 @@ inline std::string_view unquoted(const std::string_view s) noexcept
 {
     auto i_first = s.cbegin();
     while(i_first!=s.cend() && std::isspace(*i_first)) ++i_first;
-    if( *i_first=='\"' )
+    if( i_first!=s.cend() && *i_first=='\"' )
        {
         auto i_last = s.cend()-1;
         while(i_last>i_first && std::isspace(*i_last)) --i_last;

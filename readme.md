@@ -31,10 +31,11 @@ To valorize a Sipro parameter file:
 ```
 
 Normally no file will be overwritten: the program will create a temporary
-file that will be automatically deleted after invoking the utility *WinMerge*.
+file that will be automatically deleted after a manual merge.
 
-When the option `--quiet` is used the manual merge will be skipped and
-the file will be overwritten after performing a backup in the same directory.
+Alternatively, when the option `--quiet` is used, the file will be
+overwritten after performing a backup in the same directory of the
+original file.
 
 
 

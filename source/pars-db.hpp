@@ -29,7 +29,7 @@ class ParsDB final
            }
         catch( parse_error& e)
            {
-            sys::edit_text_file( e.file_path(), e.pos() );
+            sys::edit_text_file( e.file_path(), e.line(), e.pos() );
             throw;
            }
 
