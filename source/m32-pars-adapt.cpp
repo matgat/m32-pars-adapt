@@ -13,6 +13,7 @@
 
 #include "text-files-tools.hpp" // sys::edit_text_file, sys::compare
 #include "machine-type.hpp" // macotec::MachineType
+#include "extract-db.hpp" // macotec::extract_db
 #include "pars-db.hpp" // ParsDB
 #include "udt-file.hpp" // udt::File
 
@@ -247,8 +248,12 @@ int main( const int argc, const char* const argv[] )
 
             // [Machine type]
             // If machine type is not given, I'll try to extract it from the udt file
-            if( !args.job().machine_type() )
-               {
+            if( args.job().machine_type() )
+               {// Ensure to set the specified machine type in the file
+                udt_file.modify_value_if_present("vaMachName", str::quoted(args.job().machine_type().string()));
+               }
+            else
+               {// Extract machine type from udt file
                 const std::string_view s = str::unquoted( udt_file.get_value_of("vaMachName") );
                 args.modify_job().set_machine_type(s);
                }
@@ -256,8 +261,10 @@ int main( const int argc, const char* const argv[] )
             // [Parameters DB]
             ParsDB pars_db;
             pars_db.parse( args.job().db_file().path(), issues );
+            // Extract the pertinent data for this machine
+            const auto mach_db = macotec::extract_db(pars_db.root(), args.job().machine_type(), issues);
 
-            // Summarize the job
+            // [Summarize the job]
             if( args.verbose() )
                {
                 fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
@@ -266,11 +273,34 @@ int main( const int argc, const char* const argv[] )
                 //pars_db.print();
                }
 
-            // First of all I'll ensure the correct machine name
-            udt_file.modify_value("vaMachName", str::quoted(args.job().machine_type().string()));
+            // Overwrite values from database
+            for( const auto group : mach_db )
+               {
+                for( const auto& [nam, node] : group.get().childs() )
+                   {
+                    if( !node.has_value() )
+                       {
+                        issues.push_back( fmt::format("Node {} hasn't a value", nam) );
+                       }
+                    //fmt::print("{}={}\n",nam,node.value());
+
+                    if( const auto field = udt_file.get_field(nam) )
+                       {
+                        field->modify_value(node.value());
+                       }
+                    else
+                       {
+                        udt_file.add_issue( fmt::format("Not found: {}={}",nam,node.value()) );
+                       }
+                   }
+               }
 
             const fs::path tmp_udt_pth{ args.job().target_file().path().parent_path() / fmt::format("~{}.tmp", args.job().target_file().path().filename().string()) };
             udt_file.write( tmp_udt_pth );
+            if( args.verbose() )
+               {
+                fmt::print("UDT file: {}\n", udt_file.info());
+               }
 
             if( args.quiet() )
                {
@@ -282,8 +312,7 @@ int main( const int argc, const char* const argv[] )
                {
                 sys::compare(args.job().target_file().path().string().c_str(), tmp_udt_pth.string().c_str());
                 sys::sleep_ms(1500);
-                sys::delete_file( tmp_udt_pth.string() );
-                fmt::print("UDT file: {}\n", udt_file.info());
+                fs::remove( tmp_udt_pth );
                }
            }
 
@@ -322,6 +351,12 @@ int main( const int argc, const char* const argv[] )
        {
         fmt::print("!! {}\n", e.what());
         Arguments::print_usage();
+       }
+
+    catch( parse_error& e)
+       {
+        fmt::print("!! {}\n", e.what());
+        sys::edit_text_file( e.file_path(), e.line(), e.pos() );
        }
 
     catch( std::exception& e )

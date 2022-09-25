@@ -8,7 +8,7 @@
 #include <fmt/ranges.h> // To print std::vector
 
 #include "basic-parser.hpp" // BasicParser
-#include "json-node.hpp" // json::node
+#include "json-node.hpp" // json::Node
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,7 +25,7 @@ class Parser final : public BasicParser
 
 
     //-----------------------------------------------------------------------
-    void collect_childs_of(Node& node, const int nest_lvl =0, const std::size_t line_start =1)
+    void collect_childs_of(Node& n_parent, const int nest_lvl =0, const std::size_t line_start =1)
        {
         //EVTLOG("collect_node: offset:{} char:{}", i, buf[i])
         // Skip comments
@@ -72,15 +72,25 @@ class Parser final : public BasicParser
                 else if( buf[i]=='{' )
                    {// Collect subchilds
                     ++i; // Skip '{'
-                    Node n;
-                    collect_childs_of(n, nest_lvl+1, line);
-                    //D2LOG("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n.direct_childs_count(), fmt::join(keys, ", "))
 
-                    // Copy retrieved subchilds to all childs
-                    for( const auto& key : keys )
+                    if( keys.size()>1 )
+                       {// I'll ensure a child for each key
+                        Node n_tmp; // An empty bag to collect just this block
+                        collect_childs_of(n_tmp, nest_lvl+1, line);
+                        //D2LOG("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), fmt::join(keys, ", "))
+
+                        // Copy retrieved subchilds to all childs
+                        for( const auto& key : keys )
+                           {
+                            Node& n_child = n_parent.ensure_child( key );
+                            n_child.insert_childs_of(n_tmp);
+                           }
+                       }
+                    else
                        {
-                        Node& child = node.ensure_child( key );
-                        child.merge_childs(n);
+                        Node& child = n_parent.ensure_child( keys.front() );
+                        collect_childs_of(child, nest_lvl+1, line);
+                        //D2LOG("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), keys.front())
                        }
                    }
                 else
@@ -89,7 +99,7 @@ class Parser final : public BasicParser
                        {
                         throw create_parse_error("A value cannot have multiple keys");
                        }
-                    Node& child = node.ensure_child( keys.front() );
+                    Node& child = n_parent.ensure_child( keys.front() );
                     child.set_value( extract_value() );
                     //D2LOG("{}[{}] Assigned {} = {}\n", std::string(nest_lvl,'\t'), line, keys.front(), child.value())
                    }
@@ -166,7 +176,7 @@ class Parser final : public BasicParser
                 ++i; // Skip final "
                 return std::string_view(buf+i_start, i-i_start-1);
                }
-            else if( buf[i]=='\n' || (std::ispunct(buf[i]) && buf[i]!='.') )
+            else if( buf[i]=='\n' || is_json_char(buf[i]) )
                {
                 break;
                }

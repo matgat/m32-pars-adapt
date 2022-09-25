@@ -101,7 +101,7 @@ class BasicParser
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] bool end_not_reached() const noexcept { return i<siz; }
+    [[nodiscard]] bool has_data() const noexcept { return i<siz; }
     [[nodiscard]] std::size_t curr_line() const noexcept { return line; }
     [[nodiscard]] std::size_t curr_pos() const noexcept { return i; }
 

@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <fmt/core.h> // fmt::format
 
-#include "system.hpp" // sys::MemoryMappedFile, sys::edit_text_file, sys::file_write
+#include "system.hpp" // sys::MemoryMappedFile, sys::file_write
 #include "sipro-parser.hpp" // sipro::Parser
 
 
@@ -71,45 +71,39 @@ class File final
       : file_buf{pth.string()}
        {
         std::vector<std::string> parse_issues;
-        try{
-            sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
 
-            while( parser.end_not_reached() )
-               {
-                const sipro::Line line = parser.next_line();
-                Assignment* asgnm_ptr = nullptr;
+        sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
 
-                if( parser.is_inside_note_block() )
-                   {// Ignoring notes
-                   }
-                else if( line.tag() )
-                   {// Ignoring tags
-                   }
-                else if( line.assignment() )
-                   {// Collect assignment
-                    if( line.assignment().added_label().empty() )
-                       {
-                        issues.push_back( fmt::format("Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
-                       }
-                    else if( i_assignments.contains(line.assignment().added_label()) )
-                       {
-                        issues.push_back( fmt::format("Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()) );
-                       }
-                    else
-                       {
-                        // Populate the map of assignments
-                        const auto ins = i_assignments.try_emplace(line.assignment().added_label(), line.assignment(), i_lines.size());
-                        asgnm_ptr = &(ins.first->second); // Pointer to the constructed assignment to be asosciated with the collected line
-                       }
-                   }
-
-                i_lines.emplace_back( line.span(), asgnm_ptr );
-               }
-           }
-        catch( parse_error& e)
+        while( parser.has_data() )
            {
-            sys::edit_text_file( e.file_path(), e.line(), e.pos() );
-            throw;
+            const sipro::Line line = parser.next_line();
+            Assignment* asgnm_ptr = nullptr;
+
+            if( parser.is_inside_note_block() )
+               {// Ignoring notes
+               }
+            else if( line.tag() )
+               {// Ignoring tags
+               }
+            else if( line.assignment() )
+               {// Collect assignment
+                if( line.assignment().added_label().empty() )
+                   {
+                    issues.push_back( fmt::format("UDT: Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
+                   }
+                else if( i_assignments.contains(line.assignment().added_label()) )
+                   {
+                    issues.push_back( fmt::format("UDT: Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()) );
+                   }
+                else
+                   {
+                    // Populate the map of assignments
+                    const auto ins = i_assignments.try_emplace(line.assignment().added_label(), line.assignment(), i_lines.size());
+                    asgnm_ptr = &(ins.first->second); // Pointer to the constructed assignment to be associated with the collected line
+                   }
+               }
+
+            i_lines.emplace_back( line.span(), asgnm_ptr );
            }
 
         // Append parsing issues to overall issues list
@@ -124,25 +118,29 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] auto get_value_of(const std::string_view varlbl) const
+    [[nodiscard]] Assignment* get_field(const std::string_view varlbl)
        {
-        const auto it = i_assignments.find(varlbl);
-        if( it==i_assignments.end() )
+        if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
            {
-            throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
+            return &(it->second);
            }
-        return it->second.value();
+        return nullptr;
        }
 
     //-----------------------------------------------------------------------
-    void modify_value(const std::string_view varlbl, const std::string& new_val)
+    [[nodiscard]] std::string_view get_value_of(const std::string_view varlbl) const
        {
-        const auto it = i_assignments.find(varlbl);
-        if( it==i_assignments.end() )
+        if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
            {
-            throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
+            return it->second.value();
            }
-        else
+        throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
+       }
+
+    //-----------------------------------------------------------------------
+    void modify_value_if_present(const std::string_view varlbl, const std::string& new_val) noexcept
+       {
+        if( const auto it = i_assignments.find(varlbl); it!=i_assignments.end() )
            {
             it->second.modify_value(new_val);
            }
@@ -184,9 +182,15 @@ class File final
                 fw << '\n';
                }
             else
-               {// Write line as it was
+               {// Write original unmodified line
                 fw << line.span();
                }
+           }
+
+        // Append issues
+        for( const auto& issue : i_issues )
+           {
+            fw << "# "sv << issue << '\n';
            }
        }
 
@@ -203,11 +207,18 @@ class File final
 
     [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} assignments ({} modified)", i_lines.size(), i_assignments.size(), modified_values_count()); }
 
+    //-----------------------------------------------------------------------
+    void add_issue(std::string&& issue)
+       {
+        i_issues.emplace_back(issue);
+       }
+
 
  private:
     const sys::MemoryMappedFile file_buf; // File buffer
     std::vector<Line> i_lines; // Collected lines
     std::map<std::string_view,Assignment> i_assignments; // Assignments (name = value)
+    std::vector<std::string> i_issues; // Notified problems
 };
 
 

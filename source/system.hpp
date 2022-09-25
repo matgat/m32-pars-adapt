@@ -243,7 +243,7 @@ void launch_file(const std::string& pth) noexcept
 
 //---------------------------------------------------------------------------
 //void execute(const char* const exe, std::convertible_to<std::string> auto ... args)
-template<std::convertible_to<std::string> ...Args> void execute(const char* const exe, Args&&... args)
+template<std::convertible_to<std::string> ...Args> void execute(const char* const exe, Args&&... args) noexcept
 {
   #if defined(MS_WINDOWS)
     const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
@@ -255,8 +255,9 @@ template<std::convertible_to<std::string> ...Args> void execute(const char* cons
 
     shell_execute( exe, joined_args.c_str() );
   #elif defined(POSIX)
-    if( const auto pid = fork(); pid==0 )
-       {
+    const auto pid_child = fork(); // pid_t
+    if( pid_child==0 )
+       {// Inside child process
         // Posix functions exec* work with pointers to char, so...
         struct loc
            {
@@ -267,62 +268,21 @@ template<std::convertible_to<std::string> ...Args> void execute(const char* cons
         //const char* arg_list[] = { exe, loc::c_str(std::forward<Args>(args))..., nullptr };
         //execvp(arg_list[0], (char**) arg_list);
        }
+    //else if( pid_child == -1 )
+    //   {// Failed
+    //   }
+    //else
+    //   {// Inside parent process: wait child?
+    //    pid_t pid;
+    //    do {
+    //        int status;
+    //        pid = waitpid(pid_child, &status, 0);
+    //       }
+    //    while(pid==-1 && errno==EINTR);
+    //    //if(pid != pid_child) // Failed: Child process vanished
+    //   }
   #endif
 }
-
-
-
-//#include <stdlib.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/wait.h>
-//#include <errno.h>
-// Launch preferred application (in parallel) to open the specified file.
-//int open_preferred(const char *const pth)
-//{
-//    if (!pth || !*pth)
-//        return errno = EINVAL; // Invalid file name
-//
-//    // Fork a child process.
-//    const pid_t child = fork();
-//    if (child == (pid_t)-1)
-//        return errno = EAGAIN; // Out of resources, or similar
-//
-//    if( !child )
-//       {// Child process: launch file there
-//        const char *const args[3] = { "xdg-open", pth, nullptr };
-//        const int status_code = execvp(args[0], (char **)args);
-//        if( status_code == -1 )
-//           {// Terminated Incorrectly
-//            return 1;
-//           }
-//       }
-//    else
-//       {// Parent process: Wait for child to exit
-//        pid_t p;
-//        int status;
-//        do {
-//            p = waitpid(child, &status, 0);
-//           }
-//        while(p == (pid_t)-1 && errno == EINTR);
-//        if (p != child)
-//            return errno = ECHILD; // Failed; child process vanished
-//
-//        // Did the child process exit normally?
-//        if( !WIFEXITED(status) )
-//            return errno = ECHILD; // Child process was aborted
-//
-//        switch( WEXITSTATUS(status) )
-//           {
-//            case 0:  return errno = 0;       // Success
-//            case 1:  return errno = EINVAL;  // Error in command line syntax
-//            case 2:  return errno = ENOENT;  // File not found
-//            case 3:  return errno = ENODEV;  // Application not found
-//            default: return errno = EAGAIN;  // Failed for other reasons
-//           }
-//       }
-//}
-
 
 
 

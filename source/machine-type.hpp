@@ -13,6 +13,7 @@
 
 using namespace std::literals; // "..."sv
 
+
   #if !defined(__cpp_lib_to_underlying)
     template<typename E> constexpr auto to_underlying(const E e) noexcept
        {
@@ -21,6 +22,7 @@ using namespace std::literals; // "..."sv
   #else
     using std::to_underlying;
   #endif
+
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -73,10 +75,10 @@ class MachineType final
     enum class cutbridgedim : std::uint8_t
        {
         undefined=0,
-        c37, // ⎫ StratoS
+        c37, // ⎫ S
         c46, // ⎭
         c40, // ⎫
-        c49, // ⎬ StratoW
+        c49, // ⎬ W/WR/HP
         c60, // ⎭
         size
        };
@@ -96,8 +98,8 @@ class MachineType final
     enum class aligndim : std::uint8_t
        {
         undefined=0,
-        a32, // StratoS/W
-        a46, // StratoW
+        a32, // S/W/WR/HP
+        a46, // W/WR/HP
         size
        };
 
@@ -155,6 +157,7 @@ class MachineType final
     cutbridgedim i_cutbridgedim = cutbridgedim::undefined;
     aligndim i_algndim = aligndim::undefined;
 
+    //------------------------------------------------------------------------
     static MachineType recognize_machine(const std::string_view s)
        {// From strings like "StratoWR-4.9/4.6"
         // La stringa identificativa è composta da un prefisso
@@ -162,18 +165,66 @@ class MachineType final
         // una o più dimensioni.
         MachineType mach;
 
+        class parser_t
+           {
+            public:
+                parser_t(const std::string_view s) noexcept : buf(s) {}
+
+                [[nodiscard]] bool has_data() noexcept { return i<buf.size(); }
+                void skip_nondigits() noexcept { while( i<buf.size() && !std::isdigit(buf[i]) ) ++i; }
+
+                //-----------------------------------------------------------------------
+                // Extract first identifier
+                [[nodiscard]] std::string_view extract_first_id() noexcept
+                   {
+                    while( i<buf.size() && !std::isalpha(buf[i]) ) ++i; // Skip possible initial garbage
+                    const std::size_t i_start = i;
+                    do { ++i; } while( i<buf.size() && std::isalpha(buf[i]) );
+                    return std::string_view(buf.data()+i_start, i-i_start);
+                   }
+
+                //-----------------------------------------------------------------------
+                // Extract a simple (base10, no sign, no exponent) floating point number
+                [[nodiscard]] double extract_num() noexcept
+                   {
+                    //assert( i<buf.size() && std::isdigit(buf[i]) );
+
+                    // integral part
+                    double mantissa = 0;
+                    do {
+                        mantissa = (10.0 * mantissa) + static_cast<double>(buf[i] - '0');
+                        ++i;
+                       }
+                    while( i<buf.size() && std::isdigit(buf[i]) );
+
+                    // fractional part
+                    if( i<buf.size() && buf[i]=='.' )
+                       {
+                        ++i;
+                        double k = 0.1; // shift of decimal part
+                        while( i<buf.size() && std::isdigit(buf[i]) )
+                           {
+                            mantissa += k * static_cast<double>(buf[i] - '0');
+                            k *= 0.1;
+                            ++i;
+                           }
+                       }
+                    return mantissa;
+                   }
+
+            private:
+                const std::string_view buf;
+                std::size_t i = 0;
+           } parser(s);
+
         // Machine type
-        std::size_t i = 0;
-        while( i<s.size() && !std::isalpha(s[i]) ) ++i;
-        std::size_t i_start = i;
-        while( i<s.size() && !std::ispunct(s[i]) ) ++i;
-        mach.i_type = recognize_machine_type( std::string_view(s.data()+i_start, i-i_start) );
+        mach.i_type = recognize_machine_type( parser.extract_first_id() );
 
         // Possible given first dimension (cut bridge in case of strato machines)
-        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
-        if( i<s.size() )
+        parser.skip_nondigits();
+        if( parser.has_data() )
            {
-            const double dim = extract_num(s, i);
+            const double dim = parser.extract_num();
             if( mach.is_strato() )
                {
                 mach.i_cutbridgedim = recognize_strato_cutbridge_dim( mach, dim );
@@ -181,10 +232,10 @@ class MachineType final
            }
 
         // Possible given second dimension (align max in case of strato machines)
-        while( i<s.size() && !std::isdigit(s[i]) ) ++i;
-        if( i<s.size() )
+        parser.skip_nondigits();
+        if( parser.has_data() )
            {
-            const double dim = extract_num(s, i);
+            const double dim = parser.extract_num();
             if( mach.is_strato() )
                {
                 mach.i_algndim = recognize_strato_align_dim( dim );
@@ -246,35 +297,6 @@ class MachineType final
         if( matches(3.2) ) return aligndim::a32;
         else if( matches(4.6) ) return aligndim::a46;
         throw std::runtime_error( fmt::format("Unrecognized align size: {}",dim) );
-       }
-
-    //-----------------------------------------------------------------------
-    // Extract a simple (base10, no sign, no exponent) floating point number
-    [[nodiscard]] static double extract_num(const std::string_view s, std::size_t& i) noexcept
-       {
-        //assert( i<s.size() && std::isdigit(s[i]) );
-
-        // integral part
-        double mantissa = 0;
-        do {
-            mantissa = (10.0 * mantissa) + static_cast<double>(s[i] - '0');
-            ++i;
-           }
-        while( i<s.size() && std::isdigit(s[i]) );
-
-        // fractional part
-        if( i<s.size() && s[i]=='.' )
-           {
-            ++i;
-            double k = 0.1; // shift of decimal part
-            while( i<s.size() && std::isdigit(s[i]) )
-               {
-                mantissa += k * static_cast<double>(s[i] - '0');
-                k *= 0.1;
-                ++i;
-               }
-           }
-        return mantissa;
        }
 };
 

@@ -6,8 +6,9 @@
 #include <string>
 #include <string_view>
 #include <map>
+#include <functional> // std::less
 #include <iterator> // std::prev
-#include <concepts> // std::same_as
+#include <concepts> // std::convertible_to
 #include <fmt/core.h> // fmt::format, fmt::print
 
 
@@ -22,17 +23,17 @@ class Node final
  public:
     using value_type = std::string;
     using key_type = std::string;
-    using childs_type = std::map<key_type,Node>;
+    using childs_type = std::map<key_type,Node,std::less<>>; // transparent comparator to enable query with string_view also
 
 
     //-----------------------------------------------------------------------
     void set_value(const std::string_view newval)
        {
-        if( !i_childs.empty() )
+        if( !is_leaf())
            {
             throw std::runtime_error( fmt::format("Cannot assign value \"{}\" to a parent node", newval) );
            }
-        if( !i_value.empty() )
+        if( has_value() )
            {
             throw std::runtime_error( fmt::format("Cannot overwrite value \"{}\" on already existing \"{}\"", newval, i_value) );
            }
@@ -40,22 +41,32 @@ class Node final
        }
 
     //-----------------------------------------------------------------------
-    const value_type& value() const noexcept
+    [[nodiscard]] const value_type& value() const noexcept
        {
+        //if( !has_value() )
+        //   {
+        //    throw std::runtime_error("No value available") );
+        //   }
         return i_value;
        }
 
     //-----------------------------------------------------------------------
-    bool has_value() const noexcept
+    [[nodiscard]] bool has_value() const noexcept
        {
         return !i_value.empty();
        }
 
 
     //-----------------------------------------------------------------------
-    bool is_leaf() const noexcept
+    [[nodiscard]] bool is_leaf() const noexcept
        {
         return i_childs.empty();
+       }
+
+    //-----------------------------------------------------------------------
+    [[nodiscard]] const auto& childs() const noexcept
+       {
+        return i_childs;
        }
 
     //-----------------------------------------------------------------------
@@ -82,14 +93,15 @@ class Node final
     //   }
 
     //-----------------------------------------------------------------------
-    // Access childs
-    template<std::same_as<key_type>... Args> const Node* get_descendant(key_type&& childname, Args&&... subchilds) const noexcept
+    // Query child/descendant presence, returns nullptr if not found
+    template<std::convertible_to<std::string_view> T, std::convertible_to<std::string_view>... Args>
+    [[nodiscard]] const Node* get_child(T&& childname, Args&&... subchilds) const noexcept
        {
         if( const auto it_child = i_childs.find(childname); it_child!=i_childs.end() )
             {
             if constexpr( sizeof...(subchilds) > 0 )
                {
-                return it_child->second.get_descendant(std::forward<Args>(subchilds)...);
+                return it_child->second.get_child(std::forward<Args>(subchilds)...);
                }
             else
                {
@@ -100,7 +112,7 @@ class Node final
        }
 
     //-----------------------------------------------------------------------
-    void merge_childs(const Node& other)
+    void insert_childs_of(const Node& other)
        {
         if( has_value() )
            {
@@ -120,19 +132,19 @@ class Node final
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::size_t direct_childs_count() const noexcept
+    [[nodiscard]] std::size_t childs_count() const noexcept
        {
         return i_childs.size();
        }
 
 
     //-----------------------------------------------------------------------
-    //[[nodiscard]] std::size_t overall_childs_count() const noexcept
+    //[[nodiscard]] std::size_t descendants_count() const noexcept
     //   {
     //    std::size_t n = 0;
     //    for( const auto& pair : i_childs )
     //       {
-    //        n += 1 + pair.second.overall_childs_count();
+    //        n += 1 + pair.second.descendants_count();
     //       }
     //    return n;
     //   }
