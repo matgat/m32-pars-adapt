@@ -243,17 +243,21 @@ void launch_file(const std::string& pth) noexcept
 
 //---------------------------------------------------------------------------
 //void execute(const char* const exe, std::convertible_to<std::string> auto ... args)
-template<std::convertible_to<std::string> ...Args> void execute(const char* const exe, Args&&... args) noexcept
+template<std::convertible_to<std::string> ...Args>
+void execute(const char* const exe, Args&&... args) noexcept
 {
   #if defined(MS_WINDOWS)
-    const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
-    const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
+    try{
+        const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+        const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
 
-    //std::ostringstream os;
-    //[[maybe_unused]] int temp[] = { ((os << ' ' << std::forward<Args>(args)),0)... };
-    //const std::string joined_args = os.str();
+        //std::ostringstream os;
+        //[[maybe_unused]] int temp[] = { ((os << ' ' << std::forward<Args>(args)),0)... };
+        //const std::string joined_args = os.str();
 
-    shell_execute( exe, joined_args.c_str() );
+        shell_execute( exe, joined_args.c_str() );
+       }
+    catch(...){}
   #elif defined(POSIX)
     const auto pid_child = fork(); // pid_t
     if( pid_child==0 )
@@ -442,15 +446,15 @@ class file_write final
 
 
 //---------------------------------------------------------------------------
-void delete_file(const std::string& pth) noexcept
-{
-    //std::filesystem::remove(pth);
-  #if defined(MS_WINDOWS)
-    ::DeleteFile( pth.c_str() );
-  #elif defined(POSIX)
-    unlink( pth.c_str() );
-  #endif
-}
+//void delete_file(const std::string& pth) noexcept
+//{
+//    //std::filesystem::remove(pth);
+//  #if defined(MS_WINDOWS)
+//    ::DeleteFile( pth.c_str() );
+//  #elif defined(POSIX)
+//    unlink( pth.c_str() );
+//  #endif
+//}
 
 
 //---------------------------------------------------------------------------

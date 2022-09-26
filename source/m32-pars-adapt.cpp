@@ -33,7 +33,8 @@ class JobUnit final
                 unknown=0, // !Consecutive indexes!
                 udt, // MachSettings.udt, ParDefaults.udt
                 parax, // par2kax.txt
-                txt // generic text (could be a json db or a generic sirpo parameter file)
+                //par, // Sipro parameter file (par2k*.txt)
+                txt // generic text (could be a json db or a sipro parameter file)
                };
 
         public:
@@ -52,9 +53,10 @@ class JobUnit final
                 // Recognize the file type
                 const std::string fnam{ str::tolower(i_path.filename().string()) };
                 const std::string ext{ str::tolower(i_path.extension().string()) };
-                     if( ext == ".udt" ) i_type = file_type::udt;
-                else if( fnam == "par2kax.txt" ) i_type = file_type::parax;
-                else if( ext == ".txt" ) i_type = file_type::txt;
+                     if( ext==".udt" ) i_type = file_type::udt;
+                else if( fnam.starts_with("par2kax") ) i_type = file_type::parax;
+                //else if( fnam.starts_with("par2k") && ext==".txt" ) i_type = file_type::par;
+                else if( ext==".txt" ) i_type = file_type::txt;
                 else throw std::invalid_argument( fmt::format("Unrecognized file: {}",s) );
                }
 
@@ -240,10 +242,11 @@ int main( const int argc, const char* const argv[] )
            }
 
         // Recognize cases
+        //====================================================================
         if( args.job().target_file().is_udt() && args.job().db_file().is_txt() )
            {// Adapting an udt file given overlays database and machine type
 
-            // [Target file]
+            // [The UDT file to adapt]
             udt::File udt_file(args.job().target_file().path(), issues);
 
             // [Machine type]
@@ -299,33 +302,77 @@ int main( const int argc, const char* const argv[] )
             udt_file.write( tmp_udt_pth );
             if( args.verbose() )
                {
-                fmt::print("UDT file: {}\n", udt_file.info());
+                fmt::print("  .Modified {} values, {} issues\n", udt_file.modified_values_count(), udt_file.issues_count());
                }
 
             if( args.quiet() )
-               {
+               {// No user intervention
                 sys::backup_file_same_dir( args.job().target_file().path() );
                 fs::remove( args.job().target_file().path() );
                 fs::rename( tmp_udt_pth, args.job().target_file().path() );
                }
             else
-               {
-                sys::compare(args.job().target_file().path().string().c_str(), tmp_udt_pth.string().c_str());
-                sys::sleep_ms(1500);
+               {// Manual merge
+                sys::compare(tmp_udt_pth.string().c_str(), args.job().target_file().path().string().c_str());
+                sys::sleep_ms(2000);
                 fs::remove( tmp_udt_pth );
                }
            }
 
+        //====================================================================
         else if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )
            {// Updating an old udt file (db) to a newer one (target)
+
+            // [Machine type]
+            // The machine type shouldn't be explicitly given
             if( args.job().machine_type() )
                {
-                issues.push_back( fmt::format("Ignoring provided machine type: {}", args.job().machine_type().string()) );
+                throw std::invalid_argument( "Machine type shouldn't be specified for an UDT update" );
+               }
+
+            // [The template UDT file (newest)]
+            udt::File new_udt_file(args.job().target_file().path(), issues);
+
+            // [The original UDT file to upgrade (oldest)]
+            udt::File old_udt_file(args.job().db_file().path(), issues);
+
+            // [Summarize the job]
+            if( args.verbose() )
+               {
+                fmt::print("Upgrading {} using {}\n", old_udt_file.path(), new_udt_file.path());
+                fmt::print("  .Old UDT: {}\n", old_udt_file.info());
+                fmt::print("  .New UDT: {}\n", new_udt_file.info());
+               }
+
+            // Overwrite values in newest file using the old as database
+            new_udt_file.overwrite_values_from( old_udt_file );
+
+            const fs::path tmp_udt_pth{ args.job().db_file().path().parent_path() / fmt::format("~{}.tmp", args.job().db_file().path().filename().string()) };
+            new_udt_file.write( tmp_udt_pth );
+            if( args.verbose() )
+               {
+                fmt::print("  .Modified {} values, {} issues\n", new_udt_file.modified_values_count(), new_udt_file.issues_count());
+               }
+
+            if( args.quiet() )
+               {// No user intervention
+                sys::backup_file_same_dir( args.job().db_file().path() );
+                fs::remove( args.job().db_file().path() );
+                fs::rename( tmp_udt_pth, args.job().db_file().path() );
+               }
+            else
+               {// Manual merge
+                sys::compare( args.job().target_file().path().string().c_str(),
+                              tmp_udt_pth.string().c_str(),
+                              args.job().db_file().path().string().c_str() );
+                sys::sleep_ms(2000);
+                fs::remove( tmp_udt_pth );
                }
            }
 
+        //====================================================================
         //else if( args.job().target_file().is_parax() && args.job().db_file().is_txt() )
-        //   {// Adapting a pa2kax.txt file given overlays database and machine type
+        //   {// Adapting a par2kax.txt file given overlays database and machine type
         //   }
 
         else

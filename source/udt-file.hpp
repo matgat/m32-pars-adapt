@@ -39,7 +39,7 @@ class File final
 
         [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
         [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
-        void modify_value(const std::string& new_val) { i_NewVal = new_val; }
+        void modify_value(const std::string_view new_val) { i_NewVal = new_val; }
 
         [[nodiscard]] std::size_t line_index() const noexcept { return i_LineIdx; }
 
@@ -147,6 +147,28 @@ class File final
        }
 
     //-----------------------------------------------------------------------
+    void overwrite_values_from(const File& other) noexcept
+       {
+        for( const auto& [varlbl, ass] : other.i_assignments )
+           {
+            if( varlbl == "vqMachSettingsVer"sv )
+               {// Skipping
+               }
+            else if( const auto field = get_field(varlbl) )
+               {
+                field->modify_value(ass.value());
+               }
+            else
+               {
+                // Potrei cercare di rilevare rinominazioni delle label
+                // controllando la corrispondenza ass.var_name(), ass.comment()
+                // Anche con str::calc_similarity
+                add_issue( fmt::format("Not found: {}",varlbl) );
+               }
+           }
+       }
+
+    //-----------------------------------------------------------------------
     void write(const fs::path outpth)
        {
         sys::file_write fw( outpth.string() );
@@ -198,21 +220,19 @@ class File final
     [[nodiscard]] std::size_t modified_values_count() const noexcept
        {
         std::size_t count = 0;
-        for( const auto& [key, ass] : i_assignments )
+        for( const auto& [varlbl, ass] : i_assignments )
            {
             if( ass.is_value_modified() ) ++count;
            }
         return count;
        }
 
-    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} assignments ({} modified)", i_lines.size(), i_assignments.size(), modified_values_count()); }
+    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} assignments", i_lines.size(), i_assignments.size()); }
+    [[nodiscard]] const std::string& path() const noexcept { return file_buf.path(); }
 
     //-----------------------------------------------------------------------
-    void add_issue(std::string&& issue)
-       {
-        i_issues.emplace_back(issue);
-       }
-
+    void add_issue(std::string&& issue) { i_issues.emplace_back(issue); }
+    [[nodiscard]] std::size_t issues_count() const noexcept { return i_issues.size(); }
 
  private:
     const sys::MemoryMappedFile file_buf; // File buffer
