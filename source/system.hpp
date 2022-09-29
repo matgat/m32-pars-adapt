@@ -242,20 +242,24 @@ void launch_file(const std::string& pth) noexcept
 
 
 //---------------------------------------------------------------------------
-//void execute(const char* const exe, std::convertible_to<std::string> auto ... args)
 template<std::convertible_to<std::string> ...Args>
 void execute(const char* const exe, Args&&... args) noexcept
 {
   #if defined(MS_WINDOWS)
     try{
-        const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
-        const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
+        //const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+        //const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
 
-        //std::ostringstream os;
-        //[[maybe_unused]] int temp[] = { ((os << ' ' << std::forward<Args>(args)),0)... };
-        //const std::string joined_args = os.str();
+        auto join_args = [... args = std::forward<Args>(args)]() -> std::string
+           {
+            std::string s;
+            const std::size_t totsiz = sizeof...(args) + (std::size(args) + ...);
+            s.reserve(totsiz);
+            ((s+=' ', s+=args), ...);
+            return s;
+           };
 
-        shell_execute( exe, joined_args.c_str() );
+        shell_execute( exe, join_args().c_str() );
        }
     catch(...){}
   #elif defined(POSIX)
