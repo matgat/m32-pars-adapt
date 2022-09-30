@@ -104,17 +104,7 @@
     <ClCompile Include="..\source\m32-pars-adapt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\basic-parser.hpp" />
-    <ClInclude Include="..\source\json-parser.hpp" />
-    <ClInclude Include="..\source\json-node.hpp" />
-    <ClInclude Include="..\source\machine-type.hpp" />
-    <ClInclude Include="..\source\pars-db.hpp" />
-    <ClInclude Include="..\source\sipro-parser.hpp" />
-    <ClInclude Include="..\source\string-utilities.hpp" />
     <ClInclude Include="..\source\system.hpp" />
-    <ClInclude Include="..\source\debug.hpp" />
-    <ClInclude Include="..\source\udt-file.hpp" />
-    <ClInclude Include="..\source\winmerge.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

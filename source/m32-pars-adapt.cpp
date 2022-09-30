@@ -10,8 +10,8 @@
 
 #include "system.hpp" // sys::*, fs::*
 #include "string-utilities.hpp" // str::tolower, str::unquoted
+#include "text-files-tools.hpp" // sys::edit_text_file, sys::compare_wait
 
-#include "text-files-tools.hpp" // sys::edit_text_file, sys::compare
 #include "machine-type.hpp" // macotec::MachineType
 #include "extract-db.hpp" // macotec::extract_db
 #include "pars-db.hpp" // ParsDB
@@ -313,8 +313,7 @@ int main( const int argc, const char* const argv[] )
                }
             else
                {// Manual merge
-                sys::compare(tmp_udt_pth.string().c_str(), args.job().target_file().path().string().c_str());
-                sys::sleep_ms(2000);
+                sys::compare_wait(tmp_udt_pth.string().c_str(), args.job().target_file().path().string().c_str());
                 fs::remove( tmp_udt_pth );
                }
            }
@@ -362,10 +361,16 @@ int main( const int argc, const char* const argv[] )
                }
             else
                {// Manual merge
-                sys::compare( args.job().target_file().path().string().c_str(),
-                              tmp_udt_pth.string().c_str(),
-                              args.job().db_file().path().string().c_str() );
-                sys::sleep_ms(2000);
+                // Compare updated with the original
+                sys::compare_wait(  tmp_udt_pth.string().c_str(),
+                                    args.job().db_file().path().string().c_str()  );
+                // Compare the template with the merged one
+                sys::compare_wait(  args.job().target_file().path().string().c_str(),
+                                    args.job().db_file().path().string().c_str()  );
+                // Compare all three
+                //sys::compare_wait(  args.job().target_file().path().string().c_str(),
+                //                    tmp_udt_pth.string().c_str(),
+                //                    args.job().db_file().path().string().c_str()  );
                 fs::remove( tmp_udt_pth );
                }
            }

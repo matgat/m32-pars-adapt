@@ -30,7 +30,7 @@ void edit_text_file(const std::string& pth, [[maybe_unused]] const std::size_t l
 
 
 //---------------------------------------------------------------------------
-// Compare files/folders
+// Launch files/folders compare program
 template<typename ... Args> void compare(Args&& ... args)
 {
   #ifdef MS_WINDOWS
@@ -40,6 +40,17 @@ template<typename ... Args> void compare(Args&& ... args)
   #endif
 }
 
+
+//---------------------------------------------------------------------------
+// Launch files/folders compare program waiting for its termination
+template<typename ... Args> [[maybe_unused]] int compare_wait(Args&& ... args)
+{
+  #ifdef MS_WINDOWS
+    return winmerge::compare_wait(std::forward<Args>(args) ...);
+  #else
+    return sys::execute_wait("meld", std::forward<Args>(args) ...);
+  #endif
+}
 
 
 }//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

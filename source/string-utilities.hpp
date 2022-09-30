@@ -4,7 +4,7 @@
 //  String utilities
 //  ---------------------------------------------
 #include <cassert> // assert
-//#include <algorithm> // std::min
+//#include <concepts> // std::convertible_to
 #include <cctype> // std::isdigit, std::tolower, ...
 #include <string>
 #include <string_view>
@@ -61,6 +61,27 @@ inline std::string_view unquoted(const std::string_view s) noexcept
     return s;
 }
 
+
+//---------------------------------------------------------------------------
+//void print_strings(std::convertible_to<std::string_view> auto&& ...s)
+//{
+//    for(const auto sv : std::initializer_list<std::string_view>{ s... }) std::cout << sv << '\n';
+//}
+
+
+//---------------------------------------------------------------------------
+template<std::convertible_to<std::string_view>... Args>
+[[nodiscard]] std::string concat(Args&&... args, const char delim)
+{
+    //const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
+    //return fmt::format("{}", fmt::join(args_array,delim));
+    std::string s;
+    const std::size_t totsiz = sizeof...(args) + (std::size(args) + ...);
+    s.reserve(totsiz);
+    ((s+=args, s+=delim), ...);
+    if(!s.empty()) s.resize(s.size()-1);
+    return s;
+}
 
 
 //---------------------------------------------------------------------------
@@ -263,145 +284,6 @@ std::string iso_latin1_to_utf8(const std::string_view ansi)
        }
     return utf8;
 }
-
-
-//---------------------------------------------------------------------------
-// String similarity [0÷1] using The levenshtein distance (edit distance)
-//constexpr double calc_similarity1(const std::string_view s1, const std::string_view s2)
-//{
-//    int getEditDistance(std::string first, std::string second)
-//    {
-//        int m = s1.length();
-//        int n = s2.length();
-//
-//        int T[m + 1][n + 1];
-//        for (int i = 1; i <= m; i++)
-//        {
-//            T[i][0] = i;
-//        }
-//
-//        for (int j = 1; j <= n; j++)
-//        {
-//            T[0][j] = j;
-//        }
-//
-//        for (int i = 1; i <= m; i++)
-//        {
-//            for (int j = 1; j <= n; j++)
-//            {
-//                int weight = s1[i - 1] == s2[j - 1] ? 0: 1;
-//                T[i][j] = std::min(std::min(T[i-1][j] + 1, T[i][j-1] + 1), T[i-1][j-1] + weight);
-//            }
-//        }
-//
-//        return T[m][n];
-//    }
-//
-//
-//
-//    // Normalize
-//    const double max_len = std::max(s1.length(), s2.length());
-//    if(max_len)
-//    if (max_length > 0) {
-//        return (max_length - getEditDistance(first, second)) / max_length;
-//    }
-//    return 1.0;
-//}
-
-
-
-// Similarity based in Sørensen–Dice index.
-//double dice_match(const char *string1, const char *string2) {
-//
-//    //check fast cases
-//    if (((string1 != NULL) && (string1[0] == '\0')) ||
-//        ((string2 != NULL) && (string2[0] == '\0'))) {
-//        return 0;
-//    }
-//    if (string1 == string2) {
-//        return 1;
-//    }
-//
-//    size_t strlen1 = strlen(string1);
-//    size_t strlen2 = strlen(string2);
-//    if (strlen1 < 2 || strlen2 < 2) {
-//        return 0;
-//    }
-//
-//    size_t length1 = strlen1 - 1;
-//    size_t length2 = strlen2 - 1;
-//
-//    double matches = 0;
-//    int i = 0, j = 0;
-//
-//    //get bigrams and compare
-//    while (i < length1 && j < length2) {
-//        char a[3] = {string1[i], string1[i + 1], '\0'};
-//        char b[3] = {string2[j], string2[j + 1], '\0'};
-//        int cmp = strcmpi(a, b);
-//        if (cmp == 0) {
-//            matches += 2;
-//        }
-//        i++;
-//        j++;
-//    }
-//
-//    return matches / (length1 + length2);
-//}
-
-//double similarity_sorensen_dice(const std::string& _str1, const std::string& _str2) {
-//    // Base case: if some string is empty.
-//    if (_str1.empty() || _str2.empty()) {
-//        return 1.0;
-//    }
-//
-//    auto str1 = upper_string(_str1);
-//    auto str2 = upper_string(_str2);
-//
-//    // Base case: if the strings are equals.
-//    if (str1 == str2) {
-//        return 0.0;
-//    }
-//
-//    // Base case: if some string does not have bigrams.
-//    if (str1.size() < 2 || str2.size() < 2) {
-//        return 1.0;
-//    }
-//
-//    // Extract bigrams from str1
-//    auto num_pairs1 = str1.size() - 1;
-//    std::unordered_set<std::string> str1_bigrams;
-//    str1_bigrams.reserve(num_pairs1);
-//    for (unsigned i = 0; i < num_pairs1; ++i) {
-//        str1_bigrams.insert(str1.substr(i, 2));
-//    }
-//
-//    // Extract bigrams from str2
-//    auto num_pairs2 = str2.size() - 1;
-//    std::unordered_set<std::string> str2_bigrams;
-//    str2_bigrams.reserve(num_pairs2);
-//    for (unsigned int i = 0; i < num_pairs2; ++i) {
-//        str2_bigrams.insert(str2.substr(i, 2));
-//    }
-//
-//    // Find the intersection between the two sets.
-//    int intersection = 0;
-//    if (str1_bigrams.size() < str2_bigrams.size()) {
-//        const auto it_e = str2_bigrams.end();
-//        for (const auto& bigram : str1_bigrams) {
-//            intersection += str2_bigrams.find(bigram) != it_e;
-//        }
-//    } else {
-//        const auto it_e = str1_bigrams.end();
-//        for (const auto& bigram : str2_bigrams) {
-//            intersection += str1_bigrams.find(bigram) != it_e;
-//        }
-//    }
-//
-//     //Returns similarity coefficient.
-//    return (2.0 * intersection) / (num_pairs1 + num_pairs2);
-//}
-
 
 
 //---------------------------------------------------------------------------

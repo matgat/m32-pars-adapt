@@ -4,17 +4,12 @@
 //  System utilities
 //  ---------------------------------------------
 #include <stdexcept>
-#include <concepts>
+#include <concepts> // std::convertible_to
 #include <string>
 #include <string_view>
-#include <tuple>
-#include <array>
 //#include <fstream>
 #include <cstdio> // std::fopen, ...
 #include <cstdlib> // std::getenv
-//#include <chrono> // std::chrono::system_clock
-//using namespace std::chrono_literals; // 1s, 2h, ...
-#include <ctime> // std::time_t, std::strftime
 #include <filesystem> // std::filesystem
 namespace fs = std::filesystem;
 #include <regex> // std::regex*
@@ -227,18 +222,12 @@ void launch_file(const std::string& pth) noexcept
   #if defined(MS_WINDOWS)
     shell_execute( pth.c_str() );
   #elif defined(POSIX)
-    if( const auto pid = fork(); pid==0 )
+    if( const auto pid=fork(); pid==0 ) // pid_t
        {
         execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
        }
   #endif
 }
-
-//---------------------------------------------------------------------------
-//void print_strings(std::convertible_to<std::string_view> auto&& ...s)
-//{
-//    for(const auto sv : std::initializer_list<std::string_view>{ s... }) std::cout << sv << '\n';
-//}
 
 
 //---------------------------------------------------------------------------
@@ -247,9 +236,6 @@ void execute(const char* const exe, Args&&... args) noexcept
 {
   #if defined(MS_WINDOWS)
     try{
-        //const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
-        //const std::string joined_args = fmt::format("{}", fmt::join(args_array," "));
-
         auto join_args = [... args = std::forward<Args>(args)]() -> std::string
            {
             std::string s;
@@ -263,32 +249,66 @@ void execute(const char* const exe, Args&&... args) noexcept
        }
     catch(...){}
   #elif defined(POSIX)
-    const auto pid_child = fork(); // pid_t
-    if( pid_child==0 )
-       {// Inside child process
-        // Posix functions exec* work with pointers to char, so...
+    if( const auto pid=fork(); pid==0 ) // pid_t
+       {
         struct loc
-           {
+           {// Extract char pointer for posix api exec*
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
            };
         execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
-        //const char* arg_list[] = { exe, loc::c_str(std::forward<Args>(args))..., nullptr };
-        //execvp(arg_list[0], (char**) arg_list);
        }
-    //else if( pid_child == -1 )
-    //   {// Failed
-    //   }
-    //else
-    //   {// Inside parent process: wait child?
-    //    pid_t pid;
-    //    do {
-    //        int status;
-    //        pid = waitpid(pid_child, &status, 0);
-    //       }
-    //    while(pid==-1 && errno==EINTR);
-    //    //if(pid != pid_child) // Failed: Child process vanished
-    //   }
+  #endif
+}
+
+
+
+//---------------------------------------------------------------------------
+template<std::convertible_to<std::string> ...Args>
+[[maybe_unused]] int execute_wait(const char* const exe, Args&&... args) noexcept
+{
+  #if defined(MS_WINDOWS)
+    try{
+        auto join_args = [... args = std::forward<Args>(args)]() -> std::string
+           {
+            std::string s;
+            const std::size_t totsiz = sizeof...(args) + (std::size(args) + ...);
+            s.reserve(totsiz);
+            ((s+=' ', s+=args), ...);
+            return s;
+           };
+
+        return shell_execute_wait( exe, join_args().c_str() );
+       }
+    catch(...){}
+  #elif defined(POSIX)
+    const auto pid_child = fork(); // pid_t
+    if( pid_child==0 )
+       {// Fork successful, inside child process
+        struct loc
+           {// Extract char pointer for posix api exec*
+            static const char* c_str(const char* const s) noexcept { return s; }
+            static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
+           };
+        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+       }
+    else if( pid_child!=-1 )
+       {// Fork successful, inside parent process: wait child
+        pid_t pid;
+        int status;
+        do {
+            pid = waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
+            if(pid==-1) return -2; // waitpid error
+            else if( WIFEXITED(status) ) return WEXITSTATUS(status)); // Exited, return result
+            else if(WIFSIGNALED(status)) return -1; // Killed by WTERMSIG(status)
+            else if(WIFSTOPPED(status)) return -1; // Killed by WSTOPSIG(status)
+            //else if (WIFCONTINUED(status)) continue;
+            }
+        } while( !WIFEXITED(status) && !WIFSIGNALED(status) );
+        //if(pid != pid_child) // Failed: Child process vanished
+       }
+    //else // Fork failed
+    return -3; // Something failed
   #endif
 }
 
@@ -458,7 +478,54 @@ class file_write final
 //  #elif defined(POSIX)
 //    unlink( pth.c_str() );
 //  #endif
+
+
+
+//---------------------------------------------------------------------------
+// ex. const auto removed_count = remove_all_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
+//[[maybe_unused]] std::size_t remove_all_inside(const std::filesystem::path& dir, std::regex&& reg)
+//{
+//    std::size_t removed_items_count { 0 };
+//
+//    if( !fs::is_directory(dir) )
+//       {
+//        throw std::invalid_argument("Not a directory: " + dir.string());
+//       }
+//
+//    for( auto& elem : fs::directory_iterator(dir) )
+//       {
+//        if( std::regex_match(elem.path().filename().string(), reg) )
+//           {
+//            removed_items_count += fs::remove_all(elem.path());
+//           }
+//       }
+//
+//    return removed_items_count;
 //}
+
+
+
+//---------------------------------------------------------------------------
+// ex. const auto removed_count = remove_files_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
+[[maybe_unused]] std::size_t remove_files_inside(const std::filesystem::path& dir, std::regex&& reg)
+{
+    std::size_t removed_items_count { 0 };
+
+    if( !fs::is_directory(dir) )
+       {
+        throw std::invalid_argument("Not a directory: " + dir.string());
+       }
+
+    for( auto& elem : fs::directory_iterator(dir) )
+       {
+        if( elem.is_regular_file() && std::regex_match(elem.path().filename().string(), reg) )
+           {
+            removed_items_count += fs::remove(elem.path());
+           }
+       }
+
+    return removed_items_count;
+}
 
 
 //---------------------------------------------------------------------------
