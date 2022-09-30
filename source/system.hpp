@@ -37,6 +37,8 @@ namespace fs = std::filesystem;
   #include <sys/mman.h> // mmap, munmap
   #include <sys/stat.h> // fstat
   #include <time.h>   // nanosleep
+  //#include <sys/types.h>
+  #include <sys/wait.h> // waitpid
 #endif
 
 
@@ -299,12 +301,12 @@ template<std::convertible_to<std::string> ...Args>
         do {
             pid = waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
             if(pid==-1) return -2; // waitpid error
-            else if( WIFEXITED(status) ) return WEXITSTATUS(status)); // Exited, return result
-            else if(WIFSIGNALED(status)) return -1; // Killed by WTERMSIG(status)
-            else if(WIFSTOPPED(status)) return -1; // Killed by WSTOPSIG(status)
-            //else if (WIFCONTINUED(status)) continue;
-            }
-        } while( !WIFEXITED(status) && !WIFSIGNALED(status) );
+            else if( WIFEXITED(status) ) return WEXITSTATUS(status); // Exited, return result
+            else if( WIFSIGNALED(status) ) return -1; // Killed by WTERMSIG(status)
+            else if( WIFSTOPPED(status) ) return -1; // Stopped by WSTOPSIG(status)
+            //else if( WIFCONTINUED(status) ) continue;
+           }
+        while( !WIFEXITED(status) && !WIFSIGNALED(status) );
         //if(pid != pid_child) // Failed: Child process vanished
        }
     //else // Fork failed

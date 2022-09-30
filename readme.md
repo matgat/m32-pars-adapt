@@ -116,3 +116,7 @@ From the command line, something like:
 ```
 > msbuild msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
 ```
+
+```
+$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+```

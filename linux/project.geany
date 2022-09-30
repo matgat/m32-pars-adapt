@@ -28,10 +28,9 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=1
 FILE_NAME_0=15427;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
-FILE_NAME_1=2888;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fparax-file.hpp;0;4
-FILE_NAME_2=2021;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fsipro-parser.hpp;0;4
+FILE_NAME_1=2502;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fparax-file.hpp;0;4
 
 [VTE]
 last_dir=/home/mat/dev/m32-pars-adapt/source
@@ -47,7 +46,7 @@ C++FT_00_LB=_Compile
 C++FT_00_CM=clang++ -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -c "%f"
 C++FT_00_WD=
 C++FT_01_LB=_Build
-C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -DFMT_HEADER_ONLY -Isource/fmt/include -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
 C++FT_01_WD=%p
 C++FT_02_LB=_Lint
 C++FT_02_CM=cppcheck --language=c++ --enable=warning,style --suppress=passedByValue --template=gcc "%f"
@@ -60,16 +59,16 @@ NF_01_LB=Make Custom _Target...
 NF_01_CM=make
 NF_01_WD=%p/linux
 NF_02_LB=Build with gcc
-NF_02_CM=g++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -DFMT_HEADER_ONLY -Isource/fmt/include -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+NF_02_CM=g++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
 NF_02_WD=%p
 NF_03_LB=clang-tidy
-NF_03_CM=clang-tidy --header-filter=\\.hpp$ "source/m32-pars-adapt.cpp" -- -std=c++2b -funsigned-char -DFMT_HEADER_ONLY -Isource/fmt/include
+NF_03_CM=clang-tidy --header-filter=\\.hpp$ "source/m32-pars-adapt.cpp" -- -std=c++2b -funsigned-char -lfmt
 NF_03_WD=%p
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
 header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;
-ignored_dirs_patterns=.*;CVS;
+ignored_dirs_patterns=.*;
 ignored_file_patterns=*.o;*.obj;*.a;*.lib;*.so;*.dll;*.lo;*.la;*.class;*.jar;*.pyc;*.mo;*.gmo;
 generate_tag_prefs=0
 show_empty_dirs=true
