@@ -3,7 +3,7 @@
 //  ---------------------------------------------
 //  Launch external program winmerge
 //  ---------------------------------------------
-#include "system.hpp" // sys::find_executable(), sys::shell_execute(), sys::expand_env_variables(), sys::file_write
+#include "system.hpp" // sys::*
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

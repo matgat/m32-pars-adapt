@@ -13,7 +13,7 @@ To print usage info:
 > m32-pars-adapt --help
 ```
 
-To properly valorize a `MachSettings.udt` given a machine type:
+To valorize a `MachSettings.udt` given a machine type:
 ```
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
 > m32-pars-adapt --tgt MachSettings.udt --db configs\machsettings-overlays.txt --machine StratoWR-4.9/4.6
@@ -33,9 +33,12 @@ To valorize a Sipro parameter file:
 Normally no file will be overwritten: the program will create a temporary
 file that will be automatically deleted after a manual merge.
 
-Alternatively, when the option `--quiet` is used, the file will be
-overwritten after performing a backup in the same directory of the
-original file.
+When the option `--quiet` is used, the file will be backupped
+in the same directory and then overwritten without the user
+intervention.
+
+If the output file name is specified with `--out`, there won't
+be any filesystem actions (deleting or substitution).
 
 
 
@@ -110,13 +113,17 @@ _________________________________________________________________________
 ## Build
 ```
 $ git clone https://github.com/matgat/m32-pars-adapt.git
+$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
 ```
-Use the latest Microsoft Visual Studio Community.
+On Windows, use the latest Microsoft Visual Studio Community.
 From the command line, something like:
 ```
 > msbuild msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
 ```
-
+This project depends on `{fmt}` library, use `vcpkg` to install it:
 ```
-$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+> git clone https://github.com/Microsoft/vcpkg.git
+> .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+> .\vcpkg\vcpkg integrate install
+> .\vcpkg\vcpkg install fmt:x64-windows
 ```

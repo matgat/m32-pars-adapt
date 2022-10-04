@@ -79,10 +79,14 @@ class JobUnit final
     [[nodiscard]] const auto& db_file() const noexcept { return i_dbfile; }
     void set_db_file(const std::string_view s) { i_dbfile.assign(s); }
 
+    [[nodiscard]] const auto& out_file_name() const noexcept { return i_out_file_name; }
+    void set_out_file_name(const std::string_view s) { i_out_file_name = s; }
+
  private:
     macotec::MachineType i_machinetype;
     file_t i_targetfile;
     file_t i_dbfile;
+    std::string i_out_file_name;
 };
 
 
@@ -98,7 +102,8 @@ class Arguments final
                 SEE_ARG,
                 GET_MACHTYPE,
                 GET_TGTFILEPATH,
-                GET_DBFILEPATH
+                GET_DBFILEPATH,
+                GET_OUTFILENAM
                } status = STS::SEE_ARG;
 
             //for( const auto arg : args | std::views::transform([](const char* const a){ return std::string_view(a);}) )
@@ -134,6 +139,15 @@ class Arguments final
                         status = STS::SEE_ARG;
                         break;
 
+                    case STS::GET_OUTFILENAM :
+                        if( !i_job.out_file_name().empty() )
+                           {
+                            throw std::invalid_argument( fmt::format("Output file name was already set to {}",i_job.out_file_name()) );
+                           }
+                        i_job.set_out_file_name(arg);
+                        status = STS::SEE_ARG;
+                        break;
+
                     default :
                         if( arg.length()>1 && arg[0]=='-' )
                            {// A command switch!
@@ -151,6 +165,10 @@ class Arguments final
                             else if( swtch=="db"sv )
                                {
                                 status = STS::GET_DBFILEPATH;
+                               }
+                            else if( swtch=="out"sv || swtch=="o"sv )
+                               {
+                                status = STS::GET_OUTFILENAM;
                                }
                             else if( swtch=="quiet"sv )
                                {
@@ -194,12 +212,13 @@ class Arguments final
        {
         fmt::print( "\nUsage (ver. " __DATE__ "):\n"
                     "   m32-pars-adapt --verbose --tgt path/to/MachSettings.udt --db path/to/msetts_pars.txt --machine ActiveW-4.9/4.6\n"
-                    "       --machine <string> (Machine type string)\n"
-                    "       --target <path> (Parameter file to adapt)\n"
                     "       --db <path> (Parameters database json file)\n"
-                    "       --quiet (Force actions, no manual checks)\n"
-                    "       --verbose (Print more info on stdout)\n"
                     "       --help (Just print help info and abort)\n"
+                    "       --machine <string> (Machine type string)\n"
+                    "       --out <string> (Specify output file name, keeping file)\n"
+                    "       --quiet (Substitute file without manual merge)\n"
+                    "       --target <path> (Parameter file to adapt)\n"
+                    "       --verbose (Print more info on stdout)\n"
                     "\n" );
        }
 
@@ -215,6 +234,114 @@ class Arguments final
 };
 
 
+//---------------------------------------------------------------------------
+fs::path adapt_udt(Arguments& args, std::vector<std::string>& issues)
+{
+    // [The UDT file to adapt]
+    udt::File udt_file(args.job().target_file().path(), issues);
+
+    // [Machine type]
+    // If machine type is not given, I'll try to extract it from the udt file
+    if( args.job().machine_type() )
+       {// Ensure to set the specified machine type in the file
+        udt_file.modify_value_if_present("vaMachName", str::quoted(args.job().machine_type().string()));
+       }
+    else
+       {// Extract machine type from udt file
+        const std::string_view s = str::unquoted( udt_file.get_value_of("vaMachName") );
+        args.modify_job().set_machine_type(s);
+       }
+
+    // [Parameters DB]
+    ParsDB pars_db;
+    pars_db.parse( args.job().db_file().path(), issues );
+    // Extract the pertinent data for this machine
+    const auto mach_db = macotec::extract_db(pars_db.root(), args.job().machine_type(), issues);
+
+    // [Summarize the job]
+    if( args.verbose() )
+       {
+        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
+        fmt::print("  .UDT file: {}\n", udt_file.info());
+        fmt::print("  .Parameters DB: {}\n", pars_db.info());
+        //pars_db.print();
+       }
+
+    // Overwrite values from database
+    for( const auto group : mach_db )
+       {
+        for( const auto& [nam, node] : group.get().childs() )
+           {
+            if( !node.has_value() )
+               {
+                issues.push_back( fmt::format("Node {} hasn't a value", nam) );
+               }
+            //fmt::print("{}={}\n",nam,node.value());
+
+            if( const auto field = udt_file.get_field(nam) )
+               {
+                field->modify_value(node.value());
+               }
+            else
+               {
+                udt_file.add_issue( fmt::format("Not found: {}={}",nam,node.value()) );
+               }
+           }
+       }
+
+    // Write output file
+    const std::string out_nam = args.job().out_file_name().empty()
+                                ? fmt::format("~{}.tmp", args.job().target_file().path().filename().string())
+                                : args.job().out_file_name();
+    fs::path out_pth{ args.job().target_file().path().parent_path() / out_nam };
+    udt_file.write( out_pth );
+    if( args.verbose() )
+       {
+        fmt::print("  .Modified {} values, {} issues\n", udt_file.modified_values_count(), udt_file.issues_count());
+       }
+    return out_pth;
+}
+
+
+//---------------------------------------------------------------------------
+fs::path update_udt(Arguments& args, std::vector<std::string>& issues)
+{
+    // [Machine type]
+    // The machine type shouldn't be explicitly given
+    if( args.job().machine_type() )
+       {
+        throw std::invalid_argument( "Machine type shouldn't be specified for an UDT update" );
+       }
+
+    // [The template UDT file (newest)]
+    udt::File new_udt_file(args.job().target_file().path(), issues);
+
+    // [The original UDT file to upgrade (oldest)]
+    udt::File old_udt_file(args.job().db_file().path(), issues);
+
+    // [Summarize the job]
+    if( args.verbose() )
+       {
+        fmt::print("Updating {} using {}\n", old_udt_file.path(), new_udt_file.path());
+        fmt::print("  .Old UDT: {}\n", old_udt_file.info());
+        fmt::print("  .New UDT: {}\n", new_udt_file.info());
+       }
+
+    // Overwrite values in newest file using the old as database
+    new_udt_file.overwrite_values_from( old_udt_file );
+
+    // Write output file
+    const std::string out_nam = args.job().out_file_name().empty()
+                                ? fmt::format("~{}.tmp", args.job().db_file().path().filename().string())
+                                : args.job().out_file_name();
+    fs::path out_pth{ args.job().db_file().path().parent_path() / out_nam };
+    new_udt_file.write( out_pth );
+    if( args.verbose() )
+       {
+        fmt::print("  .Modified {} values, {} issues\n", new_udt_file.modified_values_count(), new_udt_file.issues_count());
+       }
+    return out_pth;
+}
 
 
 //---------------------------------------------------------------------------
@@ -245,133 +372,59 @@ int main( const int argc, const char* const argv[] )
         //====================================================================
         if( args.job().target_file().is_udt() && args.job().db_file().is_txt() )
            {// Adapting an udt file given overlays database and machine type
-
-            // [The UDT file to adapt]
-            udt::File udt_file(args.job().target_file().path(), issues);
-
-            // [Machine type]
-            // If machine type is not given, I'll try to extract it from the udt file
-            if( args.job().machine_type() )
-               {// Ensure to set the specified machine type in the file
-                udt_file.modify_value_if_present("vaMachName", str::quoted(args.job().machine_type().string()));
-               }
-            else
-               {// Extract machine type from udt file
-                const std::string_view s = str::unquoted( udt_file.get_value_of("vaMachName") );
-                args.modify_job().set_machine_type(s);
-               }
-
-            // [Parameters DB]
-            ParsDB pars_db;
-            pars_db.parse( args.job().db_file().path(), issues );
-            // Extract the pertinent data for this machine
-            const auto mach_db = macotec::extract_db(pars_db.root(), args.job().machine_type(), issues);
-
-            // [Summarize the job]
-            if( args.verbose() )
-               {
-                fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
-                fmt::print("  .UDT file: {}\n", udt_file.info());
-                fmt::print("  .Parameters DB: {}\n", pars_db.info());
-                //pars_db.print();
-               }
-
-            // Overwrite values from database
-            for( const auto group : mach_db )
-               {
-                for( const auto& [nam, node] : group.get().childs() )
-                   {
-                    if( !node.has_value() )
-                       {
-                        issues.push_back( fmt::format("Node {} hasn't a value", nam) );
-                       }
-                    //fmt::print("{}={}\n",nam,node.value());
-
-                    if( const auto field = udt_file.get_field(nam) )
-                       {
-                        field->modify_value(node.value());
-                       }
-                    else
-                       {
-                        udt_file.add_issue( fmt::format("Not found: {}={}",nam,node.value()) );
-                       }
-                   }
-               }
-
-            const fs::path tmp_udt_pth{ args.job().target_file().path().parent_path() / fmt::format("~{}.tmp", args.job().target_file().path().filename().string()) };
-            udt_file.write( tmp_udt_pth );
-            if( args.verbose() )
-               {
-                fmt::print("  .Modified {} values, {} issues\n", udt_file.modified_values_count(), udt_file.issues_count());
-               }
+            const fs::path out_pth = adapt_udt(args, issues);
 
             if( args.quiet() )
                {// No user intervention
-                sys::backup_file_same_dir( args.job().target_file().path() );
-                fs::remove( args.job().target_file().path() );
-                fs::rename( tmp_udt_pth, args.job().target_file().path() );
+                if( args.job().out_file_name().empty() )
+                   {
+                    sys::backup_file_same_dir( args.job().target_file().path() );
+                    fs::remove( args.job().target_file().path() );
+                    fs::rename( out_pth, args.job().target_file().path() );
+                   }
                }
             else
                {// Manual merge
-                sys::compare_wait(tmp_udt_pth.string().c_str(), args.job().target_file().path().string().c_str());
-                fs::remove( tmp_udt_pth );
+                sys::compare_wait(out_pth.string().c_str(), args.job().target_file().path().string().c_str());
+                
+                if( args.job().out_file_name().empty() )
+                   {
+                    fs::remove( out_pth );
+                   }
                }
            }
 
         //====================================================================
         else if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )
            {// Updating an old udt file (db) to a newer one (target)
-
-            // [Machine type]
-            // The machine type shouldn't be explicitly given
-            if( args.job().machine_type() )
-               {
-                throw std::invalid_argument( "Machine type shouldn't be specified for an UDT update" );
-               }
-
-            // [The template UDT file (newest)]
-            udt::File new_udt_file(args.job().target_file().path(), issues);
-
-            // [The original UDT file to upgrade (oldest)]
-            udt::File old_udt_file(args.job().db_file().path(), issues);
-
-            // [Summarize the job]
-            if( args.verbose() )
-               {
-                fmt::print("Upgrading {} using {}\n", old_udt_file.path(), new_udt_file.path());
-                fmt::print("  .Old UDT: {}\n", old_udt_file.info());
-                fmt::print("  .New UDT: {}\n", new_udt_file.info());
-               }
-
-            // Overwrite values in newest file using the old as database
-            new_udt_file.overwrite_values_from( old_udt_file );
-
-            const fs::path tmp_udt_pth{ args.job().db_file().path().parent_path() / fmt::format("~{}.tmp", args.job().db_file().path().filename().string()) };
-            new_udt_file.write( tmp_udt_pth );
-            if( args.verbose() )
-               {
-                fmt::print("  .Modified {} values, {} issues\n", new_udt_file.modified_values_count(), new_udt_file.issues_count());
-               }
+            const fs::path out_pth = update_udt(args, issues);
 
             if( args.quiet() )
                {// No user intervention
-                sys::backup_file_same_dir( args.job().db_file().path() );
-                fs::remove( args.job().db_file().path() );
-                fs::rename( tmp_udt_pth, args.job().db_file().path() );
+                if( args.job().out_file_name().empty() )
+                   {// Output file is a temporary
+                    sys::backup_file_same_dir( args.job().db_file().path() );
+                    fs::remove( args.job().db_file().path() );
+                    fs::rename( out_pth, args.job().db_file().path() );
+                   }
                }
             else
                {// Manual merge
                 // Compare updated with the original
-                sys::compare_wait(  tmp_udt_pth.string().c_str(),
+                sys::compare_wait(  out_pth.string().c_str(),
                                     args.job().db_file().path().string().c_str()  );
                 // Compare the template with the merged one
                 sys::compare_wait(  args.job().target_file().path().string().c_str(),
                                     args.job().db_file().path().string().c_str()  );
                 // Compare all three
                 //sys::compare_wait(  args.job().target_file().path().string().c_str(),
-                //                    tmp_udt_pth.string().c_str(),
+                //                    out_pth.string().c_str(),
                 //                    args.job().db_file().path().string().c_str()  );
-                fs::remove( tmp_udt_pth );
+
+                if( args.job().out_file_name().empty() )
+                   {// Output file is a temporary
+                    fs::remove( out_pth );
+                   }
                }
            }
 
@@ -393,6 +446,7 @@ int main( const int argc, const char* const argv[] )
                {
                 fmt::print("    {}\n",issue);
                }
+            sys::sleep_ms(10'000);
             return 1;
            }
 

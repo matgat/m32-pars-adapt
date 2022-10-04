@@ -304,9 +304,9 @@ class Parser final : public BasicParser
             if( namval.comment()[i_lbl_start]=='\'' )
                {
                 namval.set_added_label( std::string_view(namval.comment().data()+i_lbl_start+1, i_lbl_end-i_lbl_start-2) );
-                // Trim spaces for comment text end
-                do{ --i_lbl_start; } while( is_blank(namval.comment()[i_lbl_start]) );
-                namval.set_comment( std::string_view(namval.comment().data(), i_lbl_start+1) );
+                // Trim spaces at comment end
+                while( i_lbl_start>0 && is_blank(namval.comment()[--i_lbl_start]) ) ;
+                namval.set_comment( std::string_view(namval.comment().data(), i_lbl_start>0 ? i_lbl_start+1 : 0) );
                }
             else
                {

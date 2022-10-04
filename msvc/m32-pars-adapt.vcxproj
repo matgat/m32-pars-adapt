@@ -62,7 +62,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
-      <AdditionalOptions>/J /utf-8 /DFMT_HEADER_ONLY /I../source/fmt/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/J /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -82,7 +82,7 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
-      <AdditionalOptions>/J /utf-8 /DFMT_HEADER_ONLY /I../source/fmt/include %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/J /utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

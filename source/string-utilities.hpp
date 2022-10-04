@@ -4,7 +4,8 @@
 //  String utilities
 //  ---------------------------------------------
 #include <cassert> // assert
-//#include <concepts> // std::convertible_to
+#include <concepts> // std::convertible_to
+//#include <algorithm> // std::find_if
 #include <cctype> // std::isdigit, std::tolower, ...
 #include <string>
 #include <string_view>
@@ -22,13 +23,28 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //---------------------------------------------------------------------------
 // Change string to lowercase
-inline std::string tolower(std::string s)
+constexpr std::string tolower(std::string s)
 {
     for(char& c : s) c = static_cast<char>(std::tolower(c));
     // With c++20 ranges:
     //s |= action::transform([](unsigned char c){ return std::tolower(c); });
     return s;
 }
+
+//---------------------------------------------------------------------------
+// trim from start (in place)
+//constexpr void ltrim(std::string &s)
+//{
+//    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](const unsigned char ch){return !std::isspace(ch);}));
+//}
+
+//---------------------------------------------------------------------------
+// trim from end (in place)
+//constexpr void rtrim(std::string &s)
+//{
+//    s.erase(std::find_if(s.rbegin(), s.rend(), [](const unsigned char ch){return !std::isspace(ch);}).base(), s.end());
+//    //while( !s.empty() && std::isspace(static_cast<unsigned char>(s.back())) ) s.pop_back();
+//}
 
 
 //---------------------------------------------------------------------------
@@ -105,7 +121,7 @@ template<std::convertible_to<std::string_view>... Args>
 
 //---------------------------------------------------------------------------
 // Convert a character to string, escaping it if necessary
-std::string escape(const char c) noexcept
+constexpr std::string escape(const char c) noexcept
    {
     std::string s(1,c);
     switch( c )
@@ -123,7 +139,7 @@ std::string escape(const char c) noexcept
 
 //---------------------------------------------------------------------------
 // Show string special characters
-std::string escape(std::string&& s) noexcept
+constexpr std::string escape(std::string&& s) noexcept
    {
     std::string::size_type i = 0;
     while( i<s.size() )
@@ -145,7 +161,7 @@ std::string escape(std::string&& s) noexcept
 
 //---------------------------------------------------------------------------
 // Show string special characters
-std::string escape(const std::string_view sv) noexcept
+constexpr std::string escape(const std::string_view sv) noexcept
    {
     return escape( std::string(sv) );
    }
@@ -202,7 +218,7 @@ template<typename T> std::optional<T> as_num(const std::string_view s) noexcept
 
 //---------------------------------------------------------------------------
 // Generate an hash for a string
-std::size_t hash(const std::string_view s)
+constexpr std::size_t hash(const std::string_view s)
 {
     std::size_t val = 0;
     //for(const char c : s) crc += static_cast<std::size_t>(c);
@@ -213,7 +229,7 @@ std::size_t hash(const std::string_view s)
 
 
 //---------------------------------------------------------------------------
-bool contains_wildcards(const std::string& s) noexcept
+constexpr bool contains_wildcards(const std::string& s) noexcept
 {
     //return std::regex_search(s, std::regex("*?")); // Seems slow
     //return s.rfind('*') != std::string::npos || s.rfind('?') != std::string::npos;
@@ -230,7 +246,7 @@ bool contains_wildcards(const std::string& s) noexcept
 
 //-----------------------------------------------------------------------
 // Returns true if text matches glob-like pattern with wildcards (*, ?)
-bool glob_match(const char* text, const char* glob, const char dont_match ='/')
+constexpr bool glob_match(const char* text, const char* glob, const char dont_match ='/')
 {
     // 'dont_match': character not matched by any wildcards
     const char *text_backup = nullptr;
@@ -266,7 +282,7 @@ bool glob_match(const char* text, const char* glob, const char dont_match ='/')
 
 
 //---------------------------------------------------------------------------
-std::string iso_latin1_to_utf8(const std::string_view ansi)
+constexpr std::string iso_latin1_to_utf8(const std::string_view ansi)
 {
     std::string utf8;
     utf8.reserve( (3 * ansi.size()) / 2 );

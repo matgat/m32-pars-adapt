@@ -9,6 +9,7 @@
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
+#include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
 
 
@@ -163,7 +164,7 @@ class File final
                 // Potrei cercare di rilevare rinominazioni delle label
                 // controllando la corrispondenza ass.var_name(), ass.comment()
                 // Anche con str::calc_similarity
-                add_issue( fmt::format("Not found: {}",varlbl) );
+                add_issue( fmt::format("Not found: {} = {}",varlbl,ass.value()) );
                }
            }
        }
@@ -171,6 +172,11 @@ class File final
     //-----------------------------------------------------------------------
     void write(const fs::path outpth)
        {
+        const std::string_view line_break = !i_lines.empty() &&
+                                            i_lines.front().span().length()>1 &&
+                                            i_lines.front().span()[i_lines.front().span().length()-2]=='\r'
+                                            ? "\r\n"sv : "\n"sv;
+        bool block_comment_notyetfound = true;
         sys::file_write fw( outpth.string() );
         for( const auto& line : i_lines )
            {
@@ -179,6 +185,7 @@ class File final
                 // Detect indentation
                 const std::ptrdiff_t indent_len = line.assignment_ptr()->var_name().data() - line.span().data();
                 assert(indent_len>=0);
+                assert( line.span().length()>0 && line.span()[line.span().length()-1]=='\n' );
 
                 fw << std::string_view(line.span().data(), static_cast<std::size_t>(indent_len))
                    << line.assignment_ptr()->var_name()
@@ -195,13 +202,14 @@ class File final
                     fw << " '"sv << line.assignment_ptr()->added_label() << '\'';
                    }
 
-                // Respect the original line break
-                assert( line.span().length()>0 && line.span()[line.span().length()-1]=='\n' );
-                if( line.span().length()>1 && line.span()[line.span().length()-2]=='\r' )
-                   {// Windows line break
-                    fw << '\r';
-                   }
-                fw << '\n';
+                fw << line_break;
+               }
+            else if( block_comment_notyetfound && line.span().contains("[EndNote]") )
+               {
+                block_comment_notyetfound = false;
+                // Adding some info on generated file
+                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_issues.size()) << " issues)"sv << line_break;
+                fw << line.span();
                }
             else
                {// Write original unmodified line
@@ -212,7 +220,7 @@ class File final
         // Append issues
         for( const auto& issue : i_issues )
            {
-            fw << "# "sv << issue << '\n';
+            fw << "# "sv << issue << line_break;
            }
        }
 

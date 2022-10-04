@@ -131,6 +131,8 @@ class MachineType final
     [[nodiscard]] constexpr std::string_view cutbridge_dim() const noexcept { return cutbridgedim_ids[to_underlying(i_cutbridgedim)]; }
     [[nodiscard]] constexpr std::string_view align_dim() const noexcept { return aligndim_ids[to_underlying(i_algndim)]; }
 
+    [[nodiscard]] constexpr bool is_opposite() const noexcept { return i_opposite; }
+
 
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string string() const
@@ -149,6 +151,10 @@ class MachineType final
                    }
                }
            }
+        if( is_opposite() )
+           {
+            s += "-opp";
+           }
         return s;
        }
 
@@ -156,9 +162,10 @@ class MachineType final
     type i_type = type::undefined;
     cutbridgedim i_cutbridgedim = cutbridgedim::undefined;
     aligndim i_algndim = aligndim::undefined;
+    bool i_opposite = false;
 
     //------------------------------------------------------------------------
-    static MachineType recognize_machine(const std::string_view s)
+    static MachineType recognize_machine(const std::string_view sv)
        {// From strings like "StratoWR-4.9/4.6"
         // La stringa identificativa è composta da un prefisso
         // che determinano la tipologia di macchina, seguito da
@@ -215,7 +222,30 @@ class MachineType final
             private:
                 const std::string_view buf;
                 std::size_t i = 0;
-           } parser(s);
+           };
+
+        // To be more tolerant, should ignore case and trim right
+        auto lowercase_trimmed_right = [](const std::string_view sv) constexpr
+           {
+            std::string s;
+            if( sv.size()>0 )
+               {
+                std::size_t i = sv.size()-1;
+                // Trim right
+                while( std::isspace(static_cast<unsigned char>(sv[i])) )
+                   {
+                    if(i>0) [[likely]] --i;
+                    else [[unlikely]] return s;
+                   }
+                const auto i_last_not_space = i;
+                // Lowercase
+                s = sv.substr(0, i_last_not_space+1);
+                for(char& c : s) c = static_cast<char>(std::tolower(c));
+               }
+            return s;
+           };
+        const std::string s = lowercase_trimmed_right(sv);
+        parser_t parser(s);
 
         // Machine type
         mach.i_type = recognize_machine_type( parser.extract_first_id() );
@@ -242,6 +272,9 @@ class MachineType final
                }
            }
 
+        // Determine if is opposite
+        mach.i_opposite = s.ends_with("opp");
+
         // If here, all ok
         return mach;
        }
@@ -249,13 +282,13 @@ class MachineType final
     //-----------------------------------------------------------------------
     [[nodiscard]] static type recognize_machine_type(const std::string_view s)
        {
-             if( s.ends_with("HP") ) return type::hp;
-        else if( s.ends_with("WR") ) return type::wr;
-        else if( s.ends_with("atoS") || s.ends_with("iveF") || s.ends_with("iveE") ) return type::s;
-        else if( s.ends_with("W") ) return type::w;
-        else if( s.ends_with("FRV") ) return type::msfrv;
-        else if( s.ends_with("FR") ) return type::msfr;
-        else if( s.contains("StarCut") || s.contains("STC") ) return type::scut;
+             if( s.ends_with("hp") ) return type::hp;
+        else if( s.ends_with("wr") ) return type::wr;
+        else if( s.ends_with("atos") || s.ends_with("ivef") || s.ends_with("ivee") ) return type::s;
+        else if( s.ends_with("w") ) return type::w;
+        else if( s.ends_with("frv") ) return type::msfrv;
+        else if( s.ends_with("fr") ) return type::msfr;
+        else if( s.contains("starcut") || s.contains("stc") ) return type::scut;
 
         throw std::runtime_error( fmt::format("Unrecognized machine: {}", s) );
        }
