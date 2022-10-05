@@ -6,7 +6,8 @@
 #include <string>
 #include <string_view>
 #include <map>
-#include <functional> // std::less
+#include <vector>
+#include <functional> // std::less, std::reference_wrapper
 #include <iterator> // std::prev
 #include <concepts> // std::convertible_to
 #include <fmt/core.h> // fmt::format, fmt::print
@@ -29,7 +30,7 @@ class Node final
     //-----------------------------------------------------------------------
     void set_value(const std::string_view newval)
        {
-        if( !is_leaf())
+        if( has_childs() )
            {
             throw std::runtime_error( fmt::format("Cannot assign value \"{}\" to a parent node", newval) );
            }
@@ -56,11 +57,17 @@ class Node final
         return !i_value.empty();
        }
 
-
     //-----------------------------------------------------------------------
+    // Is a key:value assignment node, so no childs and has a value
     [[nodiscard]] bool is_leaf() const noexcept
        {
-        return i_childs.empty();
+        return i_childs.empty() && !i_value.empty();
+       }
+
+    //-----------------------------------------------------------------------
+    [[nodiscard]] bool has_childs() const noexcept
+       {
+        return !i_childs.empty();
        }
 
     //-----------------------------------------------------------------------
@@ -118,15 +125,34 @@ class Node final
            {
             throw std::runtime_error("Won't merge a value node");
            }
-        //i_childs.merge(other.i_childs); // Won't update existing ones
+
         // Check for clashes
         for( const auto& other_pair : other.i_childs )
            {
-            if( i_childs.contains(other_pair.first) )
-               {
-                throw std::runtime_error( fmt::format("Won't merge existing child \"{}\"", other_pair.first) );
+            if( auto it_child = i_childs.find(other_pair.first); it_child!=i_childs.end() )
+               {// I already have this child!
+                if( it_child->second.is_leaf() && other_pair.second.is_leaf() )
+                   {// Two values: Don't know which one to keep, better avoid multiple definitions
+                    throw std::runtime_error( fmt::format("Value of field \"{}\" specified twice: {} and {}", other_pair.first, it_child->second.value(), other_pair.second.value()) );
+                   }
+                else if( it_child->second.is_leaf() )
+                   {// I have a value with the same key of the other group
+                    throw std::runtime_error( fmt::format("Can't merge group \"{}\" with value {}", other_pair.first, it_child->second.value()) );
+                   }
+                else if( other_pair.second.is_leaf() )
+                   {// I have a group with the same key of the other value
+                    throw std::runtime_error( fmt::format("Can't merge a value {}:{} with a group", other_pair.first, other_pair.second.value()) );
+                   }
+                else
+                   {// Two groups, merge them
+                    it_child->second.insert_childs_of( other_pair.second );
+                   }
                }
-            i_childs.insert(other_pair);
+            else
+               {// I don't already have this child
+                //fmt::print(" Inserting {}\n", other_pair.first);
+                i_childs.insert(other_pair); // Won't update existing ones, leaves other untouched
+               }
            }
        }
 
@@ -151,13 +177,13 @@ class Node final
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::size_t overall_leafs_count() const noexcept
+    [[nodiscard]] std::size_t values_count() const noexcept
        {
         if( is_leaf() ) return 1;
         std::size_t n = 0;
         for( const auto& pair : i_childs )
            {
-            n += pair.second.overall_leafs_count();
+            n += pair.second.values_count();
            }
         return n;
        }
@@ -275,6 +301,21 @@ class Node final
 //}
 #endif
 
+
+    /////////////////////////////////////////////////////////////////////////
+    // A list of references to existing nodes
+    class NodeSpan final
+    {
+     public:
+        [[nodiscard]] auto size() const noexcept { return v.size(); }
+        [[nodiscard]] auto begin() const noexcept { return v.cbegin(); }
+        [[nodiscard]] auto end() const noexcept { return v.cend(); }
+
+        template<class... Args> void emplace_back(Args&&... args){ v.emplace_back(std::forward<Args>(args)...); }
+  
+     private:
+        std::vector<std::reference_wrapper<const json::Node>> v;
+    };
 
 
 }//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

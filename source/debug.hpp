@@ -15,13 +15,13 @@ namespace dbg
   #ifdef NDEBUG
     #define D1LOG(...)
   #else
+    // Occhio, fmt::print lancia std::runtime_error("invalid utf8") quindi meglio assicurarci di convertire
     #define D1LOG(s,...) fmt::print(fg(fmt::color::salmon) | fmt::emphasis::bold, s, __VA_ARGS__);
   #endif
   
   #ifdef NDEBUG
     #define D2LOG(...)
   #else
-    // Occhio, fmt::print lancia std::runtime_error("invalid utf8") quindi meglio assicurarci di convertire
     #define D2LOG(s,...) fmt::print(fg(fmt::color::sky_blue) | fmt::emphasis::italic, s, __VA_ARGS__);
   #endif
 

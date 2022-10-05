@@ -76,16 +76,16 @@ class File final
             else if( line.tag() )
                {// Ignoring tags
                }
-            else if( line.assignment() )
+            else if( line.field() )
                {// Collect fields
-                if( i_fields.contains(line.assignment().var_name()) )
+                if( i_fields.contains(line.field().var_name()) )
                    {
-                    issues.push_back( fmt::format("UDT: Duplicate field {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
+                    issues.push_back( fmt::format("UDT: Duplicate field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
                    }
                 else
                    {
                     // Populate the map of fields
-                    const auto ins = i_fields.try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
+                    const auto ins = i_fields.try_emplace(line.field().var_name(), line.field(), i_lines.size());
                     field_ptr = &(ins.first->second); // Field associated to the collected line
                    }
                }
@@ -134,23 +134,20 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    void overwrite_values_from(const File& other) noexcept
+    void overwrite_values_from(const File& other_file) noexcept
        {
-        for( const auto& [key, ass] : other.i_fields )
+        for( const auto& [key, other] : other_file.i_fields )
            {
-            if( key == "vqMachSettingsVer"sv )
-               {// Skipping
-               }
-            else if( const auto field = get_field(key) )
+            if( const auto field = get_field(key) )
                {
-                field->modify_value(ass.value());
+                field->modify_value(other.value());
                }
             else
                {
                 // Potrei cercare di rilevare rinominazioni delle label
                 // controllando la corrispondenza ass.var_name(), ass.comment()
                 // Anche con str::calc_similarity
-                add_issue( fmt::format("Not found: {}",key) );
+                add_issue( fmt::format("Not found: {} = {}",key,other.value()) );
                }
            }
        }
@@ -158,14 +155,20 @@ class File final
     //-----------------------------------------------------------------------
     void write(const fs::path outpth)
        {
+        const std::string_view line_break = !i_lines.empty() &&
+                                            i_lines.front().span().length()>1 &&
+                                            i_lines.front().span()[i_lines.front().span().length()-2]=='\r'
+                                            ? "\r\n"sv : "\n"sv;
+        bool block_comment_notyetfound = true;
         sys::file_write fw( outpth.string() );
         for( const auto& line : i_lines )
            {
             if( line.field_ptr() && line.field_ptr()->is_value_modified() )
-               {// This line is an assignment with modified value, reconstructing the line
+               {// This line is a field with modified value, reconstructing the line
                 // Detect indentation
                 const std::ptrdiff_t indent_len = line.field_ptr()->var_name().data() - line.span().data();
                 assert(indent_len>=0);
+                assert( line.span().length()>0 && line.span()[line.span().length()-1]=='\n' );
 
                 fw << std::string_view(line.span().data(), static_cast<std::size_t>(indent_len))
                    << line.field_ptr()->var_name()
@@ -182,13 +185,14 @@ class File final
                     fw << " '"sv << line.field_ptr()->added_label() << '\'';
                    }
 
-                // Respect the original line break
-                assert( line.span().length()>0 && line.span()[line.span().length()-1]=='\n' );
-                if( line.span().length()>1 && line.span()[line.span().length()-2]=='\r' )
-                   {// Windows line break
-                    fw << '\r';
-                   }
-                fw << '\n';
+                fw << line_break;
+               }
+            else if( block_comment_notyetfound && line.span().contains("[EndNote]") )
+               {
+                block_comment_notyetfound = false;
+                // Adding some info on generated file
+                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_issues.size()) << " issues)"sv << line_break;
+                fw << line.span();
                }
             else
                {// Write original unmodified line
@@ -199,7 +203,7 @@ class File final
         // Append issues
         for( const auto& issue : i_issues )
            {
-            fw << "# "sv << issue << '\n';
+            fw << "# "sv << issue << line_break;
            }
        }
 

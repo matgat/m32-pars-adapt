@@ -3,8 +3,6 @@
 //  ---------------------------------------------
 //  Get DB data pertinent to a certain machine type
 //  ---------------------------------------------
-#include <vector>
-#include <functional> // std::reference_wrapper
 #include "json-node.hpp" // json::Node
 #include "machine-type.hpp" // macotec::MachineType
 
@@ -13,27 +11,54 @@
 namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
+
 //----------------------------------------------------------------------------
-[[nodiscard]] auto extract_db(const json::Node& db, const macotec::MachineType& mach, std::vector<std::string>& issues)
+// From a structure like this:  root┐
+//                                  ├mach1┐
+//                                  │     ├"common"-{nam=val,...}
+//                                  │     ├"cut-bridge"
+//                                  │     │  ├"dim1"-{nam=val,...}
+//                                  │     │  ├"dim2"-{nam=val,...}
+//                                  │     │  └···
+//                                  │     └"algn-span"
+//                                  │       ├"dim1"-{nam=val,...}
+//                                  │       ├"dim2"-{nam=val,...}
+//                                  │       └···
+//                                  ├mach2┐
+//                                  │     ├"common"─{nam=val,...}
+//                                  │     ├"cut-bridge"
+//                                  │     │  ├"dim1"-{nam=val,...}
+//                                  │     │  ├"dim2"-{nam=val,...}
+//                                  │     │  └···
+//                                  │     └"algn-span"
+//                                  │       ├"dim1"-{nam=val,...}
+//                                  │       ├"dim2"-{nam=val,...}
+//                                  │       └···
+//                                  └···
+// Will be extracted a list like this:   ┌{nam=val,...}
+//                                       ├{nam=val,...}
+//                                       └{nam=val,...}
+[[nodiscard]] json::NodeSpan extract_db(const json::Node& db, const macotec::MachineType& mach, std::vector<std::string>& issues)
 {
-    std::vector<std::reference_wrapper<const json::Node>> mach_db;
+    json::NodeSpan mach_db;
     if( const json::Node* const mach_db_root = db.get_child(mach.mach_id()) )
        {// Good, got an entry for this machine
         // Here expecting a structure like this:
         // root┐
-        //     ├"common"─{nam=val,...}
-        //     │  ├
-        //     ├"cut-bridge"┐
-        //     │  ├"dim"─{nam=val,...}
-        //     │  └···
+        //     ├"common"-{nam=val,...}
+        //     ├"cut-bridge"
+        //     │  ├"dim1"-{nam=val,...}           ┌{nam=val,...}
+        //     │  ├"dim2"-{nam=val,...}     =>    ├{nam=val,...}
+        //     │  └···                            └{nam=val,...}
         //     └"algn-span"
-        //       ├"dim"─{nam=val,...}
+        //       ├"dim1"-{nam=val,...}
+        //       ├"dim2"-{nam=val,...}
         //       └···
         for( const auto& [child_id, child] : mach_db_root->childs() )
            {
             if( child.is_leaf() )
                {
-                issues.push_back( fmt::format("DB: Ignoring ungrouped orphan assignment {}={} in {}", child_id, child.value(), mach.mach_id()) );
+                issues.push_back( fmt::format("DB: Ignoring orphan assignment {}:{} in {}", child_id, child.value(), mach.mach_id()) );
                }
             else if( child_id=="common" )
                {

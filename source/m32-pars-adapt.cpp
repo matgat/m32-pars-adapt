@@ -272,13 +272,12 @@ fs::path adapt_udt(Arguments& args, std::vector<std::string>& issues)
        {
         for( const auto& [nam, node] : group.get().childs() )
            {
+            //fmt::print("{}={}\n",nam,node.value());
             if( !node.has_value() )
                {
-                issues.push_back( fmt::format("Node {} hasn't a value", nam) );
+                issues.push_back( fmt::format("Node {} hasn't a value in {}", nam, args.job().db_file().path().string()) );
                }
-            //fmt::print("{}={}\n",nam,node.value());
-
-            if( const auto field = udt_file.get_field(nam) )
+            else if( const auto field = udt_file.get_field(nam) )
                {
                 field->modify_value(node.value());
                }

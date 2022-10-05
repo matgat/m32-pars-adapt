@@ -148,23 +148,23 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    void overwrite_values_from(const File& other) noexcept
+    void overwrite_values_from(const File& other_file) noexcept
        {
-        for( const auto& [varlbl, ass] : other.i_assignments )
+        for( const auto& [varlbl, other] : other_file.i_assignments )
            {
             if( varlbl == "vqMachSettingsVer"sv )
                {// Skipping
                }
             else if( const auto field = get_field(varlbl) )
                {
-                field->modify_value(ass.value());
+                field->modify_value(other.value());
                }
             else
                {
                 // Potrei cercare di rilevare rinominazioni delle label
                 // controllando la corrispondenza ass.var_name(), ass.comment()
                 // Anche con str::calc_similarity
-                add_issue( fmt::format("Not found: {} = {}",varlbl,ass.value()) );
+                add_issue( fmt::format("Not found: {} = {}",varlbl,other.value()) );
                }
            }
        }

@@ -40,7 +40,7 @@ class ParsDB final
 
     //-----------------------------------------------------------------------
     [[nodiscard]] const json::Node& root() const noexcept { return i_root; }
-    [[nodiscard]] std::string info() const { return fmt::format("{} first level nodes ({} values)", i_root.childs_count(), i_root.overall_leafs_count()); }
+    [[nodiscard]] std::string info() const { return fmt::format("{} first level nodes ({} values)", i_root.childs_count(), i_root.values_count()); }
     [[nodiscard]] std::string string() const { return i_root.string(); }
     void print() const { return i_root.print(); }
 
