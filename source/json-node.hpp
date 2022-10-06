@@ -307,12 +307,18 @@ class Node final
     class NodeSpan final
     {
      public:
+        void reserve(const std::size_t n) { v.reserve(n); }
         [[nodiscard]] auto size() const noexcept { return v.size(); }
         [[nodiscard]] auto begin() const noexcept { return v.cbegin(); }
         [[nodiscard]] auto end() const noexcept { return v.cend(); }
 
         template<class... Args> void emplace_back(Args&&... args){ v.emplace_back(std::forward<Args>(args)...); }
-  
+        
+        void append(const NodeSpan& other)
+           {
+            v.insert(v.end(), other.v.begin(), other.v.end());
+           }
+
      private:
         std::vector<std::reference_wrapper<const json::Node>> v;
     };

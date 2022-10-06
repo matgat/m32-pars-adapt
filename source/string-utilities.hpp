@@ -22,12 +22,18 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
 //---------------------------------------------------------------------------
-// Change string to lowercase
-constexpr std::string tolower(std::string s)
+constexpr std::string tolower(std::string s) noexcept
 {
     for(char& c : s) c = static_cast<char>(std::tolower(c));
-    // With c++20 ranges:
-    //s |= action::transform([](unsigned char c){ return std::tolower(c); });
+    //s |= action::transform([](unsigned char c){ return std::tolower(c); }); // With c++20 ranges
+    return s;
+}
+
+//---------------------------------------------------------------------------
+constexpr std::string tolower(const std::string_view sv)
+{
+    std::string s{sv};
+    for(char& c : s) c = static_cast<char>(std::tolower(c));
     return s;
 }
 
@@ -44,6 +50,27 @@ constexpr std::string tolower(std::string s)
 //{
 //    s.erase(std::find_if(s.rbegin(), s.rend(), [](const unsigned char ch){return !std::isspace(ch);}).base(), s.end());
 //    //while( !s.empty() && std::isspace(static_cast<unsigned char>(s.back())) ) s.pop_back();
+//}
+
+//---------------------------------------------------------------------------
+//constexpr std::string lowercase_trimmed_right(const std::string_view sv)
+//{
+//    std::string s;
+//    if( sv.size()>0 )
+//       {
+//        std::size_t i = sv.size()-1;
+//        // Trim right
+//        while( std::isspace(static_cast<unsigned char>(sv[i])) )
+//           {
+//            if(i>0) [[likely]] --i;
+//            else [[unlikely]] return s;
+//           }
+//        const auto i_last_not_space = i;
+//        // Lowercase
+//        s = sv.substr(0, i_last_not_space+1);
+//        for(char& c : s) c = static_cast<char>(std::tolower(c));
+//       }
+//    return s;
 //}
 
 

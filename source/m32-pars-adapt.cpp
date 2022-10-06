@@ -445,7 +445,6 @@ int main( const int argc, const char* const argv[] )
                {
                 fmt::print("    {}\n",issue);
                }
-            sys::sleep_ms(10'000);
             return 1;
            }
 
