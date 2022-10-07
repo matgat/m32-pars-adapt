@@ -115,25 +115,6 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::string_view get_value_of(const std::string_view key) const
-       {
-        if( const auto it=i_fields.find(key); it!=i_fields.end() )
-           {
-            return it->second.value();
-           }
-        throw std::runtime_error( fmt::format("Variable {} not found in {}", key, file_buf.path()) );
-       }
-
-    //-----------------------------------------------------------------------
-    void modify_value_if_present(const std::string_view key, const std::string& new_val) noexcept
-       {
-        if( const auto it = i_fields.find(key); it!=i_fields.end() )
-           {
-            it->second.modify_value(new_val);
-           }
-       }
-
-    //-----------------------------------------------------------------------
     void overwrite_values_from(const File& other_file) noexcept
        {
         for( const auto& [key, other] : other_file.i_fields )

@@ -241,15 +241,44 @@ fs::path adapt_udt(Arguments& args, std::vector<std::string>& issues)
     udt::File udt_file(args.job().target_file().path(), issues);
 
     // [Machine type]
-    // If machine type is not given, I'll try to extract it from the udt file
     if( args.job().machine_type() )
-       {// Ensure to set the specified machine type in the file
-        udt_file.modify_value_if_present("vaMachName", str::quoted(args.job().machine_type().string()));
+       {// Machine type specified
+        if( const auto vaMachName = udt_file.get_field("vaMachName") )
+           {
+            // Better check that the target file has already superimposed options
+            macotec::MachineType udt_mach_type;
+            try{
+                udt_mach_type.assign( str::unquoted(vaMachName->value()) );
+               }
+            catch( std::exception& e )
+               {
+                issues.push_back( fmt::format("{} has an invalid vaMachName \"{}\": {}", args.job().target_file().path().filename().string(), vaMachName->value(), e.what()) );
+               }
+            if( !udt_mach_type.options().is_empty() )
+               {
+                throw std::runtime_error( fmt::format("{} had already options: {}", args.job().target_file().path().filename().string(), udt_mach_type.options().string()) );
+               }
+            // Overwrite the specified machine type in the file
+            vaMachName->modify_value( str::quoted(args.job().machine_type().string()) );
+           }
+        else
+           {
+            issues.push_back( fmt::format("{} hasn't field vaMachName", args.job().target_file().path().filename().string()) );
+           }
        }
     else
-       {// Extract machine type from udt file
-        const std::string_view s = str::unquoted( udt_file.get_value_of("vaMachName") );
-        args.modify_job().set_machine_type(s);
+       {// Machine type not explicitly specified
+        // Ask for machine type
+        //args.modify_job().set_machine_type( macotec::MachineType::ask_user() );
+        // Extract machine type from udt file
+        if( const auto vaMachName = udt_file.get_field("vaMachName") )
+           {
+            args.modify_job().set_machine_type( str::unquoted(vaMachName->value()) );
+           }
+        else
+           {
+            throw std::runtime_error( fmt::format("Can't infer machine from {}", args.job().target_file().path().filename().string()) );
+           }
        }
 
     // [Parameters DB]
@@ -385,7 +414,7 @@ int main( const int argc, const char* const argv[] )
             else
                {// Manual merge
                 sys::compare_wait(out_pth.string().c_str(), args.job().target_file().path().string().c_str());
-                
+
                 if( args.job().out_file_name().empty() )
                    {
                     fs::remove( out_pth );

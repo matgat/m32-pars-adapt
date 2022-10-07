@@ -129,23 +129,23 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::string_view get_value_of(const std::string_view varlbl) const
-       {
-        if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
-           {
-            return it->second.value();
-           }
-        throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
-       }
+    //[[nodiscard]] std::string_view get_value_of(const std::string_view varlbl) const
+    //   {
+    //    if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
+    //       {
+    //        return it->second.value();
+    //       }
+    //    throw std::runtime_error( fmt::format("Variable {} not found in {}", varlbl, file_buf.path()) );
+    //   }
 
     //-----------------------------------------------------------------------
-    void modify_value_if_present(const std::string_view varlbl, const std::string& new_val) noexcept
-       {
-        if( const auto it = i_assignments.find(varlbl); it!=i_assignments.end() )
-           {
-            it->second.modify_value(new_val);
-           }
-       }
+    //void modify_value_if_present(const std::string_view varlbl, const std::string& new_val) noexcept
+    //   {
+    //    if( const auto it = i_assignments.find(varlbl); it!=i_assignments.end() )
+    //       {
+    //        it->second.modify_value(new_val);
+    //       }
+    //   }
 
     //-----------------------------------------------------------------------
     void overwrite_values_from(const File& other_file) noexcept

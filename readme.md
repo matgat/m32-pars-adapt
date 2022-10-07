@@ -97,7 +97,15 @@ First level keys are the machine type:
 
 Recognized second level keys are:
 
-	"common", "cut-bridge", "algn-span"
+	"common", "cut-bridge", "algn-span", "+<option-name>"
+
+Second level keys whose name is prefixed with `+`
+represent special groups denoting *options*.
+The values inside these groups are applied last,
+overwriting possible existing fields with the same name.
+Warning: Adapting a `MachSettings.utd` that has
+superimposed options can lead to incoherences,
+so in this case the program will rise an error.
 
 Recognized  dimensions:
 
