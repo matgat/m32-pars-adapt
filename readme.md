@@ -56,7 +56,7 @@ And as fallback the association with the extension `.WinMerge`
 
 
 _________________________________________________________________________
-## Database
+## Parameters database
 ### Syntax
 The format is a simplified json syntax:
 * Optional double quotes for keys
@@ -81,7 +81,27 @@ The format is a simplified json syntax:
        }
    }
 ```
-### Recognized keys
+
+_________________________________________________________________________
+### Structure for MachSettings.udt
+Here is the expected database structure used to adapt
+a `MachSettings.udt` file:
+```
+root┐
+    ├mach┐
+    │    ├"common"-{nam=val,...}
+    │    ├"cut-bridge"
+    │    │  ├"dim"-{nam=val,...}
+    │    │  ├"dim"-{nam=val,...}
+    │    │  └···
+    │    ├"algn-span"
+    │    │ ├"dim"-{nam=val,...}
+    │    │ ├"dim"-{nam=val,...}
+    │    │ └···
+    │    ├"+option"-{nam=val,...}
+    │    └···
+    └···
+```
 First level keys are the machine type:
 
 | *id*  | *Machine*  | *Type*    |
@@ -116,13 +136,54 @@ Recognized  dimensions:
 	W,WR,HP: algn-span  : 3.2, 4.6
 
 
+_________________________________________________________________________
+### Structure for par2kax.txt
+Here is the expected database structure used to adapt
+a `par2kax.txt` file:
+```
+root┐
+    ├mach┐
+    │    ├"common"┐
+    │    │        ├"ax"-{nam=val,...}
+    │    │        ├"ax"-{nam=val,...}
+    │    │        └···
+    │    ├"cut-bridge"┐
+    │    │            ├"dim"┐
+    │    │            │     ├"ax"-{nam=val,...}
+    │    │            │     ├"ax"-{nam=val,...}
+    │    │            │     └···
+    │    │            ├"dim"┐
+    │    │            │     ├"ax"-{nam=val,...}
+    │    │            │     ├"ax"-{nam=val,...}
+    │    │            │     └···
+    │    │            └···
+    │    ├"algn-span"┐
+    │    │           ├"dim"┐
+    │    │           │     ├"ax"-{nam=val,...}
+    │    │           │     ├"ax"-{nam=val,...}
+    │    │           │     └···
+    │    │           ├"dim"┐
+    │    │           │     ├"ax"-{nam=val,...}
+    │    │           │     ├"ax"-{nam=val,...}
+    │    │           │     └···
+    │    │           └···
+    │    ├"+option"┐
+    │    │         ├"ax"-{nam=val,...}
+    │    │         ├"ax"-{nam=val,...}
+    │    │         └···
+    │    └···
+    └···
+```
 
 _________________________________________________________________________
 ## Build
 ```
+# pacman -S fmt
 $ git clone https://github.com/matgat/m32-pars-adapt.git
+$ cd m32-pars-adapt
 $ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
 ```
+
 On Windows, use the latest Microsoft Visual Studio Community.
 From the command line, something like:
 ```

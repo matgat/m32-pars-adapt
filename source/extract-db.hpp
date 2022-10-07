@@ -14,30 +14,30 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //----------------------------------------------------------------------------
 // From a structure like this:  root┐
-//                                  ├mach1┐
-//                                  │     ├"common"-{nam=val,...}
-//                                  │     ├"cut-bridge"
-//                                  │     │  ├"dim1"-{nam=val,...}
-//                                  │     │  ├"dim2"-{nam=val,...}
-//                                  │     │  └···
-//                                  │     ├"algn-span"
-//                                  │     │ ├"dim1"-{nam=val,...}
-//                                  │     │ ├"dim2"-{nam=val,...}
-//                                  │     │ └···
-//                                  │     ├"+option"-{nam=val,...}
-//                                  │     └···
-//                                  ├mach2┐
-//                                  │     ├"common"─{nam=val,...}
-//                                  │     ├"cut-bridge"
-//                                  │     │  ├"dim1"-{nam=val,...}
-//                                  │     │  ├"dim2"-{nam=val,...}
-//                                  │     │  └···
-//                                  │     ├"algn-span"
-//                                  │     │ ├"dim1"-{nam=val,...}
-//                                  │     │ ├"dim2"-{nam=val,...}
-//                                  │     │ └···
-//                                  │     ├"+option"-{nam=val,...}
-//                                  │     └···
+//                                  ├mach┐
+//                                  │    ├"common"-{nam=val,...}
+//                                  │    ├"cut-bridge"
+//                                  │    │  ├"dim"-{nam=val,...}
+//                                  │    │  ├"dim"-{nam=val,...}
+//                                  │    │  └···
+//                                  │    ├"algn-span"
+//                                  │    │ ├"dim"-{nam=val,...}
+//                                  │    │ ├"dim"-{nam=val,...}
+//                                  │    │ └···
+//                                  │    ├"+option"-{nam=val,...}
+//                                  │    └···
+//                                  ├mach┐
+//                                  │    ├"common"─{nam=val,...}
+//                                  │    ├"cut-bridge"
+//                                  │    │  ├"dim"-{nam=val,...}
+//                                  │    │  ├"dim"-{nam=val,...}
+//                                  │    │  └···
+//                                  │    ├"algn-span"
+//                                  │    │ ├"dim"-{nam=val,...}
+//                                  │    │ ├"dim"-{nam=val,...}
+//                                  │    │ └···
+//                                  │    ├"+option"-{nam=val,...}
+//                                  │    └···
 //                                  └···
 // Will be extracted a list like this:   ┌{nam=val,...}
 //                                       ├{nam=val,...}
@@ -53,12 +53,12 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // root┐
         //     ├"common"-{nam=val,...}
         //     ├"cut-bridge"
-        //     │  ├"dim1"-{nam=val,...}           ┌{nam=val,...}
-        //     │  ├"dim2"-{nam=val,...}     =>    ├{nam=val,...}
-        //     │  └···                            └{nam=val,...}
+        //     │  ├"dim"-{nam=val,...}           ┌{nam=val,...}
+        //     │  ├"dim"-{nam=val,...}     =>    ├{nam=val,...}
+        //     │  └···                           └{nam=val,...}
         //     ├"algn-span"
-        //     │ ├"dim1"-{nam=val,...}
-        //     │ ├"dim2"-{nam=val,...}
+        //     │ ├"dim"-{nam=val,...}
+        //     │ ├"dim"-{nam=val,...}
         //     │ └···
         //     ├"+option"-{nam=val,...}
         //     └···
@@ -110,7 +110,7 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 issues.push_back( fmt::format("DB: Ignoring unrecognized block {}:{{{}}}", mach.family().id_string(), child_id) );
                }
            }
-        
+
         // Ensuring option nodes in the back in order to overwrite the values in other groups
         if( options_db.size()>0 )
            {

@@ -72,7 +72,6 @@ class File final
       : file_buf{pth.string()}
        {
         std::vector<std::string> parse_issues;
-
         sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
 
         while( parser.has_data() )
@@ -90,11 +89,11 @@ class File final
                {// Collect assignment
                 if( line.assignment().added_label().empty() )
                    {
-                    issues.push_back( fmt::format("UDT: Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
+                    parse_issues.push_back( fmt::format("Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
                    }
                 else if( i_assignments.contains(line.assignment().added_label()) )
                    {
-                    issues.push_back( fmt::format("UDT: Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()) );
+                    parse_issues.push_back( fmt::format("Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()) );
                    }
                 else
                    {
@@ -104,6 +103,7 @@ class File final
                    }
                }
 
+            // All lines are collected to reproduce the original file
             i_lines.emplace_back( line.span(), asgnm_ptr );
            }
 

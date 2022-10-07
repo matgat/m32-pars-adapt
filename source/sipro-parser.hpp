@@ -19,6 +19,7 @@ class Tag final
     [[nodiscard]] operator bool() const noexcept { return !i_Name.empty(); }
 
     [[nodiscard]] std::string_view name() const noexcept { return i_Name; }
+
     void set_name(std::string_view s)
        {
         if( s.empty() )

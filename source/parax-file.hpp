@@ -1,10 +1,11 @@
 #ifndef GUARD_parax_file_hpp
 #define GUARD_parax_file_hpp
 //  ---------------------------------------------
-//  Sipro par2kax file descriptor
+//  Sipro par2kax.txt file descriptor
 //  ---------------------------------------------
-#include <string_view>
 #include <stdexcept>
+#include <string_view>
+#include <optional>
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
@@ -62,34 +63,68 @@ class File final
       : file_buf{pth.string()}
        {
         std::vector<std::string> parse_issues;
-
         sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
+
+        std::optional<sipro::Tag> curr_ax_block; // To know if I'm collecting axis fields
 
         while( parser.has_data() )
            {
             const sipro::Line line = parser.next_line();
             Field* field_ptr = nullptr;
 
-            if( parser.is_inside_note_block() )
-               {// Ignoring notes
-               }
-            else if( line.tag() )
-               {// Ignoring tags
-               }
-            else if( line.field() )
-               {// Collect fields
-                if( i_fields.contains(line.field().var_name()) )
-                   {
-                    issues.push_back( fmt::format("UDT: Duplicate field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
+            if( curr_ax_block )
+               {// Collecting the fields of an axis
+                if( parser.is_inside_note_block() )
+                   {// Ignoring notes
                    }
-                else
+                else if( line.tag() )
+                   {// Detect Ax definition block end [End###Ax]
+                    if( line.tag().is_endof(curr_ax_block->name()) )
+                       {
+                        curr_ax_block.reset();
+                       }
+                    else
+                       {
+                        parse_issues.push_back( fmt::format("Unexpected tag {} at line {}"sv, line.tag().name(), i_lines.size()) );
+                       }
+                   }
+                else if( line.field() )
+                   {// Collect axis fields
+                    if( i_fields.contains(line.field().var_name()) )
+                       {
+                        parse_issues.push_back( fmt::format("UDT: Duplicate field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
+                       }
+                    else
+                       {
+                        // Populate the map of fields
+                        const auto ins = i_fields.try_emplace(line.field().var_name(), line.field(), i_lines.size());
+                        field_ptr = &(ins.first->second); // Field associated to the collected line
+                       }
+                   }
+               }
+            else
+               {// Searching for a [Start###Ax] tag
+                if( parser.is_inside_note_block() )
+                   {// Ignoring notes
+                   }
+                else if( line.tag() )
+                   {// Detect entering Ax definition block [Start###Ax]
+                    if( line.tag().is_start() && line.tag().name().ends_with("Ax") )
+                       {
+                        curr_ax_block = line.tag();
+                       }
+                    else
+                       {
+                        parse_issues.push_back( fmt::format("Unexpected tag {} at line {}"sv, line.tag().name(), i_lines.size()) );
+                       }
+                   }
+                else if( line.field() )
                    {
-                    // Populate the map of fields
-                    const auto ins = i_fields.try_emplace(line.field().var_name(), line.field(), i_lines.size());
-                    field_ptr = &(ins.first->second); // Field associated to the collected line
+                    parse_issues.push_back( fmt::format("Unexpected field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
                    }
                }
 
+            // All lines are collected to reproduce the original file
             i_lines.emplace_back( line.span(), field_ptr );
            }
 
@@ -114,24 +149,7 @@ class File final
         return nullptr;
        }
 
-    //-----------------------------------------------------------------------
-    void overwrite_values_from(const File& other_file) noexcept
-       {
-        for( const auto& [key, other] : other_file.i_fields )
-           {
-            if( const auto field = get_field(key) )
-               {
-                field->modify_value(other.value());
-               }
-            else
-               {
-                // Potrei cercare di rilevare rinominazioni delle label
-                // controllando la corrispondenza ass.var_name(), ass.comment()
-                // Anche con str::calc_similarity
-                add_issue( fmt::format("Not found: {} = {}",key,other.value()) );
-               }
-           }
-       }
+
 
     //-----------------------------------------------------------------------
     void write(const fs::path outpth)
@@ -156,15 +174,10 @@ class File final
                    << " = "sv
                    << line.field_ptr()->value();
 
-                if( !line.field_ptr()->comment().empty() )
-                   {
-                    fw << " # "sv << line.field_ptr()->comment();
-                   }
-
-                if( !line.field_ptr()->added_label().empty() )
-                   {
-                    fw << " '"sv << line.field_ptr()->added_label() << '\'';
-                   }
+                //if( !line.field_ptr()->comment().empty() )
+                //   {
+                //    fw << " # "sv << line.field_ptr()->comment();
+                //   }
 
                 fw << line_break;
                }
