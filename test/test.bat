@@ -22,8 +22,8 @@ goto menu%errorlevel%
 
 :menu1
 rem Test udt adaptation (W)
-set mach=hp(4.0/4.6)
-::set mach=ActWR-4.0/4.6|no-buf;combo
+::set mach=hp(4.0/4.6)
+set mach=ActWR-4.0/4.6;no-buf;combo
 ::set mach=wr/4.0
 %exe% --verbose --tgt "%src_pth%\%udt_name%" --db "%udt_overlay%" --machine "%mach%"
 goto menu0

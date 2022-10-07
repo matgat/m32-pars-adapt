@@ -11,6 +11,7 @@
 #include <array>
 #include <cctype> // std::isdigit, std::tolower, ...
 #include <fmt/core.h> // fmt::format
+#include "vectset.hpp" // mat::vectset
 #include "string-utilities.hpp" // str::tolower
 
 using namespace std::literals; // "..."sv
@@ -247,7 +248,11 @@ class MachineOptions final
        };
 
  public:
-    [[nodiscard]] bool contains(const MachineOptions& other) const noexcept { return (bit_mask | other.bit_mask) == bit_mask; }
+    [[nodiscard]] bool contains(const MachineOptions& other) const noexcept
+       {
+        return (bit_mask | other.bit_mask) == bit_mask // Contains known options
+               && unrecognized.contains(other.unrecognized); // Contains also unknown ones
+       }
 
     [[nodiscard]] bool is_empty() const noexcept { return bit_mask==0; }
     //void reset() noexcept { bit_mask=0; }
@@ -277,13 +282,14 @@ class MachineOptions final
 
     constexpr void add_option(const std::string_view opt) noexcept
        {
+        // Try to recognize option...  
              if( opt=="opp" )    set_opp(true);
         else if( opt=="lowe" )   set_lowe(true);
         else if( opt=="rot" )    set_rot(true);
         else if( opt=="buf" )    set_buf(true);
         else if( opt=="no-buf" ) set_nobuf(true);
-        // Nah, just silently ignore unrecognized options
-        //else throw std::runtime_error( fmt::format("Unknown option \"{}\"",option) );
+        //...Otherwise just collect it
+        else unrecognized.insert( std::string(opt) );
        }
 
     std::string string(const char sep =',') const
@@ -294,12 +300,18 @@ class MachineOptions final
         if( has_rot() )   { s+="rot";    s+=sep; }
         if( has_buf() )   { s+="buf";    s+=sep; }
         if( has_nobuf() ) { s+="no-buf"; s+=sep; }
+        // Also the unrecognized ones
+        for( const std::string& opt : unrecognized )
+           {
+            s+=opt; s+=sep;
+           }
         if(s.size()>0) s.resize(s.size()-1);
         return s;
        }
 
  private:
     std::underlying_type_t<bits> bit_mask = 0;
+    mat::vectset<std::string> unrecognized; // Unknown options
 
     [[nodiscard]] bool has_bit(const bits bit) const noexcept { return bit_mask & to_underlying(bit); }
     void set_bit(const bits bit, const bool b) noexcept { if(b)bit_mask|=to_underlying(bit); else bit_mask&=~to_underlying(bit); }
@@ -311,9 +323,6 @@ class MachineOptions final
 class MachineType final
 {
  public:
-    MachineType() noexcept = default;
-    //explicit MachineType(const std::string_view s) { *this = recognize_machine(s); }
-
     void assign(const std::string_view s) { *this = recognize_machine(s); }
 
     [[nodiscard]] operator bool() const noexcept { return i_family.is_defined(); }

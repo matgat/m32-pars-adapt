@@ -313,7 +313,7 @@ class Node final
         [[nodiscard]] auto end() const noexcept { return v.cend(); }
 
         template<class... Args> void emplace_back(Args&&... args){ v.emplace_back(std::forward<Args>(args)...); }
-        
+
         void append(const NodeSpan& other)
            {
             v.insert(v.end(), other.v.begin(), other.v.end());

@@ -20,20 +20,24 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //                                  │     │  ├"dim1"-{nam=val,...}
 //                                  │     │  ├"dim2"-{nam=val,...}
 //                                  │     │  └···
-//                                  │     └"algn-span"
-//                                  │       ├"dim1"-{nam=val,...}
-//                                  │       ├"dim2"-{nam=val,...}
-//                                  │       └···
+//                                  │     ├"algn-span"
+//                                  │     │ ├"dim1"-{nam=val,...}
+//                                  │     │ ├"dim2"-{nam=val,...}
+//                                  │     │ └···
+//                                  │     ├"+option"-{nam=val,...}
+//                                  │     └···
 //                                  ├mach2┐
 //                                  │     ├"common"─{nam=val,...}
 //                                  │     ├"cut-bridge"
 //                                  │     │  ├"dim1"-{nam=val,...}
 //                                  │     │  ├"dim2"-{nam=val,...}
 //                                  │     │  └···
-//                                  │     └"algn-span"
-//                                  │       ├"dim1"-{nam=val,...}
-//                                  │       ├"dim2"-{nam=val,...}
-//                                  │       └···
+//                                  │     ├"algn-span"
+//                                  │     │ ├"dim1"-{nam=val,...}
+//                                  │     │ ├"dim2"-{nam=val,...}
+//                                  │     │ └···
+//                                  │     ├"+option"-{nam=val,...}
+//                                  │     └···
 //                                  └···
 // Will be extracted a list like this:   ┌{nam=val,...}
 //                                       ├{nam=val,...}
@@ -52,10 +56,12 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //     │  ├"dim1"-{nam=val,...}           ┌{nam=val,...}
         //     │  ├"dim2"-{nam=val,...}     =>    ├{nam=val,...}
         //     │  └···                            └{nam=val,...}
-        //     └"algn-span"
-        //       ├"dim1"-{nam=val,...}
-        //       ├"dim2"-{nam=val,...}
-        //       └···
+        //     ├"algn-span"
+        //     │ ├"dim1"-{nam=val,...}
+        //     │ ├"dim2"-{nam=val,...}
+        //     │ └···
+        //     ├"+option"-{nam=val,...}
+        //     └···
         json::NodeSpan options_db; // Possible options are collected in a separate container
 
         for( const auto& [child_id, child] : mach_db_root->childs() )
