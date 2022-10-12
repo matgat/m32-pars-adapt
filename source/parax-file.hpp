@@ -5,10 +5,11 @@
 //  ---------------------------------------------
 #include <stdexcept>
 #include <string_view>
-#include <optional>
+#include <map>
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
+#include "string-utilities.hpp" // str::unquoted
 #include "sipro-parser.hpp" // sipro::Parser
 
 
@@ -22,41 +23,42 @@ class File final
 {
     /////////////////////////////////////////////////////////////////////////
     class Field final
-    {
-     public:
-        explicit Field(const sipro::Assignment a, const std::size_t l) : i_Assignment(a), i_LineIdx(l) {}
+       {
+        public:
+            explicit Field(const sipro::Assignment a, const std::size_t l) : i_Assignment(a), i_LineIdx(l) {}
 
-        [[nodiscard]] std::string_view var_name() const noexcept { return i_Assignment.var_name(); }
-        [[nodiscard]] std::string_view value() const noexcept { return i_NewVal.empty() ? i_Assignment.value() : i_NewVal; }
+            [[nodiscard]] std::string_view var_name() const noexcept { return i_Assignment.var_name(); }
+            [[nodiscard]] std::string_view value() const noexcept { return i_NewVal.empty() ? i_Assignment.value() : i_NewVal; }
 
-        [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
-        [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
-        void modify_value(const std::string_view new_val) { i_NewVal = new_val; }
+            [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
+            [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
+            void modify_value(const std::string_view new_val) { i_NewVal = new_val; }
 
-        [[nodiscard]] std::size_t line_index() const noexcept { return i_LineIdx; }
+            [[nodiscard]] std::size_t line_index() const noexcept { return i_LineIdx; }
 
-     private:
-        sipro::Assignment i_Assignment;
-        std::size_t i_LineIdx;
-        std::string i_NewVal;
-    };
+        private:
+            sipro::Assignment i_Assignment;
+            std::size_t i_LineIdx;
+            std::string i_NewVal;
+       };
 
     /////////////////////////////////////////////////////////////////////////
     class Line final
-    {
-     public:
-        explicit Line(const std::string_view l, Field* const p) : i_LineSpan(l), i_FieldPtr(p) {}
+       {
+        public:
+            explicit Line(const std::string_view l) : i_LineSpan(l), i_FieldPtr(nullptr) {}
 
-        [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
-        [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
+            [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
+            [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
 
-        [[nodiscard]] const Field* field_ptr() const noexcept { return i_FieldPtr; }
-        [[nodiscard]] Field* field_ptr() noexcept { return i_FieldPtr; }
+            [[nodiscard]] const Field* field_ptr() const noexcept { return i_FieldPtr; }
+            [[nodiscard]] Field* field_ptr() noexcept { return i_FieldPtr; }
+            void set_field_ptr(Field* const p) noexcept { i_FieldPtr = p; }
 
-     private:
-        std::string_view i_LineSpan;
-        Field* i_FieldPtr;
-    };
+        private:
+            std::string_view i_LineSpan;
+            Field* i_FieldPtr;
+       };
 
  public:
     explicit File(const fs::path& pth, std::vector<std::string>& issues)
@@ -65,12 +67,38 @@ class File final
         std::vector<std::string> parse_issues;
         sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
 
-        std::optional<sipro::Tag> curr_ax_block; // To know if I'm collecting axis fields
+        // A context for collecting axis fields
+        class
+           {
+            public:
+                void start(const std::string_view nam, const std::size_t lin)
+                   {
+                    m_tagname = nam;
+                    m_line_idx = lin;
+                    m_collected_fields.clear();
+                    m_inside = true;
+                   }
+
+                void end()
+                   {
+                    m_inside = false;
+                   }
+
+                [[nodiscard]] operator bool() const noexcept { return m_inside; }
+                [[nodiscard]] std::string_view tag_name() const noexcept { return m_tagname; }
+                [[nodiscard]] std::size_t line_idx() const noexcept { return m_line_idx; }
+                [[nodiscard]] auto& collected_fields() noexcept { return m_collected_fields; }
+
+            private:
+                std::string_view m_tagname;
+                std::size_t m_line_idx = 0;
+                std::map<std::string_view,Field> m_collected_fields;
+                bool m_inside = false;
+           } curr_ax_block;
 
         while( parser.has_data() )
            {
             const sipro::Line line = parser.next_line();
-            Field* field_ptr = nullptr;
 
             if( curr_ax_block )
                {// Collecting the fields of an axis
@@ -79,26 +107,55 @@ class File final
                    }
                 else if( line.tag() )
                    {// Detect Ax definition block end [End###Ax]
-                    if( line.tag().is_endof(curr_ax_block->name()) )
+                    if( line.tag().is_end_of(curr_ax_block.tag_name()) )
                        {
-                        curr_ax_block.reset();
+                        curr_ax_block.end();
+                        if( curr_ax_block.collected_fields().empty() )
+                           {
+                            parse_issues.push_back( fmt::format("No fields collected in axis block at line {}"sv, curr_ax_block.line_idx()) );
+                           }
+                        // I need the axis name to store the collected fields
+                        else if( const Field* ax_name_field = get_field(curr_ax_block.collected_fields(),"Name") )
+                           {
+                            const std::string_view ax_name = str::unquoted(ax_name_field->value());
+                            if( i_axblocks.contains(ax_name) )
+                               {
+                                parse_issues.push_back( fmt::format("Duplicate axis name {} in block at line {}"sv, ax_name, curr_ax_block.line_idx()) );
+                               }
+                            else
+                               {
+                                const auto [it, inserted] = i_axblocks.insert({ax_name, std::move(curr_ax_block.collected_fields())});
+                                assert(curr_ax_block.collected_fields().empty()); // After move should be empty
+                                if( !inserted )
+                                   {
+                                    parse_issues.push_back( fmt::format("Axis block {} at line {} was not inserted"sv, ax_name, curr_ax_block.line_idx()) );
+                                   }
+                               }
+                           }
+                        else
+                           {
+                            parse_issues.push_back( fmt::format("Name not found in axis block at line {}"sv, curr_ax_block.line_idx()) );
+                           }
                        }
-                    else
+                    else if( line.tag().name() != "Note"sv )
                        {
-                        parse_issues.push_back( fmt::format("Unexpected tag {} at line {}"sv, line.tag().name(), i_lines.size()) );
+                        parse_issues.push_back( fmt::format("Unexpected tag {} at line {}"sv, line.tag().name(), i_lines.size()+1) );
                        }
                    }
-                else if( line.field() )
+                else if( line.assignment() )
                    {// Collect axis fields
-                    if( i_fields.contains(line.field().var_name()) )
+                    if( curr_ax_block.collected_fields().contains(line.assignment().var_name()) )
                        {
-                        parse_issues.push_back( fmt::format("UDT: Duplicate field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
+                        parse_issues.push_back( fmt::format("Duplicate field {} at line {}"sv, line.assignment().var_name(), i_lines.size()+1) );
                        }
                     else
                        {
                         // Populate the map of fields
-                        const auto ins = i_fields.try_emplace(line.field().var_name(), line.field(), i_lines.size());
-                        field_ptr = &(ins.first->second); // Field associated to the collected line
+                        const auto [it, inserted] = curr_ax_block.collected_fields().try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
+                        if( !inserted )
+                           {
+                            parse_issues.push_back( fmt::format("Field {} at line {} was not inserted"sv, line.assignment().var_name(), i_lines.size()+1) );
+                           }
                        }
                    }
                }
@@ -111,21 +168,28 @@ class File final
                    {// Detect entering Ax definition block [Start###Ax]
                     if( line.tag().is_start() && line.tag().name().ends_with("Ax") )
                        {
-                        curr_ax_block = line.tag();
+                        curr_ax_block.start(line.tag().name(), i_lines.size()+1);
                        }
-                    else
-                       {
-                        parse_issues.push_back( fmt::format("Unexpected tag {} at line {}"sv, line.tag().name(), i_lines.size()) );
-                       }
+                    // Ignoring other tags
                    }
-                else if( line.field() )
+                else if( line.assignment() )
                    {
-                    parse_issues.push_back( fmt::format("Unexpected field {} at line {}"sv, line.field().var_name(), i_lines.size()) );
+                    parse_issues.push_back( fmt::format("Unexpected field {} at line {}"sv, line.assignment().var_name(), i_lines.size()+1) );
                    }
                }
 
             // All lines are collected to reproduce the original file
-            i_lines.emplace_back( line.span(), field_ptr );
+            i_lines.emplace_back( line.span() );
+           }
+
+        // Associate the field pointers to lines
+        for( auto& [axid, axblock] : i_axblocks )
+           {
+            for( auto& [var_name, field] : axblock )
+               {
+                assert(field.line_index()<i_lines.size());
+                i_lines[field.line_index()].set_field_ptr(&field);
+               }
            }
 
         // Append parsing issues to overall issues list
@@ -140,15 +204,24 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] Assignment* get_field(const std::string_view key)
+    [[nodiscard]] std::map<std::string_view,Field>* get_axfields(const std::string_view axid) noexcept
        {
-        if( const auto it=i_fields.find(key); it!=i_fields.end() )
+        if( auto it=i_axblocks.find(axid); it!=i_axblocks.end() )
            {
             return &(it->second);
            }
         return nullptr;
        }
 
+    //-----------------------------------------------------------------------
+    [[nodiscard]] static Field* get_field(std::map<std::string_view,Field>& fields, const std::string_view key) noexcept
+       {
+        if( auto it=fields.find(key); it!=fields.end() )
+           {
+            return &(it->second);
+           }
+        return nullptr;
+       }
 
 
     //-----------------------------------------------------------------------
@@ -185,7 +258,7 @@ class File final
                {
                 block_comment_notyetfound = false;
                 // Adding some info on generated file
-                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_issues.size()) << " issues)"sv << line_break;
+                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_mod_issues.size()) << " issues)"sv << line_break;
                 fw << line.span();
                }
             else
@@ -194,36 +267,40 @@ class File final
                }
            }
 
-        // Append issues
-        for( const auto& issue : i_issues )
+        // Append modification issues
+        for( const auto& issue : i_mod_issues )
            {
             fw << "# "sv << issue << line_break;
            }
        }
 
+
     //-----------------------------------------------------------------------
     [[nodiscard]] std::size_t modified_values_count() const noexcept
        {
         std::size_t count = 0;
-        for( const auto& [key, ass] : i_fields )
+        for( auto& [axid, axblock] : i_axblocks )
            {
-            if( ass.is_value_modified() ) ++count;
+            for( auto& [var_name, field] : axblock )
+               {
+                if( field.is_value_modified() ) ++count;
+               }
            }
         return count;
        }
 
-    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} fields", i_lines.size(), i_fields.size()); }
+    [[nodiscard]] std::string info() const { return fmt::format("{} lines, {} axes", i_lines.size(), i_axblocks.size()); }
     [[nodiscard]] const std::string& path() const noexcept { return file_buf.path(); }
 
     //-----------------------------------------------------------------------
-    void add_issue(std::string&& issue) { i_issues.emplace_back(issue); }
-    [[nodiscard]] std::size_t issues_count() const noexcept { return i_issues.size(); }
+    void add_mod_issue(std::string&& issue) { i_mod_issues.emplace_back(issue); }
+    [[nodiscard]] std::size_t mod_issues_count() const noexcept { return i_mod_issues.size(); }
 
  private:
     const sys::MemoryMappedFile file_buf; // File buffer
     std::vector<Line> i_lines; // Collected lines
-    std::map<std::string_view,Field> i_fields; // Fields (name = value)
-    std::vector<std::string> i_issues; // Notified problems
+    std::map<std::string_view,std::map<std::string_view,Field>> i_axblocks; // Axes fields
+    std::vector<std::string> i_mod_issues; // Notified problems
 };
 
 

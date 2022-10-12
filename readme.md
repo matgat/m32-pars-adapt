@@ -58,11 +58,12 @@ And as fallback the association with the extension `.WinMerge`
 _________________________________________________________________________
 ## Parameters database
 ### Syntax
-The format is a simplified json syntax:
-* Optional double quotes for keys
-* Just line breaks as separators
-* Multiple keys support
+The format is an extended/simplified json syntax:
+* Key names can be unquoted, use double quotes in case of special chars
+* Multiple comma separated keys support
+* No semicolons necessary to separate key/value blocks
 * Supported double slash line comments (`//`) at blocks start and after values
+* Tolerated equal sign (`=`) as key assignment char (just for plain values)
 
 ```js
 "key1", key2 :
@@ -71,7 +72,7 @@ The format is a simplified json syntax:
     "subkey1" :
        {// Subchilds comment
         name1: 170 // Value comment
-        name2: 2.4 // Value comment
+        name2 = 2.4 // Yes, also equal sign
        }
 
     subkey2 :
@@ -187,7 +188,7 @@ $ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -
 On Windows, use the latest Microsoft Visual Studio Community.
 From the command line, something like:
 ```
-> msbuild msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
+> msbuild .msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
 ```
 This project depends on `{fmt}` library, use `vcpkg` to install it:
 ```

@@ -4,11 +4,13 @@
 //  Sipro udt file descriptor
 //  Consists in a list of name=value assignments
 //  ---------------------------------------------
-#include <string_view>
 #include <stdexcept>
+#include <string_view>
+#include <map>
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
+//#include "string-utilities.hpp" // str::calc_similarity
 #include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
 
@@ -23,49 +25,43 @@ class File final
 {
     /////////////////////////////////////////////////////////////////////////
     class Assignment final
-    {
-     public:
-        explicit Assignment(const sipro::Assignment a, const std::size_t l) : i_Assignment(a), i_LineIdx(l) {}
+       {
+        public:
+            explicit Assignment(const sipro::Assignment a, const std::size_t l) : i_Assignment(a), i_LineIdx(l) {}
 
-        //[[nodiscard]] std::string build_line(const std::string_view orig_line) const noexcept
-        //   {
-        //    return i_Assignment.has_added_label() ? fmt::format("{} = {} # {} '{}'"sv, i_Assignment.var_name(), i_NewVal, i_Assignment.comment(), i_Assignment.added_label())
-        //                                          : fmt::format("{} = {} # {}"sv, i_Assignment.var_name(), i_NewVal, i_Assignment.comment() );
-        //   }
+            [[nodiscard]] std::string_view var_name() const noexcept { return i_Assignment.var_name(); }
+            [[nodiscard]] std::string_view value() const noexcept { return i_NewVal.empty() ? i_Assignment.value() : i_NewVal; }
+            [[nodiscard]] std::string_view comment() const noexcept { return i_Assignment.comment(); }
+            [[nodiscard]] std::string_view added_label() const noexcept { return i_Assignment.added_label(); }
 
-        [[nodiscard]] std::string_view var_name() const noexcept { return i_Assignment.var_name(); }
-        [[nodiscard]] std::string_view value() const noexcept { return i_NewVal.empty() ? i_Assignment.value() : i_NewVal; }
-        [[nodiscard]] std::string_view comment() const noexcept { return i_Assignment.comment(); }
-        [[nodiscard]] std::string_view added_label() const noexcept { return i_Assignment.added_label(); }
+            [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
+            [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
+            void modify_value(const std::string_view new_val) { i_NewVal = new_val; }
 
-        [[nodiscard]] bool is_value_modified() const noexcept { return !i_NewVal.empty(); }
-        [[nodiscard]] std::string_view modified_value() const noexcept { return i_NewVal; }
-        void modify_value(const std::string_view new_val) { i_NewVal = new_val; }
+            [[nodiscard]] std::size_t line_index() const noexcept { return i_LineIdx; }
 
-        [[nodiscard]] std::size_t line_index() const noexcept { return i_LineIdx; }
-
-     private:
-        sipro::Assignment i_Assignment;
-        std::size_t i_LineIdx;
-        std::string i_NewVal;
-    };
+        private:
+            sipro::Assignment i_Assignment;
+            std::size_t i_LineIdx;
+            std::string i_NewVal;
+       };
 
     /////////////////////////////////////////////////////////////////////////
     class Line final
-    {
-     public:
-        explicit Line(const std::string_view l, Assignment* const pa) : i_LineSpan(l), i_AssignmentPtr(pa) {}
+       {
+        public:
+            explicit Line(const std::string_view l, Assignment* const pa) : i_LineSpan(l), i_AssignmentPtr(pa) {}
 
-        [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
-        [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
+            [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
+            [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
 
-        [[nodiscard]] const Assignment* assignment_ptr() const noexcept { return i_AssignmentPtr; }
-        [[nodiscard]] Assignment* assignment_ptr() noexcept { return i_AssignmentPtr; }
+            [[nodiscard]] const Assignment* assignment_ptr() const noexcept { return i_AssignmentPtr; }
+            [[nodiscard]] Assignment* assignment_ptr() noexcept { return i_AssignmentPtr; }
 
-     private:
-        std::string_view i_LineSpan;
-        Assignment* i_AssignmentPtr;
-    };
+        private:
+            std::string_view i_LineSpan;
+            Assignment* i_AssignmentPtr;
+       };
 
  public:
     explicit File(const fs::path& pth, std::vector<std::string>& issues)
@@ -77,7 +73,7 @@ class File final
         while( parser.has_data() )
            {
             const sipro::Line line = parser.next_line();
-            Assignment* asgnm_ptr = nullptr;
+            Assignment* stored_asgnm_ptr = nullptr; // Possible assignment associated to this line
 
             if( parser.is_inside_note_block() )
                {// Ignoring notes
@@ -89,22 +85,26 @@ class File final
                {// Collect assignment
                 if( line.assignment().added_label().empty() )
                    {
-                    parse_issues.push_back( fmt::format("Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()) );
+                    parse_issues.push_back( fmt::format("Unlabeled variable {} at line {}"sv, line.assignment().var_name(), i_lines.size()+1) );
                    }
                 else if( i_assignments.contains(line.assignment().added_label()) )
                    {
-                    parse_issues.push_back( fmt::format("Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()) );
+                    parse_issues.push_back( fmt::format("Duplicate variable {} at line {}"sv, line.assignment().added_label(), i_lines.size()+1) );
                    }
                 else
                    {
                     // Populate the map of assignments
-                    const auto ins = i_assignments.try_emplace(line.assignment().added_label(), line.assignment(), i_lines.size());
-                    asgnm_ptr = &(ins.first->second); // Pointer to the constructed assignment to be associated with the collected line
+                    const auto [it, inserted] = i_assignments.try_emplace(line.assignment().added_label(), line.assignment(), i_lines.size());
+                    stored_asgnm_ptr = &(it->second); // Pointer to the constructed assignment to be associated with the collected line
+                    if( !inserted )
+                       {
+                        parse_issues.push_back( fmt::format("Assignment of {} at line {} was not inserted"sv, line.assignment().added_label(), i_lines.size()+1) );
+                       }
                    }
                }
 
             // All lines are collected to reproduce the original file
-            i_lines.emplace_back( line.span(), asgnm_ptr );
+            i_lines.emplace_back( line.span(), stored_asgnm_ptr );
            }
 
         // Append parsing issues to overall issues list
@@ -164,10 +164,11 @@ class File final
                 // Potrei cercare di rilevare rinominazioni delle label
                 // controllando la corrispondenza ass.var_name(), ass.comment()
                 // Anche con str::calc_similarity
-                add_issue( fmt::format("Not found: {} = {}",varlbl,other.value()) );
+                add_mod_issue( fmt::format("Not found: {} = {}",varlbl,other.value()) );
                }
            }
        }
+
 
     //-----------------------------------------------------------------------
     void write(const fs::path outpth)
@@ -208,7 +209,7 @@ class File final
                {
                 block_comment_notyetfound = false;
                 // Adding some info on generated file
-                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_issues.size()) << " issues)"sv << line_break;
+                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_mod_issues.size()) << " issues)"sv << line_break;
                 fw << line.span();
                }
             else
@@ -217,8 +218,8 @@ class File final
                }
            }
 
-        // Append issues
-        for( const auto& issue : i_issues )
+        // Append modification issues
+        for( const auto& issue : i_mod_issues )
            {
             fw << "# "sv << issue << line_break;
            }
@@ -239,14 +240,14 @@ class File final
     [[nodiscard]] const std::string& path() const noexcept { return file_buf.path(); }
 
     //-----------------------------------------------------------------------
-    void add_issue(std::string&& issue) { i_issues.emplace_back(issue); }
-    [[nodiscard]] std::size_t issues_count() const noexcept { return i_issues.size(); }
+    void add_mod_issue(std::string&& issue) { i_mod_issues.emplace_back(issue); }
+    [[nodiscard]] std::size_t mod_issues_count() const noexcept { return i_mod_issues.size(); }
 
  private:
     const sys::MemoryMappedFile file_buf; // File buffer
     std::vector<Line> i_lines; // Collected lines
     std::map<std::string_view,Assignment> i_assignments; // Assignments (name = value)
-    std::vector<std::string> i_issues; // Notified problems
+    std::vector<std::string> i_mod_issues; // Modifications problems
 };
 
 

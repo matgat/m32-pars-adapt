@@ -60,8 +60,17 @@ class Parser final : public BasicParser
                {
                 // Here expecting one or more keys
                 const auto keys = extract_keys();
-                //if( keys.empty() ) throw ...; // Not necessary, already ensured
+                assert( !keys.empty() );
                 //D1LOG("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
+
+                // Extension: Support also '=' as key=value separator
+                // So I'll get the separator here
+                skip_any_space();
+                const char separator = i<siz ? buf[i++] : '\0';
+                if( separator!=':' && separator!='=' )
+                   {
+                    throw create_parse_error(fmt::format("Invalid separator '{}' after key \"{}\"", str::escape(separator), keys.back()));
+                   }
 
                 // Now expecting a value or further childs
                 skip_any_space();
@@ -72,6 +81,12 @@ class Parser final : public BasicParser
                 else if( buf[i]=='{' )
                    {// Collect subchilds
                     ++i; // Skip '{'
+
+                    // In this case I strictly enforce a colon
+                    if( separator!=':' )
+                       {
+                        throw create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
+                       }
 
                     if( keys.size()>1 )
                        {// I'll ensure a child for each key
@@ -111,9 +126,9 @@ class Parser final : public BasicParser
  private:
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] static bool is_json_char(const char c) noexcept
+    [[nodiscard]] static bool is_special_char(const char c) noexcept
        {
-        return c==';' || c==',' || c==':' || c=='{' || c=='}';
+        return c==';' || c==',' || c==':' || c=='{' || c=='}' || c=='=';
        }
 
 
@@ -167,6 +182,7 @@ class Parser final : public BasicParser
     // Collect a quoted key (first " not yet eat)
     [[nodiscard]] std::string_view collect_quoted_key()
        {
+        assert( buf[i]=='\"' );
         ++i; // Skip initial "
         const std::size_t i_start = i;
         while( i<siz )
@@ -176,7 +192,7 @@ class Parser final : public BasicParser
                 ++i; // Skip final "
                 return std::string_view(buf+i_start, i-i_start-1);
                }
-            else if( buf[i]=='\n' || is_json_char(buf[i]) )
+            else if( buf[i]=='\n' || is_special_char(buf[i]) )
                {
                 break;
                }
@@ -190,6 +206,7 @@ class Parser final : public BasicParser
     // Collect a quoted value (first " not yet eat)
     [[nodiscard]] std::string_view collect_quoted_value()
        {
+        assert( buf[i]=='\"' );
         const std::size_t i_start = i; // Including the double quote
         ++i; // Skip initial "
         while( i<siz )
@@ -212,10 +229,11 @@ class Parser final : public BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_unquoted_value()
        {
+        assert( !std::isspace(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && !std::isspace(buf[i]) )
            {
-            if( is_json_char(buf[i]) )
+            if( is_special_char(buf[i]) )
                {
                 throw create_parse_error( fmt::format("Character '{}' not allowed in unquoted value",buf[i]) );
                }
@@ -229,6 +247,7 @@ class Parser final : public BasicParser
     // Extract a (possibly quoted) string. Ensures not empty
     [[nodiscard]] std::string_view extract_key()
        {
+        assert( !std::isspace(buf[i]) );
         const std::string_view key = buf[i]=='\"' ? collect_quoted_key()
                                                   : collect_identifier();
         if( key.empty() )
@@ -247,24 +266,24 @@ class Parser final : public BasicParser
 
         keys.push_back( extract_key() ); // Note: This ensures keys not empty
         skip_any_space();
-        // Support multiple keys (comma separated)
+        // Extension: Support multiple keys (comma separated)
         while( i<siz && buf[i]==',' )
            {
             ++i; // Skip ','
             skip_any_space();
             keys.push_back( extract_key() );
-            skip_any_space();
            }
-        // Here I'm expecting a colon
-        if( i<siz && buf[i]==':' )
-           {
-            ++i; // Eat ':'
-           }
-        else
-           {
-            //create_parse_error(fmt::format("Unexpected character \'{}\' after key \"{}\"", str::escape(buf[i]), keys.back()));
-            create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
-           }
+        // Here I'm expecting a colon...
+        //skip_any_space();
+        //if( i<siz && buf[i]==':' )
+        //   {
+        //    ++i; // Eat ':'
+        //   }
+        //else
+        //   {
+        //    throw create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
+        //   }
+        // ...or, as an extension, a '=' if it's a value, so I'll check this later
 
         return keys;
        }
@@ -276,6 +295,20 @@ class Parser final : public BasicParser
         const std::string_view val = buf[i]=='\"' ? collect_quoted_value()
                                                   : collect_unquoted_value();
         //D2LOG("[{}] Collected value \"{}\"\n", line, val)
+        // Here I'm expecting a line break or a semicolon
+        //skip_any_space();
+        if( i<siz )
+           {
+            if( eat_line_end )
+            else if( buf[i]==';' )
+               {
+                ++i; // Eat ';'
+               }
+            else
+               {
+                throw create_parse_error(fmt::format("Unexpected content after value \"{}\"", val));
+               }
+           }
         return val;
        }
 };

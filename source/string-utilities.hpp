@@ -22,7 +22,7 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
 //---------------------------------------------------------------------------
-constexpr std::string tolower(std::string s) noexcept
+[[nodiscard]] constexpr std::string tolower(std::string s) noexcept
 {
     for(char& c : s) c = static_cast<char>(std::tolower(c));
     //s |= action::transform([](unsigned char c){ return std::tolower(c); }); // With c++20 ranges
@@ -30,7 +30,7 @@ constexpr std::string tolower(std::string s) noexcept
 }
 
 //---------------------------------------------------------------------------
-constexpr std::string tolower(const std::string_view sv)
+[[nodiscard]] constexpr std::string tolower(const std::string_view sv)
 {
     std::string s{sv};
     for(char& c : s) c = static_cast<char>(std::tolower(c));
@@ -53,7 +53,7 @@ constexpr std::string tolower(const std::string_view sv)
 //}
 
 //---------------------------------------------------------------------------
-//constexpr std::string lowercase_trimmed_right(const std::string_view sv)
+//[[nodiscard]] constexpr std::string lowercase_trimmed_right(const std::string_view sv)
 //{
 //    std::string s;
 //    if( sv.size()>0 )
@@ -76,7 +76,7 @@ constexpr std::string tolower(const std::string_view sv)
 
 //---------------------------------------------------------------------------
 // Put a string between double quotes
-inline std::string quoted(const std::string& s)
+[[nodiscard]] /*constexpr*/ std::string quoted(const std::string& s)
 {
     if( s.contains('\"') )
        {// TODO: Should escape internal double quotes
@@ -88,7 +88,7 @@ inline std::string quoted(const std::string& s)
 
 //---------------------------------------------------------------------------
 // Remove double quotes
-inline std::string_view unquoted(const std::string_view s) noexcept
+[[nodiscard]] constexpr std::string_view unquoted(const std::string_view s) noexcept
 {
     auto i_first = s.cbegin();
     while(i_first!=s.cend() && std::isspace(*i_first)) ++i_first;
@@ -114,7 +114,7 @@ inline std::string_view unquoted(const std::string_view s) noexcept
 
 //---------------------------------------------------------------------------
 template<std::convertible_to<std::string_view>... Args>
-[[nodiscard]] std::string concat(Args&&... args, const char delim)
+[[nodiscard]] constexpr std::string concat(Args&&... args, const char delim)
 {
     //const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
     //return fmt::format("{}", fmt::join(args_array,delim));
@@ -129,7 +129,7 @@ template<std::convertible_to<std::string_view>... Args>
 
 //---------------------------------------------------------------------------
 // See also std::filesystem::path::replace_extension
-//std::string replace_extension( const std::string& pth, std::string_view newext ) noexcept
+//[[nodiscard]] constexpr std::string replace_extension( const std::string& pth, std::string_view newext ) noexcept
 //{
 //    const std::string::size_type i_extpos = pth.rfind('.'); // std::string::npos
 //    return pth.substr(0,i_extpos).append(newext);
@@ -138,7 +138,7 @@ template<std::convertible_to<std::string_view>... Args>
 
 
 //---------------------------------------------------------------------------
-//std::string repeat(const std::string& input, size_t num)
+//[[nodiscard]] constexpr std::string repeat(const std::string& input, size_t num)
 //{
 //    std::ostringstream os;
 //    std::fill_n(std::ostream_iterator<std::string>(os), num, input);
@@ -148,7 +148,7 @@ template<std::convertible_to<std::string_view>... Args>
 
 //---------------------------------------------------------------------------
 // Convert a character to string, escaping it if necessary
-constexpr std::string escape(const char c) noexcept
+[[nodiscard]] constexpr std::string escape(const char c) noexcept
    {
     std::string s(1,c);
     switch( c )
@@ -158,7 +158,7 @@ constexpr std::string escape(const char c) noexcept
         case '\t': s = "\\t"; break;
         //case '\f': s = "\\f"; break;
         //case '\v': s = "\\v"; break;
-        //case '\0': s = "\\0"; break;
+        case '\0': s = "NULL"; break;
        }
     return s;
    }
@@ -166,7 +166,7 @@ constexpr std::string escape(const char c) noexcept
 
 //---------------------------------------------------------------------------
 // Show string special characters
-constexpr std::string escape(std::string&& s) noexcept
+[[nodiscard]] constexpr std::string escape(std::string&& s) noexcept
    {
     std::string::size_type i = 0;
     while( i<s.size() )
@@ -188,7 +188,7 @@ constexpr std::string escape(std::string&& s) noexcept
 
 //---------------------------------------------------------------------------
 // Show string special characters
-constexpr std::string escape(const std::string_view sv) noexcept
+[[nodiscard]] constexpr std::string escape(const std::string_view sv) noexcept
    {
     return escape( std::string(sv) );
    }
@@ -196,7 +196,7 @@ constexpr std::string escape(const std::string_view sv) noexcept
 
 //---------------------------------------------------------------------------
 // Replace all occurrences in a string
-void replace_all(std::string& s, const std::string& from, const std::string& to)
+constexpr void replace_all(std::string& s, const std::string& from, const std::string& to)
 {
     //std::string::size_type i = 0;
     //while( (i = s.find(from, i)) != std::string::npos )
@@ -221,7 +221,7 @@ void replace_all(std::string& s, const std::string& from, const std::string& to)
 
 //---------------------------------------------------------------------------
 // Convert a string_view to number
-template<typename T> T to_num(const std::string_view s)
+template<typename T> [[nodiscard]] constexpr T to_num(const std::string_view s)
 {
     T result;
     const auto i_end = s.data() + s.size();
@@ -233,7 +233,7 @@ template<typename T> T to_num(const std::string_view s)
 
 //---------------------------------------------------------------------------
 // Try to convert a string_view to number
-template<typename T> std::optional<T> as_num(const std::string_view s) noexcept
+template<typename T> [[nodiscard]] constexpr std::optional<T> as_num(const std::string_view s) noexcept
    {
     T result;
     const auto i_end = s.data() + s.size();
@@ -245,7 +245,7 @@ template<typename T> std::optional<T> as_num(const std::string_view s) noexcept
 
 //---------------------------------------------------------------------------
 // Generate an hash for a string
-constexpr std::size_t hash(const std::string_view s)
+[[nodiscard]] constexpr std::size_t hash(const std::string_view s)
 {
     std::size_t val = 0;
     //for(const char c : s) crc += static_cast<std::size_t>(c);
@@ -256,7 +256,7 @@ constexpr std::size_t hash(const std::string_view s)
 
 
 //---------------------------------------------------------------------------
-constexpr bool contains_wildcards(const std::string& s) noexcept
+[[nodiscard]] constexpr bool contains_wildcards(const std::string& s) noexcept
 {
     //return std::regex_search(s, std::regex("*?")); // Seems slow
     //return s.rfind('*') != std::string::npos || s.rfind('?') != std::string::npos;
@@ -273,7 +273,7 @@ constexpr bool contains_wildcards(const std::string& s) noexcept
 
 //-----------------------------------------------------------------------
 // Returns true if text matches glob-like pattern with wildcards (*, ?)
-constexpr bool glob_match(const char* text, const char* glob, const char dont_match ='/')
+[[nodiscard]] constexpr bool glob_match(const char* text, const char* glob, const char dont_match ='/')
 {
     // 'dont_match': character not matched by any wildcards
     const char *text_backup = nullptr;
@@ -309,7 +309,7 @@ constexpr bool glob_match(const char* text, const char* glob, const char dont_ma
 
 
 //---------------------------------------------------------------------------
-constexpr std::string iso_latin1_to_utf8(const std::string_view ansi)
+[[nodiscard]] constexpr std::string iso_latin1_to_utf8(const std::string_view ansi)
 {
     std::string utf8;
     utf8.reserve( (3 * ansi.size()) / 2 );
@@ -331,7 +331,7 @@ constexpr std::string iso_latin1_to_utf8(const std::string_view ansi)
 
 //---------------------------------------------------------------------------
 // Split to lines
-//std::vector<std::string_view> split_lines(const std::string_view buf)
+//[[nodiscard]] constexpr std::vector<std::string_view> split_lines(const std::string_view buf)
 //{
 //    std::vector<std::string_view> lines;
 //    lines.reserve(buf.size() / 40);

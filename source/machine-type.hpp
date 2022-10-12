@@ -11,6 +11,7 @@
 #include <array>
 #include <cctype> // std::isdigit, std::tolower, ...
 #include <fmt/core.h> // fmt::format
+
 #include "vectset.hpp" // mat::vectset
 #include "string-utilities.hpp" // str::tolower
 
@@ -18,7 +19,7 @@ using namespace std::literals; // "..."sv
 
 
   #if !defined(__cpp_lib_to_underlying)
-    template<typename E> constexpr auto to_underlying(const E e) noexcept
+    [[nodiscard]] template<typename E> constexpr auto to_underlying(const E e) noexcept
        {
         return static_cast<std::underlying_type_t<E>>(e);
        }
@@ -262,10 +263,10 @@ class MachineOptions final
 
     [[nodiscard]] bool has_lowe() const noexcept { return has_bit(bits::lowe); }
     void set_lowe(const bool b) noexcept { set_bit(bits::lowe,b); }
-    
+
     [[nodiscard]] bool has_rot() const noexcept { return has_bit(bits::rot); }
     void set_rot(const bool b) noexcept { set_bit(bits::rot,b); }
-    
+
     [[nodiscard]] bool has_buf() const noexcept { return has_bit(bits::buf); }
     void set_buf(const bool b) noexcept { set_bit(bits::buf,b); }
 
@@ -282,7 +283,7 @@ class MachineOptions final
 
     constexpr void add_option(const std::string_view opt) noexcept
        {
-        // Try to recognize option...  
+        // Try to recognize option...
              if( opt=="opp" )    set_opp(true);
         else if( opt=="lowe" )   set_lowe(true);
         else if( opt=="rot" )    set_rot(true);
@@ -292,7 +293,7 @@ class MachineOptions final
         else unrecognized.insert( std::string(opt) );
        }
 
-    std::string string(const char sep =',') const
+    [[nodiscard]] std::string string(const char sep =',') const
        {
         std::string s;
         if( is_opp() )    { s+="opp";    s+=sep; }
@@ -374,7 +375,7 @@ class MachineType final
     MachineOptions i_options;
 
     //------------------------------------------------------------------------
-    static MachineType recognize_machine(const std::string_view sv)
+    [[nodiscard]] static MachineType recognize_machine(const std::string_view sv)
        {// From strings like "StratoWR-4.9/4.6-(opp,no-buf)"
         //                      type🠉    🠉dims    🠉options
         MachineType mach;
@@ -493,6 +494,13 @@ class MachineType final
            }
 
         // If here, all ok
+        return mach;
+       }
+       
+    //------------------------------------------------------------------------
+    [[nodiscard]] static MachineType ask_user() noexcept
+       {
+        MachineType mach;
         return mach;
        }
 };

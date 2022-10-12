@@ -16,6 +16,7 @@
 #include "extract-db.hpp" // macotec::extract_db
 #include "pars-db.hpp" // ParsDB
 #include "udt-file.hpp" // udt::File
+#include "parax-file.hpp" // parax::File
 
 using namespace std::literals; // "..."sv
 
@@ -33,7 +34,6 @@ class JobUnit final
                 unknown=0, // !Consecutive indexes!
                 udt, // MachSettings.udt, ParDefaults.udt
                 parax, // par2kax.txt
-                //par, // Sipro parameter file (par2k*.txt)
                 txt // generic text (could be a json db or a sipro parameter file)
                };
 
@@ -47,17 +47,28 @@ class JobUnit final
                 i_path = s;
                 if( !fs::exists(i_path) )
                    {
-                    throw std::invalid_argument( fmt::format("File doesn't exists: {}",s) );
+                    throw std::invalid_argument( fmt::format("File not found: {}",s) );
                    }
 
                 // Recognize the file type
                 const std::string fnam{ str::tolower(i_path.filename().string()) };
                 const std::string ext{ str::tolower(i_path.extension().string()) };
-                     if( ext==".udt" ) i_type = file_type::udt;
-                else if( fnam.starts_with("par2kax") ) i_type = file_type::parax;
-                //else if( fnam.starts_with("par2k") && ext==".txt" ) i_type = file_type::par;
-                else if( ext==".txt" ) i_type = file_type::txt;
-                else throw std::invalid_argument( fmt::format("Unrecognized file: {}",s) );
+                if( ext==".udt" )
+                   {
+                    i_type = file_type::udt;
+                   }
+                else if( fnam=="par2kax.txt" )
+                   {
+                    i_type = file_type::parax;
+                   }
+                else if( ext==".txt" )
+                   {
+                    i_type = file_type::txt;
+                   }
+                else
+                   {
+                    throw std::invalid_argument( fmt::format("Unrecognized file: {}",s) );
+                   }
                }
 
             [[nodiscard]] bool is_udt() const noexcept { return i_type==file_type::udt; }
@@ -154,7 +165,7 @@ class Arguments final
                             // Skip hyphen, tolerate also doubled ones
                             const std::size_t skip = arg[1]=='-' ? 2 : 1;
                             const std::string_view swtch{ arg.data()+skip, arg.length()-skip};
-                            if( swtch=="machine"sv || swtch=="m"sv )
+                            if( swtch=="machine"sv || swtch=="mach"sv || swtch=="m"sv )
                                {
                                 status = STS::GET_MACHTYPE;
                                }
@@ -312,7 +323,7 @@ fs::path adapt_udt(Arguments& args, std::vector<std::string>& issues)
                }
             else
                {
-                udt_file.add_issue( fmt::format("Not found: {}={}",nam,node.value()) );
+                udt_file.add_mod_issue( fmt::format("Not found: {}={}",nam,node.value()) );
                }
            }
        }
@@ -325,14 +336,14 @@ fs::path adapt_udt(Arguments& args, std::vector<std::string>& issues)
     udt_file.write( out_pth );
     if( args.verbose() )
        {
-        fmt::print("  .Modified {} values, {} issues\n", udt_file.modified_values_count(), udt_file.issues_count());
+        fmt::print("  .Modified {} values, {} issues\n", udt_file.modified_values_count(), udt_file.mod_issues_count());
        }
     return out_pth;
 }
 
 
 //---------------------------------------------------------------------------
-fs::path update_udt(Arguments& args, std::vector<std::string>& issues)
+fs::path update_udt(const Arguments& args, std::vector<std::string>& issues)
 {
     // [Machine type]
     // The machine type shouldn't be explicitly given
@@ -366,9 +377,130 @@ fs::path update_udt(Arguments& args, std::vector<std::string>& issues)
     new_udt_file.write( out_pth );
     if( args.verbose() )
        {
-        fmt::print("  .Modified {} values, {} issues\n", new_udt_file.modified_values_count(), new_udt_file.issues_count());
+        fmt::print("  .Modified {} values, {} issues\n", new_udt_file.modified_values_count(), new_udt_file.mod_issues_count());
        }
     return out_pth;
+}
+
+
+//---------------------------------------------------------------------------
+fs::path adapt_parax(const Arguments& args, std::vector<std::string>& issues)
+{
+    // [The parax file to adapt]
+    parax::File parax_file(args.job().target_file().path(), issues);
+
+    // [Machine type]
+    if( !args.job().machine_type() )
+       {// Machine type not explicitly specified
+        // Ask for machine type
+        //args.modify_job().set_machine_type( macotec::MachineType::ask_user() );
+        throw std::invalid_argument("Machine not specified");
+       }
+
+    // [Parameters DB]
+    ParsDB pars_db;
+    pars_db.parse( args.job().db_file().path(), issues );
+    // Extract the pertinent data for this machine
+    const auto mach_db = macotec::extract_db(pars_db.root(), args.job().machine_type(), issues);
+
+    // [Summarize the job]
+    if( args.verbose() )
+       {
+        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
+        fmt::print("  .parax file: {}\n", parax_file.info());
+        fmt::print("  .Parameters DB: {}\n", pars_db.info());
+        //pars_db.print();
+       }
+
+    //// Overwrite values from database
+    //for( const auto group : mach_db )
+    //   {
+    //    for( const auto& [nam, node] : group.get().childs() )
+    //       {
+    //        //fmt::print("{}={}\n",nam,node.value());
+    //        if( !node.has_value() )
+    //           {
+    //            issues.push_back( fmt::format("Node {} hasn't a value in {}", nam, args.job().db_file().path().string()) );
+    //           }
+    //        else if( const auto field = parax_file.get_field(nam) )
+    //           {
+    //            field->modify_value(node.value());
+    //           }
+    //        else
+    //           {
+    //            parax_file.add_mod_issue( fmt::format("Not found: {}={}",nam,node.value()) );
+    //           }
+    //       }
+    //   }
+
+    // Write output file
+    const std::string out_nam = args.job().out_file_name().empty()
+                                ? fmt::format("~{}.tmp", args.job().target_file().path().filename().string())
+                                : args.job().out_file_name();
+    fs::path out_pth{ args.job().target_file().path().parent_path() / out_nam };
+    parax_file.write( out_pth );
+    if( args.verbose() )
+       {
+        fmt::print("  .Modified {} values, {} issues\n", parax_file.modified_values_count(), parax_file.mod_issues_count());
+       }
+    return out_pth;
+}
+
+
+//---------------------------------------------------------------------------
+void handle_adapted_file(const Arguments& args, const fs::path& out_pth)
+{
+    if( args.quiet() )
+       {// No user intervention
+        if( args.job().out_file_name().empty() )
+           {
+            sys::backup_file_same_dir( args.job().target_file().path() );
+            fs::remove( args.job().target_file().path() );
+            fs::rename( out_pth, args.job().target_file().path() );
+           }
+       }
+    else
+       {// Manual merge
+        sys::compare_wait(out_pth.string().c_str(), args.job().target_file().path().string().c_str());
+
+        if( args.job().out_file_name().empty() )
+           {
+            fs::remove( out_pth );
+           }
+       }
+}
+
+
+//---------------------------------------------------------------------------
+void handle_upgraded_file(const Arguments& args, const fs::path& out_pth)
+{
+    if( args.quiet() )
+       {// No user intervention
+        if( args.job().out_file_name().empty() )
+           {// Output file is a temporary
+            sys::backup_file_same_dir( args.job().db_file().path() );
+            fs::remove( args.job().db_file().path() );
+            fs::rename( out_pth, args.job().db_file().path() );
+           }
+       }
+    else
+       {// Manual merge
+        // Compare updated with the original
+        sys::compare_wait(  out_pth.string().c_str(),
+                            args.job().db_file().path().string().c_str()  );
+        // Compare the template with the merged one
+        sys::compare_wait(  args.job().target_file().path().string().c_str(),
+                            args.job().db_file().path().string().c_str()  );
+        // Compare all three
+        //sys::compare_wait(  args.job().target_file().path().string().c_str(),
+        //                    out_pth.string().c_str(),
+        //                    args.job().db_file().path().string().c_str()  );
+
+        if( args.job().out_file_name().empty() )
+           {// Output file is a temporary
+            fs::remove( out_pth );
+           }
+       }
 }
 
 
@@ -396,70 +528,27 @@ int main( const int argc, const char* const argv[] )
             throw std::invalid_argument("No DB file specified");
            }
 
-        // Recognize cases
+
         //====================================================================
         if( args.job().target_file().is_udt() && args.job().db_file().is_txt() )
            {// Adapting an udt file given overlays database and machine type
             const fs::path out_pth = adapt_udt(args, issues);
-
-            if( args.quiet() )
-               {// No user intervention
-                if( args.job().out_file_name().empty() )
-                   {
-                    sys::backup_file_same_dir( args.job().target_file().path() );
-                    fs::remove( args.job().target_file().path() );
-                    fs::rename( out_pth, args.job().target_file().path() );
-                   }
-               }
-            else
-               {// Manual merge
-                sys::compare_wait(out_pth.string().c_str(), args.job().target_file().path().string().c_str());
-
-                if( args.job().out_file_name().empty() )
-                   {
-                    fs::remove( out_pth );
-                   }
-               }
+            handle_adapted_file(args, out_pth);
            }
 
         //====================================================================
         else if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )
            {// Updating an old udt file (db) to a newer one (target)
             const fs::path out_pth = update_udt(args, issues);
-
-            if( args.quiet() )
-               {// No user intervention
-                if( args.job().out_file_name().empty() )
-                   {// Output file is a temporary
-                    sys::backup_file_same_dir( args.job().db_file().path() );
-                    fs::remove( args.job().db_file().path() );
-                    fs::rename( out_pth, args.job().db_file().path() );
-                   }
-               }
-            else
-               {// Manual merge
-                // Compare updated with the original
-                sys::compare_wait(  out_pth.string().c_str(),
-                                    args.job().db_file().path().string().c_str()  );
-                // Compare the template with the merged one
-                sys::compare_wait(  args.job().target_file().path().string().c_str(),
-                                    args.job().db_file().path().string().c_str()  );
-                // Compare all three
-                //sys::compare_wait(  args.job().target_file().path().string().c_str(),
-                //                    out_pth.string().c_str(),
-                //                    args.job().db_file().path().string().c_str()  );
-
-                if( args.job().out_file_name().empty() )
-                   {// Output file is a temporary
-                    fs::remove( out_pth );
-                   }
-               }
+            handle_upgraded_file(args, out_pth);
            }
 
         //====================================================================
-        //else if( args.job().target_file().is_parax() && args.job().db_file().is_txt() )
-        //   {// Adapting a par2kax.txt file given overlays database and machine type
-        //   }
+        else if( args.job().target_file().is_parax() && args.job().db_file().is_txt() )
+           {// Adapting a par2kax.txt file given overlays database and machine type
+            const fs::path out_pth = adapt_parax(args, issues);
+            handle_adapted_file(args, out_pth);
+           }
 
         else
            {
