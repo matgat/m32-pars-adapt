@@ -288,7 +288,6 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_token() noexcept
        {
-        //assert( i<siz && !std::isspace(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && !std::isspace(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -298,7 +297,6 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_identifier() noexcept
        {
-        //assert( i<siz && is_identifier(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && is_identifier(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -308,7 +306,6 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_numeric_value() noexcept
        {
-        //assert( i<siz && is_numeric_literal(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && is_numeric_literal(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -318,7 +315,6 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_digits() noexcept
        {
-        //assert( i<siz && std::isdigit(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && std::isdigit(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -329,7 +325,6 @@ class BasicParser
     // Read a (base10) positive integer literal
     [[nodiscard]] std::size_t extract_index()
        {
-        //assert( i<siz && is_numeric_literal(buf[i]) );
         if( i>=siz )
            {
             throw create_parse_error("Index not found");
@@ -365,7 +360,6 @@ class BasicParser
     // Read a (base10) integer literal
     [[nodiscard]] int extract_integer()
        {
-        //assert( i<siz && is_numeric_literal(buf[i]) );
         if( i>=siz )
            {
             throw create_parse_error("No integer found");
@@ -407,7 +401,6 @@ class BasicParser
     // Read a (base10) floating point number literal
     //[[nodiscard]] double extract_double()
     //   {
-    //    //assert( i<siz && is_numeric_literal(buf[i]) );
     //    // [sign]
     //    int sgn = 1;
     //    if( i<siz && buf[i]=='-' ) {sgn = -1; ++i;}

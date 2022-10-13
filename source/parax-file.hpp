@@ -225,7 +225,7 @@ class File final
 
 
     //-----------------------------------------------------------------------
-    void write(const fs::path outpth)
+    void write(const fs::path outpth, const std::string_view mach_type)
        {
         const std::string_view line_break = !i_lines.empty() &&
                                             i_lines.front().span().length()>1 &&
@@ -258,7 +258,12 @@ class File final
                {
                 block_comment_notyetfound = false;
                 // Adding some info on generated file
-                fw << "    ("sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_mod_issues.size()) << " issues)"sv << line_break;
+                fw << "    "sv << sys::get_formatted_time_stamp() << " m32-pars-adapt, "sv << std::to_string(i_mod_issues.size()) << " issues"sv << line_break;
+                fw << "    Machine: "sv << mach_type << line_break;
+                for( const auto& issue : i_mod_issues )
+                   {
+                    fw << "      ."sv << issue << line_break;
+                   }
                 fw << line.span();
                }
             else
@@ -267,11 +272,6 @@ class File final
                }
            }
 
-        // Append modification issues
-        for( const auto& issue : i_mod_issues )
-           {
-            fw << "# "sv << issue << line_break;
-           }
        }
 
 

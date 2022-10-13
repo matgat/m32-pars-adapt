@@ -51,6 +51,11 @@ class Parser final : public BasicParser
                    }
                 return;
                }
+            else if( buf[i]==',' || buf[i]==';' )
+               {// Tolerating these separators after values
+                ++i; // Skip ';'
+                continue;
+               }
             else if( buf[i]=='}' )
                {// Childs block closed
                 ++i; // Skip '}'
@@ -62,10 +67,9 @@ class Parser final : public BasicParser
                 const auto keys = extract_keys();
                 assert( !keys.empty() );
                 //D1LOG("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
-
+                // What I'm expecting after a key?
                 // Extension: Support also '=' as key=value separator
-                // So I'll get the separator here
-                skip_any_space();
+                assert( !std::isspace(buf[i]) );
                 const char separator = i<siz ? buf[i++] : '\0';
                 if( separator!=':' && separator!='=' )
                    {
@@ -128,7 +132,7 @@ class Parser final : public BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] static bool is_special_char(const char c) noexcept
        {
-        return c==';' || c==',' || c==':' || c=='{' || c=='}' || c=='=';
+        return c==':' || c=='{' || c=='}' || c==',' || c==';' || c=='=';
        }
 
 
@@ -270,21 +274,11 @@ class Parser final : public BasicParser
         while( i<siz && buf[i]==',' )
            {
             ++i; // Skip ','
-            skip_any_space();
+            skip_any_space(); // Possible spaces after comma
             keys.push_back( extract_key() );
+            skip_any_space(); // Possible spaces before next comma
            }
-        // Here I'm expecting a colon...
-        //skip_any_space();
-        //if( i<siz && buf[i]==':' )
-        //   {
-        //    ++i; // Eat ':'
-        //   }
-        //else
-        //   {
-        //    throw create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
-        //   }
-        // ...or, as an extension, a '=' if it's a value, so I'll check this later
-
+        // What I'm expecting here? I'll let the main cycle deal with that
         return keys;
        }
 
@@ -295,20 +289,7 @@ class Parser final : public BasicParser
         const std::string_view val = buf[i]=='\"' ? collect_quoted_value()
                                                   : collect_unquoted_value();
         //D2LOG("[{}] Collected value \"{}\"\n", line, val)
-        // Here I'm expecting a line break or a semicolon
-        //skip_any_space();
-        if( i<siz )
-           {
-            if( eat_line_end )
-            else if( buf[i]==';' )
-               {
-                ++i; // Eat ';'
-               }
-            else
-               {
-                throw create_parse_error(fmt::format("Unexpected content after value \"{}\"", val));
-               }
-           }
+        // What I'm expecting here? I'll let the main cycle deal with that
         return val;
        }
 };

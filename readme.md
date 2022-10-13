@@ -59,11 +59,11 @@ _________________________________________________________________________
 ## Parameters database
 ### Syntax
 The format is an extended/simplified json syntax:
-* Key names can be unquoted, use double quotes in case of special chars
-* Multiple comma separated keys support
-* No semicolons necessary to separate key/value blocks
-* Supported double slash line comments (`//`) at blocks start and after values
-* Tolerated equal sign (`=`) as key assignment char (just for plain values)
+* Key names can be unquoted, double quotes are necessary just in case of special chars
+* Supported multiple keys, comma separated
+* No comma or semicolons necessary to separate blocks
+* Equal sign is tolerated for plain `key=value` assignments
+* Supported double slash line comments (`//`) at block start and after values
 
 ```js
 "key1", key2 :
