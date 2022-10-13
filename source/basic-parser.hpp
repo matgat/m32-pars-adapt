@@ -490,7 +490,7 @@ class BasicParser
     //       {
     //        if( buf[i]==c )
     //           {
-    //            //D1LOG("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
+    //            //DLOG1("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
     //            return std::string_view(buf+i_start, i-i_start);
     //           }
     //        else if( buf[i]=='\n' ) ++line;
@@ -508,7 +508,7 @@ class BasicParser
     //       {
     //        if( buf[i]==c )
     //           {
-    //            //D1LOG("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
+    //            //DLOG1("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
     //            return std::string_view(buf+i_start, i-i_start);
     //           }
     //        else if( buf[i]=='\n' ) break;

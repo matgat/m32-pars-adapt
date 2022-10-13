@@ -229,7 +229,7 @@ class Parser final : public BasicParser
             throw create_parse_error( fmt::format("Unclosed tag [{}", tag.name()) );
            }
         ++i; // Skip ']'
-        //D2LOG("[{}] Collected tag [{}]\n", line, tag.name())
+        //DLOG2("[{}] Collected tag [{}]\n", line, tag.name())
 
         // Expecting nothing more
         skip_blanks();
@@ -315,7 +315,7 @@ class Parser final : public BasicParser
                }
            }
 
-        //D2LOG("[{}] Collected assignment: {} = {} // {} '{}'\n", line, namval.var_name(), namval.value(), str::iso_latin1_to_utf8(namval.comment()), namval.added_label())
+        //DLOG2("[{}] Collected assignment: {} = {} // {} '{}'\n", line, namval.var_name(), namval.value(), str::iso_latin1_to_utf8(namval.comment()), namval.added_label())
        }
 
  private:

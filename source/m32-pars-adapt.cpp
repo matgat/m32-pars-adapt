@@ -226,8 +226,8 @@ class Arguments final
                     "       --db <path> (Parameters database json file)\n"
                     "       --help/-h (Just print help info and abort)\n"
                     "       --machine/-mach/-m <string> (Machine type string)\n"
-                    "       --out/-o <string> (Specify output file name, keep file)\n"
-                    "       --quiet/-q (Substitute file without manual merge)\n"
+                    "       --out/-o <string> (Specify output file name, keep file, no substitution)\n"
+                    "       --quiet/-q (No manual merge)\n"
                     "       --target/-tgt <path> (Parameter file to adapt)\n"
                     "       --verbose/-v (Print more info on stdout)\n"
                     "\n" );
@@ -256,12 +256,12 @@ class Arguments final
     else
        {
         out_path /= args.job().out_file_name();
-        if( fs::equivalent(out_path, orig_path) )
+        if( sys::are_paths_equivalent(out_path, orig_path) )
            {
             throw std::runtime_error( fmt::format("Specified output file \"{}\" collides with original file",args.job().out_file_name()) );
            }
        }
-    return out_path ;
+    return out_path;
 }
 
 
@@ -272,7 +272,7 @@ class Arguments final
     // The machine type shouldn't be explicitly given
     if( args.job().machine_type() )
        {
-        throw std::invalid_argument( "Machine type shouldn't be specified for an UDT update" );
+        throw std::invalid_argument( "Machine type shouldn't be specified for a UDT update" );
        }
 
     // [The template UDT file (newest)]
@@ -436,7 +436,6 @@ class Arguments final
                {
                 for( const auto& [nam, db_field] : group_ref.get().childs() )
                    {
-                    fmt::print(">>> {}.{}={}\n",axid,nam,db_field.value());
                     if( !db_field.has_value() )
                        {
                         issues.push_back( fmt::format("Axis field {}.{} hasn't a value in {}", axid, nam, args.job().db_file().path().string()) );
@@ -444,6 +443,7 @@ class Arguments final
                     else if( const auto par_field = parax_file.get_field(*par_ax_fields,nam) )
                        {
                         par_field->modify_value(db_field.value());
+                        DLOG2("    Modified: {}.{}={}\n",axid,nam,db_field.value())
                        }
                     else
                        {
@@ -454,7 +454,7 @@ class Arguments final
            }
         else
            {
-            parax_file.add_mod_issue( fmt::format("Axis not found: {}",axid) );
+            parax_file.add_mod_issue( fmt::format("Axis not found here: {}",axid) );
            }
        }
 
@@ -476,7 +476,7 @@ void handle_adapted_file(const fs::path& out_pth, const Arguments& args)
     if( args.quiet() )
        {// No user intervention
         if( args.job().out_file_name().empty() )
-           {
+           {// Output file not specified, is a temporary
             sys::backup_file_same_dir( args.job().target_file().path() );
             fs::remove( args.job().target_file().path() );
             fs::rename( out_pth, args.job().target_file().path() );
@@ -500,7 +500,7 @@ void handle_updated_file(const fs::path& out_pth, const Arguments& args)
     if( args.quiet() )
        {// No user intervention
         if( args.job().out_file_name().empty() )
-           {// Output file is a temporary
+           {// Output file not specified, is a temporary
             sys::backup_file_same_dir( args.job().db_file().path() );
             fs::remove( args.job().db_file().path() );
             fs::rename( out_pth, args.job().db_file().path() );

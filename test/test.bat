@@ -46,7 +46,7 @@ goto menu0
 rem Test parax adaptation
 set mach=ActWR-4.0/4.6;no-buf;combo
 set pars_fold=%UserProfile%\Macotec\Machines\m32-Strato\sde\param
-%exe% -v -tgt "%pars_fold%\par2kax.txt" -db "%pars_fold%\configs\par2kax-overlay.txt" -m "%mach%"
+%exe% -v -tgt "%pars_fold%\par2kax.txt" -db "%pars_fold%\configs\par2kax-overlays.txt" -m "%mach%"
 goto menu0
 
 

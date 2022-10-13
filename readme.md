@@ -8,6 +8,11 @@ various machine types.
 
 _________________________________________________________________________
 ## Usage
+Windows binary is dynamically linked to Microsoft c++ runtime,
+so needs the installation of
+[`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+as prerequisite.
+
 To print usage info:
 ```
 > m32-pars-adapt --help
@@ -33,12 +38,11 @@ To valorize a Sipro parameter file:
 Normally no file will be overwritten: the program will create a temporary
 file that will be automatically deleted after a manual merge.
 
-When the option `--quiet` is used, the file will be backupped
-in the same directory and then overwritten without the user
-intervention.
-
-If the output file name is specified with `--out`, there won't
-be any filesystem actions (deleting or substitution).
+When the option `--quiet` is used, the manual merge will be skipped:
+if an output file name is specified with `--out`,
+there won't be any actions after its creation, otherwise
+the file to be modified will be backupped in the same directory and
+then silently overwritten.
 
 
 
@@ -59,26 +63,27 @@ _________________________________________________________________________
 ## Parameters database
 ### Syntax
 The format is an extended/simplified json syntax:
-* Key names can be unquoted, double quotes are necessary just in case of special chars
-* Supported multiple keys, comma separated
-* No comma or semicolons necessary to separate blocks
+* Key names can be unquoted, double quotes necessary just if name contains special chars
+* Separators like comma or semicolons are not strictly necessary
+* Supported multiple (comma separated) keys
 * Equal sign is tolerated for plain `key=value` assignments
-* Supported double slash line comments (`//`) at block start and after values
+* Supported double slash line comments (`//`) as shown in the example below
+* Block comments (`/*...*/`) are *deliberately* not supported
 
 ```js
 "key1", key2 :
    {// Subchilds comment
 
-    "subkey1" :
+    "subkey1" : // Key comment
        {// Subchilds comment
         name1: 170 // Value comment
         name2 = 2.4 // Yes, also equal sign
        }
 
     subkey2 :
-       {// Subchilds comment
-        name3: "a quoted value" // Value comment
-        name4: unquoted // Value comment
+       {
+        name3: "a quoted value"
+        name4: unquoted
        }
    }
 ```

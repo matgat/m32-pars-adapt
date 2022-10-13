@@ -31,6 +31,7 @@ namespace fs = std::filesystem;
   //#include <unistd.h> // _stat
   #include <shellapi.h> // FindExecutableA
   #include <shlwapi.h> // AssocQueryString
+  #include <cctype> // std::tolower
 #elif defined(POSIX)
   #include <unistd.h> // unlink, exec*, fork, ...
   #include <fcntl.h> // open
@@ -541,6 +542,32 @@ class file_write final
        }
     std::filesystem::copy_file(src_pth, dst_pth);
     return dst_pth;
+}
+
+
+//---------------------------------------------------------------------------
+[[nodiscard]] bool are_paths_equivalent(const fs::path& pth1, const fs::path& pth2)
+{
+    // Unfortunately fs::equivalent() needs existing files
+    if( fs::exists(pth1) && fs::exists(pth2) )
+       {
+        return fs::equivalent(pth1,pth2);
+       }
+    // The following is not perfect:
+    //   .'fs::absolute' implementation may need the file existence
+    //   .'fs::weakly_canonical' may need to be called multiple times
+  #if defined(MS_WINDOWS)
+    const auto tolower = [](std::string&& s) noexcept -> std::string
+       {
+        for(char& c : s) c = static_cast<char>(std::tolower(c));
+        return s;
+       };
+    return tolower(fs::weakly_canonical(fs::absolute(pth1)).string()) ==
+           tolower(fs::weakly_canonical(fs::absolute(pth2)).string());
+  #else
+    return fs::weakly_canonical(fs::absolute(pth1)) ==
+           fs::weakly_canonical(fs::absolute(pth2));
+  #endif
 }
 
 

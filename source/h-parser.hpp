@@ -241,7 +241,7 @@ class Parser final : public BasicParser
             notify_error("Unexpected content after define: {}", str::escape(skip_line()));
            }
 
-        //D2LOG("  [*] Collected define: label=\"{}\" value=\"{}\" comment=\"{}\"\n", def.label(), def.value(), def.comment())
+        //DLOG2("  [*] Collected define: label=\"{}\" value=\"{}\" comment=\"{}\"\n", def.label(), def.value(), def.comment())
        }
 };
 
@@ -256,7 +256,7 @@ void parse(const std::string& file_path, const std::string_view buf, std::map<De
     try{
         while( const DefineBuf def = parser.next_define() )
            {
-            //D1LOG("Define - label=\"{}\" value=\"{}\" comment=\"{}\" predecl=\"{}\"\n", def.label(), def.value(), str::iso_latin1_to_utf8(def.comment()), def.comment_predecl())
+            //DLOG1("Define - label=\"{}\" value=\"{}\" comment=\"{}\" predecl=\"{}\"\n", def.label(), def.value(), str::iso_latin1_to_utf8(def.comment()), def.comment_predecl())
 
             //if( const sipro::Register reg(def.value()); reg.is_valid() ) // It's a Sipro register
             //else if( def.value_is_number() ) // It's a numeric constant

@@ -32,14 +32,8 @@ class Parser final : public BasicParser
         while( i<siz )
            {
             skip_any_space();
-            if( eat_line_comment_start() )
+            if( skip_possible_comment() )
                {
-                skip_line();
-                continue;
-               }
-            else if( eat_block_comment_start() )
-               {
-                skip_block_comment();
                 continue;
                }
             else if( i>=siz )
@@ -66,18 +60,29 @@ class Parser final : public BasicParser
                 // Here expecting one or more keys
                 const auto keys = extract_keys();
                 assert( !keys.empty() );
-                //D1LOG("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
+                //DLOG1("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
                 // What I'm expecting after a key?
-                // Extension: Support also '=' as key=value separator
+
+                // Get key/value separator
+                if( i>=siz )
+                   {
+                    throw create_parse_error(fmt::format("No data after key \"{}\"", keys.back()));
+                   }
                 assert( !std::isspace(buf[i]) );
-                const char separator = i<siz ? buf[i++] : '\0';
-                if( separator!=':' && separator!='=' )
+                const char separator = buf[i++];
+                if( separator!=':' && separator!='=' ) // Extension: Also '='
                    {
                     throw create_parse_error(fmt::format("Invalid separator '{}' after key \"{}\"", str::escape(separator), keys.back()));
                    }
 
-                // Now expecting a value or further childs
+                // I'll support comments also here
                 skip_any_space();
+                if( skip_possible_comment() )
+                   {
+                    skip_any_space();
+                   }
+
+                // Now expecting a value or further childs
                 if( i>=siz )
                    {
                     throw create_parse_error( fmt::format("Missing value of key \"{}\"", keys.back()) );
@@ -96,7 +101,7 @@ class Parser final : public BasicParser
                        {// I'll ensure a child for each key
                         Node n_tmp; // An empty bag to collect just this block
                         collect_childs_of(n_tmp, nest_lvl+1, line);
-                        //D2LOG("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), fmt::join(keys, ", "))
+                        //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), fmt::join(keys, ", "))
 
                         // Copy retrieved subchilds to all childs
                         for( const auto& key : keys )
@@ -109,7 +114,7 @@ class Parser final : public BasicParser
                        {
                         Node& child = n_parent.ensure_child( keys.front() );
                         collect_childs_of(child, nest_lvl+1, line);
-                        //D2LOG("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), keys.front())
+                        //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), keys.front())
                        }
                    }
                 else
@@ -120,7 +125,7 @@ class Parser final : public BasicParser
                        }
                     Node& child = n_parent.ensure_child( keys.front() );
                     child.set_value( extract_value() );
-                    //D2LOG("{}[{}] Assigned {} = {}\n", std::string(nest_lvl,'\t'), line, keys.front(), child.value())
+                    //DLOG2("{}[{}] Assigned {} = {}\n", std::string(nest_lvl,'\t'), line, keys.front(), child.value())
                    }
                }
            }
@@ -137,48 +142,41 @@ class Parser final : public BasicParser
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] bool eat_line_comment_start() noexcept
+    [[nodiscard]] bool skip_possible_comment()
        {
-        if( i<(siz-1) && buf[i]=='/' && buf[i+1]=='/' )
-           {
-            i += 2; // Skip "//"
-            return true;
+        if( i<(siz-1) && buf[i]=='/' )
+           {// Possible comment detected
+            if( buf[i+1]=='/' ) [[likely]]
+               {// Line comment detected
+                i += 2; // Skip "//"
+                skip_line();
+                return true;
+               }
+            else if( buf[i+1]=='*' ) [[unlikely]]
+               {// Block comment detected
+                throw create_parse_error("Block comments are not supported, use //");
+                //i += 2; // Skip "/*"
+                //// Skip block comment
+                //const std::size_t line_start = line; // Store current line
+                //const std::size_t i_start = i; // Store current position
+                //while( i<i_last )
+                //   {
+                //    if( buf[i]=='*' && buf[i+1]=='/' )
+                //       {
+                //        i += 2; // Skip "*/"
+                //        return;
+                //       }
+                //    else if( buf[i]=='\n' )
+                //       {
+                //        ++line;
+                //       }
+                //    ++i;
+                //   }
+                //throw create_parse_error("Unclosed block comment", line_start, i_start);
+                //return true;
+               }
            }
         return false;
-       }
-
-
-    //-----------------------------------------------------------------------
-    [[nodiscard]] bool eat_block_comment_start() noexcept
-       {
-        if( i<(siz-1) && buf[i]=='/' && buf[i+1]=='*' )
-           {
-            i += 2; // Skip "/*"
-            return true;
-           }
-        return false;
-       }
-
-
-    //-----------------------------------------------------------------------
-    void skip_block_comment()
-       {
-        const std::size_t line_start = line; // Store current line
-        const std::size_t i_start = i; // Store current position
-        while( i<i_last )
-           {
-            if( buf[i]=='*' && buf[i+1]=='/' )
-               {
-                i += 2; // Skip "*/"
-                return;
-               }
-            else if( buf[i]=='\n' )
-               {
-                ++line;
-               }
-            ++i;
-           }
-        throw create_parse_error("Unclosed block comment", line_start, i_start);
        }
 
 
@@ -186,7 +184,7 @@ class Parser final : public BasicParser
     // Collect a quoted key (first " not yet eat)
     [[nodiscard]] std::string_view collect_quoted_key()
        {
-        assert( buf[i]=='\"' );
+        assert( i<siz && buf[i]=='\"' );
         ++i; // Skip initial "
         const std::size_t i_start = i;
         while( i<siz )
@@ -210,7 +208,7 @@ class Parser final : public BasicParser
     // Collect a quoted value (first " not yet eat)
     [[nodiscard]] std::string_view collect_quoted_value()
        {
-        assert( buf[i]=='\"' );
+        assert( i<siz && buf[i]=='\"' );
         const std::size_t i_start = i; // Including the double quote
         ++i; // Skip initial "
         while( i<siz )
@@ -233,7 +231,7 @@ class Parser final : public BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_unquoted_value()
        {
-        assert( !std::isspace(buf[i]) );
+        assert( i<siz && !std::isspace(buf[i]) );
         const std::size_t i_start = i;
         while( i<siz && !std::isspace(buf[i]) )
            {
@@ -251,14 +249,14 @@ class Parser final : public BasicParser
     // Extract a (possibly quoted) string. Ensures not empty
     [[nodiscard]] std::string_view extract_key()
        {
-        assert( !std::isspace(buf[i]) );
+        assert( i<siz && !std::isspace(buf[i]) );
         const std::string_view key = buf[i]=='\"' ? collect_quoted_key()
                                                   : collect_identifier();
         if( key.empty() )
            {
             throw create_parse_error( "Empty key" );
            }
-        //D2LOG("[{}] Collected key \"{}\"\n", line, key)
+        //DLOG2("[{}] Collected key \"{}\"\n", line, key)
         return key;
        }
 
@@ -288,7 +286,7 @@ class Parser final : public BasicParser
        {
         const std::string_view val = buf[i]=='\"' ? collect_quoted_value()
                                                   : collect_unquoted_value();
-        //D2LOG("[{}] Collected value \"{}\"\n", line, val)
+        //DLOG2("[{}] Collected value \"{}\"\n", line, val)
         // What I'm expecting here? I'll let the main cycle deal with that
         return val;
        }

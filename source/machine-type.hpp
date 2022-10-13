@@ -89,13 +89,14 @@ class MachineFamily final
            {
             i_family = family::wr;
            }
-        else if( s.ends_with("atos") || s.ends_with("ivef") || s.ends_with("ivee") )
-           {
-            i_family = family::s;
-           }
         else if( s.ends_with("w") )
            {
             i_family = family::w;
+           }
+        else if( (s.contains("active") && (s.ends_with('f') || s.ends_with('e'))) ||
+                 (s.ends_with("strato") && s.ends_with('s')) )
+           {
+            i_family = family::s;
            }
         else if( s.ends_with("frv") )
            {
