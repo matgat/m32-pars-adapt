@@ -169,9 +169,10 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
 
     SHELLEXECUTEINFO ShExecInfo = {0};
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-    ShExecInfo.fMask =   (wait ? SEE_MASK_NOCLOSEPROCESS : 0) // SEE_MASK_DEFAULT
+    ShExecInfo.fMask = (wait ? SEE_MASK_NOCLOSEPROCESS : 0) // SEE_MASK_DEFAULT
                        // | SEE_MASK_FLAG_NO_UI // Do not show error dialog in case of exe not found
                        // | SEE_MASK_DOENVSUBST // Substitute environment vars
+                       // cppcheck-suppress badBitmaskCheck
                        | (show ? 0 : SEE_MASK_FLAG_NO_UI);
     ShExecInfo.hwnd = NULL;
     ShExecInfo.lpVerb = NULL;
@@ -311,8 +312,8 @@ template<std::convertible_to<std::string> ...Args>
         //if(pid != pid_child) // Failed: Child process vanished
        }
     //else // Fork failed
-    return -3; // Something failed
   #endif
+    return -3; // Something failed
 }
 
 
@@ -427,13 +428,18 @@ class MemoryMappedFile final
 class file_write final
 {
  public:
+    // cppcheck-suppress uninitMemberVar
     explicit file_write(const std::string& pth)
+    #if defined(MS_WINDOWS)
+      : i_File(nullptr)
+    #elif defined(POSIX)
+      : i_File(fopen(pth.c_str(), "wb")) // "a" for append
+    #endif
        {
       #if defined(MS_WINDOWS)
         const errno_t err = fopen_s(&i_File, pth.c_str(), "wb"); // "a" for append
         if(err) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
       #elif defined(POSIX)
-        i_File = fopen(pth.c_str(), "wb"); // "a" for append
         if(!i_File) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
       #endif
        }

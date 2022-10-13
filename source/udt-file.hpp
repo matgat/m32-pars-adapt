@@ -113,6 +113,7 @@ class File final
             const std::string prefix{ pth.filename().string() };
             for(const auto& issue_entry : parse_issues )
                {
+                // cppcheck-suppress useStlAlgorithm
                 issues.push_back( fmt::format("[{}]: {}", prefix , issue_entry) );
                }
            }

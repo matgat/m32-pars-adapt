@@ -33,5 +33,5 @@ Makefile.Release
 *.user
 
 # [specific]
-*.pll
-*.plclib
+linux/build
+test/

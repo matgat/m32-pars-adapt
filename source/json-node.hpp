@@ -183,6 +183,7 @@ class Node final
         std::size_t n = 0;
         for( const auto& pair : i_childs )
            {
+            // cppcheck-suppress useStlAlgorithm
             n += pair.second.values_count();
            }
         return n;

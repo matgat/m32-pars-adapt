@@ -16,8 +16,8 @@ template<class elem_type> class vectset
 {
  public:
     using container_type = std::vector<elem_type>;
-    using iterator = container_type::iterator;
-    using const_iterator = container_type::const_iterator;
+    using iterator = typename container_type::iterator;
+    using const_iterator = typename container_type::const_iterator;
 
 
     [[nodiscard]] auto size() const noexcept { return vect.size(); }
@@ -67,6 +67,7 @@ template<class elem_type> class vectset
        {
         for(const elem_type& elem : vect)
            {
+            // cppcheck-suppress useStlAlgorithm
             if(elem==other_elem) return true;
            }
         return false;
@@ -77,6 +78,7 @@ template<class elem_type> class vectset
        {
         for( const elem_type& other_elem : other.vect )
            {
+            // cppcheck-suppress useStlAlgorithm
             if( !contains(other_elem) ) return false;
            }
         return true;

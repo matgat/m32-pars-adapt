@@ -19,7 +19,7 @@ using namespace std::literals; // "..."sv
 
 
   #if !defined(__cpp_lib_to_underlying)
-    [[nodiscard]] template<typename E> constexpr auto to_underlying(const E e) noexcept
+    template<typename E> [[nodiscard]] constexpr auto to_underlying(const E e) noexcept
        {
         return static_cast<std::underlying_type_t<E>>(e);
        }
@@ -250,32 +250,32 @@ class MachineOptions final
        };
 
  public:
-    [[nodiscard]] bool contains(const MachineOptions& other) const noexcept
+    [[nodiscard]] constexpr bool contains(const MachineOptions& other) const noexcept
        {
         return (bit_mask | other.bit_mask) == bit_mask // Contains known options
                && unrecognized.contains(other.unrecognized); // Contains also unknown ones
        }
 
-    [[nodiscard]] bool is_empty() const noexcept { return bit_mask==0; }
+    [[nodiscard]] constexpr bool is_empty() const noexcept { return bit_mask==0; }
     //void reset() noexcept { bit_mask=0; }
 
-    [[nodiscard]] bool is_opp() const noexcept { return has_bit(bits::opp); }
-    void set_opp(const bool b) noexcept { set_bit(bits::opp,b); }
+    [[nodiscard]] constexpr bool is_opp() const noexcept { return has_bit(bits::opp); }
+    constexpr void set_opp(const bool b) noexcept { set_bit(bits::opp,b); }
 
-    [[nodiscard]] bool has_lowe() const noexcept { return has_bit(bits::lowe); }
-    void set_lowe(const bool b) noexcept { set_bit(bits::lowe,b); }
+    [[nodiscard]] constexpr bool has_lowe() const noexcept { return has_bit(bits::lowe); }
+    constexpr void set_lowe(const bool b) noexcept { set_bit(bits::lowe,b); }
 
-    [[nodiscard]] bool has_rot() const noexcept { return has_bit(bits::rot); }
-    void set_rot(const bool b) noexcept { set_bit(bits::rot,b); }
+    [[nodiscard]] constexpr bool has_rot() const noexcept { return has_bit(bits::rot); }
+    constexpr void set_rot(const bool b) noexcept { set_bit(bits::rot,b); }
 
-    [[nodiscard]] bool has_buf() const noexcept { return has_bit(bits::buf); }
-    void set_buf(const bool b) noexcept { set_bit(bits::buf,b); }
+    [[nodiscard]] constexpr bool has_buf() const noexcept { return has_bit(bits::buf); }
+    constexpr void set_buf(const bool b) noexcept { set_bit(bits::buf,b); }
 
-    [[nodiscard]] bool has_nobuf() const noexcept { return has_bit(bits::nobuf); }
-    void set_nobuf(const bool b) noexcept { set_bit(bits::nobuf,b); }
+    [[nodiscard]] constexpr bool has_nobuf() const noexcept { return has_bit(bits::nobuf); }
+    constexpr void set_nobuf(const bool b) noexcept { set_bit(bits::nobuf,b); }
 
 
-    [[nodiscard]] bool has_option(const std::string_view opt) const noexcept
+    [[nodiscard]] constexpr bool has_option(const std::string_view opt) const noexcept
        {
         MachineOptions other;
         other.add_option(opt);
@@ -315,8 +315,8 @@ class MachineOptions final
     std::underlying_type_t<bits> bit_mask = 0;
     mat::vectset<std::string> unrecognized; // Unknown options
 
-    [[nodiscard]] bool has_bit(const bits bit) const noexcept { return bit_mask & to_underlying(bit); }
-    void set_bit(const bits bit, const bool b) noexcept { if(b)bit_mask|=to_underlying(bit); else bit_mask&=~to_underlying(bit); }
+    [[nodiscard]] constexpr bool has_bit(const bits bit) const noexcept { return bit_mask & to_underlying(bit); }
+    constexpr void set_bit(const bits bit, const bool b) noexcept { if(b)bit_mask|=to_underlying(bit); else bit_mask&=~to_underlying(bit); }
 };
 
 
@@ -384,11 +384,11 @@ class MachineType final
         class parser_t
            {
             public:
-                parser_t(const std::string_view s) noexcept : buf(s) {}
+                explicit parser_t(const std::string_view s) noexcept : buf(s) {}
 
-                [[nodiscard]] bool has_data() noexcept { return i<buf.size(); }
-                [[nodiscard]] bool is_alpha() noexcept { return i<buf.size() && std::isalpha(buf[i]); }
-                [[nodiscard]] bool is_digit() noexcept { return i<buf.size() && std::isdigit(buf[i]); }
+                [[nodiscard]] bool has_data() const noexcept { return i<buf.size(); }
+                [[nodiscard]] bool is_alpha() const noexcept { return i<buf.size() && std::isalpha(buf[i]); }
+                [[nodiscard]] bool is_digit() const noexcept { return i<buf.size() && std::isdigit(buf[i]); }
 
                 void skip_nonalnum() noexcept { while( i<buf.size() && !std::isalnum(buf[i]) ) ++i; }
                 void skip_nonalpha() noexcept { while( i<buf.size() && !std::isalpha(buf[i]) ) ++i; }
@@ -497,8 +497,9 @@ class MachineType final
         // If here, all ok
         return mach;
        }
-       
+
     //------------------------------------------------------------------------
+    // cppcheck-suppress unusedPrivateFunction
     [[nodiscard]] static MachineType ask_user() noexcept
        {
         MachineType mach;

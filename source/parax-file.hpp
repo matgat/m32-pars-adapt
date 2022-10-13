@@ -48,8 +48,7 @@ class File final
         public:
             explicit Line(const std::string_view l) : i_LineSpan(l), i_FieldPtr(nullptr) {}
 
-            [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
-            [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
+            [[nodiscard]] std::string_view span() const noexcept { return i_LineSpan; }
 
             [[nodiscard]] const Field* field_ptr() const noexcept { return i_FieldPtr; }
             [[nodiscard]] Field* field_ptr() noexcept { return i_FieldPtr; }
@@ -198,6 +197,7 @@ class File final
             const std::string prefix{ pth.filename().string() };
             for(const auto& issue_entry : parse_issues )
                {
+                // cppcheck-suppress useStlAlgorithm
                 issues.push_back( fmt::format("[{}]: {}", prefix , issue_entry) );
                }
            }

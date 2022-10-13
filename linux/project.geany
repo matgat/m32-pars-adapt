@@ -29,7 +29,7 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=15427;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
+FILE_NAME_0=480;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
 
 [VTE]
 last_dir=/home/mat/dev/m32-pars-adapt/source
@@ -43,13 +43,13 @@ EX_01_CM=time ./m32-pars-adapt --verbose --quiet --tgt ../../test/machsettings.u
 EX_01_WD=%p/linux/build
 C++FT_00_LB=_Compile
 C++FT_00_CM=clang++ -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wfatal-errors -c "%f"
-C++FT_00_WD=
+C++FT_00_WD=%d
 C++FT_01_LB=_Build
 C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
 C++FT_01_WD=%p
-C++FT_02_LB=_Lint
-C++FT_02_CM=cppcheck --language=c++ --enable=warning,style --suppress=passedByValue --template=gcc "%f"
-C++FT_02_WD=
+C++FT_02_LB=Build with gcc
+C++FT_02_CM=g++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+C++FT_02_WD=%p
 filetypes=C++;
 NF_00_LB=_Make
 NF_00_CM=make
@@ -57,9 +57,9 @@ NF_00_WD=%p/linux
 NF_01_LB=Make Custom _Target...
 NF_01_CM=make
 NF_01_WD=%p/linux
-NF_02_LB=Build with gcc
-NF_02_CM=g++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
-NF_02_WD=%p
+NF_02_LB=_Lint
+NF_02_CM=cppcheck --language=c++ --enable=warning,style --inline-suppr --suppress=passedByValue --template=gcc "%f"
+NF_02_WD=%d
 NF_03_LB=clang-tidy
 NF_03_CM=clang-tidy --header-filter=\\.hpp$ "source/m32-pars-adapt.cpp" -- -std=c++2b -funsigned-char -lfmt
 NF_03_WD=%p
