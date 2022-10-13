@@ -52,8 +52,7 @@ class File final
         public:
             explicit Line(const std::string_view l, Assignment* const pa) : i_LineSpan(l), i_AssignmentPtr(pa) {}
 
-            [[nodiscard]] const std::string_view& span() const noexcept { return i_LineSpan; }
-            [[nodiscard]] std::string_view& span() noexcept { return i_LineSpan; }
+            [[nodiscard]] std::string_view span() const noexcept { return i_LineSpan; }
 
             [[nodiscard]] const Assignment* assignment_ptr() const noexcept { return i_AssignmentPtr; }
             [[nodiscard]] Assignment* assignment_ptr() noexcept { return i_AssignmentPtr; }

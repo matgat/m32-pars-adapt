@@ -10,6 +10,7 @@
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
 #include "string-utilities.hpp" // str::unquoted
+#include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
 
 
@@ -67,7 +68,7 @@ class File final
         sipro::Parser parser(file_buf.path(), file_buf.as_string_view(), parse_issues, true);
 
         // A context for collecting axis fields
-        class
+        class CurrAxBlock final
            {
             public:
                 void start(const std::string_view nam, const std::size_t lin)
@@ -86,7 +87,8 @@ class File final
                 [[nodiscard]] operator bool() const noexcept { return m_inside; }
                 [[nodiscard]] std::string_view tag_name() const noexcept { return m_tagname; }
                 [[nodiscard]] std::size_t line_idx() const noexcept { return m_line_idx; }
-                [[nodiscard]] auto& collected_fields() noexcept { return m_collected_fields; }
+                [[nodiscard]] const auto& collected_fields() const noexcept { return m_collected_fields; }
+                [[nodiscard]] auto& modify_collected_fields() noexcept { return m_collected_fields; }
 
             private:
                 std::string_view m_tagname;
@@ -114,7 +116,7 @@ class File final
                             parse_issues.push_back( fmt::format("No fields collected in axis block at line {}"sv, curr_ax_block.line_idx()) );
                            }
                         // I need the axis name to store the collected fields
-                        else if( const Field* ax_name_field = get_field(curr_ax_block.collected_fields(),"Name") )
+                        else if( const Field* const ax_name_field = get_field(curr_ax_block.collected_fields(),"Name") )
                            {
                             const std::string_view ax_name = str::unquoted(ax_name_field->value());
                             if( i_axblocks.contains(ax_name) )
@@ -150,7 +152,7 @@ class File final
                     else
                        {
                         // Populate the map of fields
-                        const auto [it, inserted] = curr_ax_block.collected_fields().try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
+                        const auto [it, inserted] = curr_ax_block.modify_collected_fields().try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
                         if( !inserted )
                            {
                             parse_issues.push_back( fmt::format("Field {} at line {} was not inserted"sv, line.assignment().var_name(), i_lines.size()+1) );
@@ -214,7 +216,7 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] static Field* get_field(std::map<std::string_view,Field>& fields, const std::string_view key) noexcept
+    [[nodiscard]] static const Field* get_field(const std::map<std::string_view,Field>& fields, const std::string_view key) noexcept
        {
         if( auto it=fields.find(key); it!=fields.end() )
            {
@@ -223,6 +225,16 @@ class File final
         return nullptr;
        }
 
+
+    //-----------------------------------------------------------------------
+    [[nodiscard]] static Field* get_field(std::map<std::string_view,Field>& fields, const std::string_view key) noexcept
+       {
+        if( auto it=fields.find(key); it!=fields.end() )
+           {
+            return &(it->second);
+           }
+        return nullptr;
+       }
 
     //-----------------------------------------------------------------------
     void write(const fs::path outpth, const std::string_view mach_type)

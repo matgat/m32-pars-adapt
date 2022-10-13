@@ -29,17 +29,17 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=480;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
+FILE_NAME_0=17197;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
 
 [VTE]
 last_dir=/home/mat/dev/m32-pars-adapt/source
 
 [build-menu]
 EX_00_LB=Run
-EX_00_CM=./m32-pars-adapt --verbose --tgt ../../test/machsettings.udt --db ../../test/machsettings-old.udt
+EX_00_CM=./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-old.udt
 EX_00_WD=%p/linux/build
 EX_01_LB=Test
-EX_01_CM=time ./m32-pars-adapt --verbose --quiet --tgt ../../test/machsettings.udt --db ../../test/machsettings-ovl.txt --machine StratoHP-4.9/3.2
+EX_01_CM=time ./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-ovl.txt --mach StratoHP-4.9/3.2
 EX_01_WD=%p/linux/build
 C++FT_00_LB=_Compile
 C++FT_00_CM=clang++ -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wfatal-errors -c "%f"
