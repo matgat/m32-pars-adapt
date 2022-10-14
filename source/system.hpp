@@ -36,9 +36,9 @@ namespace fs = std::filesystem;
    }
 #elif defined(POSIX)
     #include <cstdio> // std::fopen
+    #include <unistd.h> // unlink, exec*, fork, ...
   namespace psx
    {
-    #include <unistd.h> // unlink, exec*, fork, ...
     #include <fcntl.h> // open
     #include <sys/mman.h> // mmap, munmap
     #include <sys/stat.h> // fstat
@@ -66,10 +66,10 @@ void sleep_ms( const int ms )
   #if defined(MS_WINDOWS)
     win::Sleep(ms);
   #elif defined(POSIX)
-    psx::timespec ts;
+    timespec ts;
     ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000000;
-    psx::nanosleep(&ts, NULL);
+    nanosleep(&ts, NULL);
   #endif
 }
 
@@ -236,9 +236,9 @@ void launch_file(const std::string& pth) noexcept
   #if defined(MS_WINDOWS)
     shell_execute( pth.c_str() );
   #elif defined(POSIX)
-    if( const auto pid=psx::fork(); pid==0 ) // psx::pid_t
+    if( const auto pid=fork(); pid==0 ) // pid_t
        {
-        psx::execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
+        execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
        }
   #endif
 }
@@ -263,14 +263,14 @@ void execute(const char* const exe, Args&&... args) noexcept
        }
     catch(...){}
   #elif defined(POSIX)
-    if( const auto pid=psx::fork(); pid==0 ) // psx::pid_t
+    if( const auto pid=fork(); pid==0 ) // pid_t
        {
         struct loc
            {// Extract char pointer for posix api exec*
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
            };
-        psx::execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
        }
   #endif
 }
@@ -296,7 +296,7 @@ template<std::convertible_to<std::string> ...Args>
        }
     catch(...){}
   #elif defined(POSIX)
-    const auto pid_child = psx::fork(); // psx::pid_t
+    const auto pid_child = fork(); // pid_t
     if( pid_child==0 )
        {// Fork successful, inside child process
         struct loc
@@ -304,14 +304,14 @@ template<std::convertible_to<std::string> ...Args>
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
            };
-        psx::execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
        }
     else if( pid_child!=-1 )
        {// Fork successful, inside parent process: wait child
-        psx::pid_t pid;
+        pid_t pid;
         int status;
         do {
-            pid = psx::waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
+            pid = waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
             if(pid==-1) return -2; // waitpid error
             else if( WIFEXITED(status) ) return WEXITSTATUS(status); // Exited, return result
             else if( WIFSIGNALED(status) ) return -1; // Killed by WTERMSIG(status)
@@ -358,15 +358,15 @@ class MemoryMappedFile final
             throw std::runtime_error( fmt::format("Couldn't create view of {} ({})", i_path, get_lasterr_msg()) );
            }
       #elif defined(POSIX)
-        const int fd = psx::open(i_path.c_str(), O_RDONLY);
+        const int fd = open(i_path.c_str(), O_RDONLY);
         if(fd == -1) throw std::runtime_error( fmt::format("Couldn't open {}", i_path) );
 
         // obtain file size
-        psx::stat sbuf {};
-        if(psx::fstat(fd, &sbuf) == -1) throw std::runtime_error("Cannot stat file size");
+        struct stat sbuf {};
+        if(fstat(fd, &sbuf) == -1) throw std::runtime_error("Cannot stat file size");
         i_bufsiz = static_cast<std::size_t>(sbuf.st_size);
 
-        i_buf = static_cast<const char*>(psx::mmap(nullptr, i_bufsiz, PROT_READ, MAP_PRIVATE, fd, 0U));
+        i_buf = static_cast<const char*>(mmap(nullptr, i_bufsiz, PROT_READ, MAP_PRIVATE, fd, 0U));
         if(i_buf == MAP_FAILED)
            {
             i_buf = nullptr;
@@ -384,7 +384,7 @@ class MemoryMappedFile final
             if(hMapping) win::CloseHandle(hMapping);
             if(hFile!=INVALID_HANDLE_VALUE) win::CloseHandle(hFile);
           #elif defined(POSIX)
-            /* const int ret = */ psx::munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
+            /* const int ret = */ munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
             //if(ret==-1) std::cerr << "munmap() failed\n";
           #endif
            }
@@ -482,6 +482,7 @@ class file_write final
       #elif defined(POSIX)
         std::fopen(filename, mode);
       #endif
+        // cppcheck-suppress syntaxError
         if(!f) throw std::runtime_error( fmt::format("file_write: Cannot open {}",filename) );
         return f;
        }

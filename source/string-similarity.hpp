@@ -48,7 +48,7 @@ double calc_similarity_sorensen( const std::string_view s1, const std::string_vi
     class charpairs_t final
     {
      public:
-         charpairs_t(const std::string_view s)
+         explicit charpairs_t(const std::string_view s)
             {
              assert( !s.empty() ); // Sould be already intercepted
              const std::size_t i_last = s.size()-1;
