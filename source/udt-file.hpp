@@ -10,7 +10,7 @@
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
-//#include "string-utilities.hpp" // str::calc_similarity
+#include "string-similarity.hpp" // str::calc_similarity_sorensen
 #include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
 
@@ -119,12 +119,33 @@ class File final
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] Assignment* get_field(const std::string_view varlbl)
+    [[nodiscard]] Assignment* get_field(const std::string_view varlbl) noexcept
        {
         if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
            {
             return &(it->second);
            }
+        return nullptr;
+       }
+
+    //-----------------------------------------------------------------------
+    [[nodiscard]] Assignment* detect_rename_of(const Assignment& his_assgnm) noexcept
+       {
+        try{
+            for( auto& [my_varlbl, my_assgnm] : i_assignments )
+               {
+                // Deve corrispondere l'indirizzo del registro
+                if( my_assgnm.var_name() == his_assgnm.var_name() )
+                   {
+                    // Se il commento è abbastanza simile, è lui!
+                    const auto comment_similarity = str::calc_similarity_sorensen(my_assgnm.comment(), his_assgnm.comment());
+                    assert( comment_similarity>=0.0 && comment_similarity<=1.0 );
+                    if( comment_similarity > 0.85 ) return &my_assgnm;
+                   }
+                // Potrei essere più tollerante accettando anche registri indici dello
+                // stesso tipo con indici vicini, ma meglio evitare falsi positivi
+               }
+           } catch(...){}
         return nullptr;
        }
 
@@ -150,21 +171,24 @@ class File final
     //-----------------------------------------------------------------------
     void overwrite_values_from(const File& other_file) noexcept
        {
-        for( const auto& [varlbl, other] : other_file.i_assignments )
+        for( const auto& [his_varlbl, his_assgnm] : other_file.i_assignments )
            {
-            if( varlbl == "vqMachSettingsVer"sv )
-               {// Skipping
+            if( his_varlbl == "vqMachSettingsVer"sv )
+               {// Skipping: I'll keep my own version
                }
-            else if( const auto field = get_field(varlbl) )
+            else if( auto my_assgnm = get_field(his_varlbl); my_assgnm!=nullptr )
                {
-                field->modify_value(other.value());
+                my_assgnm->modify_value(his_assgnm.value());
+               }
+            // Rilevo eventuale rinominazione della 'added_label()'
+            else if( my_assgnm = detect_rename_of(his_assgnm); my_assgnm!=nullptr )
+               {
+                add_mod_issue( fmt::format("Renamed: {}={} => {}={} (verify)",his_varlbl,his_assgnm.value(),my_assgnm->added_label(),my_assgnm->value()) );
+                my_assgnm->modify_value(his_assgnm.value());
                }
             else
                {
-                // Potrei cercare di rilevare rinominazioni delle label
-                // controllando la corrispondenza ass.var_name(), ass.comment()
-                // Anche con str::calc_similarity
-                add_mod_issue( fmt::format("Not found: {} = {}",varlbl,other.value()) );
+                add_mod_issue( fmt::format("Not found: {}={} (removed or renamed)",his_varlbl,his_assgnm.value()) );
                }
            }
        }
@@ -229,9 +253,9 @@ class File final
     [[nodiscard]] std::size_t modified_values_count() const noexcept
        {
         std::size_t count = 0;
-        for( const auto& [varlbl, ass] : i_assignments )
+        for( const auto& [varlbl, assgnm] : i_assignments )
            {
-            if( ass.is_value_modified() ) ++count;
+            if( assgnm.is_value_modified() ) ++count;
            }
         return count;
        }

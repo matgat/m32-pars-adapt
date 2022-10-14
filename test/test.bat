@@ -2,70 +2,95 @@
 title m32-pars-adapt test
 cd /d %~dp0
 
+rem settings
+set old_udt=MachSettings-old.udt
+set src_pth_w=%UserProfile%\Macotec\Machines\m32-Strato\sde
+set src_pth_s=%UserProfile%\Macotec\Machines\m32-StratoS\sde
+set udt_w=%src_pth_w%\userdata\MachSettings.udt
+set udt_s=%src_pth_s%\userdata\MachSettings.udt
+set udt_db=%src_pth_w%\userdata\configs\machsettings-overlays.txt
+set parax_w=%src_pth_w%\param\par2kax.txt
+set parax_s=%src_pth_s%\param\par2kax.txt
+set parax_db=%src_pth_w%\param\configs\par2kax-overlays.txt
 set exe="..\.msvc\x64-Debug\m32-pars-adapt.exe"
 ::set exe="m32-pars-adapt.exe"
-set src_pth=%UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
-set udt_name=MachSettings.udt
-set udt_overlay=%src_pth%\configs\machsettings-overlays.txt
+echo %exe%
 
-set old_udt=MachSettings-old.udt
-set loc_udt=~MachSettings.udt
-set new_udt1=~MachSettings-theirs.udt
-set new_udt2=~MachSettings-mine.udt
 
 :select_test
-echo %exe%
+echo.
+echo -----------
 echo Choose test:
-choice /c asup /m "Adapt-W, Adapt-S, Update, ParAx"
+choice /N /C 123456q /M "[1]Update, [2]Adapt-W, [3]Adapt-S, [4]ParAx-W, [5]ParAx-S, [6]Confront, [q]Quit: "
 goto menu%errorlevel%
+
+:menu0
+goto select_test
 
 
 :menu1
+rem Test udt update
+%exe% -v -tgt "%udt_w%" -db %old_udt%
+echo ret=%errorlevel%
+goto select_test
+
+
+:menu2
 rem Test udt adaptation (W)
 ::set mach=hp(4.0/4.6)
 set mach=ActWR-4.0/4.6;no-buf;combo
 ::set mach=wr/4.0
-%exe% -v -tgt "%src_pth%\%udt_name%" -db "%udt_overlay%" -m "%mach%"
-goto menu0
-
-
-:menu2
-rem Test udt adaptation (S)
-set mach=ActiveF-4.6/3.2-(rot)
-%exe% -v -tgt "%UserProfile%\Macotec\Machines\m32-StratoS\sde\userdata\%udt_name%" -db "%udt_overlay%" -m "%mach%"
-goto menu0
+%exe% -v -tgt "%udt_w%" -db "%udt_db%" -m "%mach%"
+echo ret=%errorlevel%
+goto select_test
 
 
 :menu3
-rem Test udt update
-%exe% -v -tgt "%src_pth%\%udt_name%" -db %old_udt%
-goto menu0
+rem Test udt adaptation (S)
+set mach=ActiveF-4.6/3.2-(rot)
+%exe% -v -tgt "%udt_s%" -db "%udt_db%" -m "%mach%"
+echo ret=%errorlevel%
+goto select_test
 
 
 :menu4
-rem Test parax adaptation
-set mach=ActWR-4.0/4.6;no-buf;combo
-set pars_fold=%UserProfile%\Macotec\Machines\m32-Strato\sde\param
-%exe% -v -tgt "%pars_fold%\par2kax.txt" -db "%pars_fold%\configs\par2kax-overlays.txt" -m "%mach%"
-goto menu0
+rem Test parax adaptation (W)
+set mach=ActHP-4.9/4.6;no-buf;combo
+%exe% -v -tgt "%parax_w%" -db "%parax_db%" -m "%mach%"
+echo ret=%errorlevel%
+goto select_test
 
 
-rem :menu5
-rem rem Confront with MachSettings-tool.js
-rem rem Copy here the file
-rem copy /Y "%src_pth%\%udt_name%" "%loc_udt%"
-rem rem Create updated udts
-rem cscript "%src_pth%\configs\MachSettings-tool.js" -tgt="%old_udt%" -tpl="%loc_udt%" -out="%new_udt1%" -quiet
-rem %exe% --verbose --quiet --tgt "%loc_udt%" --db %old_udt% --out "%new_udt2%"
-rem rem Confront them
-rem "%ProgramFiles%\WinMerge\WinMergeU.exe" /e /u "%new_udt1%" "%new_udt2%"
-rem del "%loc_udt%"
-rem del "%new_udt1%"
-rem del "%new_udt2%"
-rem goto menu0
+:menu5
+rem Test parax adaptation (S)
+set mach=ActiveF-3.7-buf
+%exe% -v -tgt "%parax_s%" -db "%parax_db%" -m "%mach%"
+echo ret=%errorlevel%
+goto select_test
 
 
-:menu0
-echo.
-if %errorlevel% neq 0 pause
+:menu6
+rem Confront
+set loc_udt=~MachSettings.udt
+set new_udt_theirs=~MachSettings-theirs.udt
+set new_udt_mine=~MachSettings-mine.udt
+rem Copy here the file
+copy /Y "%udt_w%" "%loc_udt%"
+rem Create my updated udt
+%exe% -v -q --tgt "%loc_udt%" --db %old_udt% --out "%new_udt_mine%"
+echo ret=%errorlevel%
+rem Create the other
+rem with MachSettings-tool.js
+::cscript "%src_pth_w%\userdata\configs\MachSettings-tool.js" -tgt="%old_udt%" -tpl="%loc_udt%" -out="%new_udt_theirs%" -quiet
+rem with previous m32-pars-adapt
+m32-pars-adapt -v -q --tgt "%loc_udt%" --db %old_udt% --out "%new_udt_theirs%"
+rem Confront them
+"%ProgramFiles%\WinMerge\WinMergeU.exe" /e /u "%new_udt_theirs%" "%new_udt_mine%"
+del "%loc_udt%"
+del "%new_udt_theirs%"
+del "%new_udt_mine%"
+goto select_test
+
+
+:menu7
 exit

@@ -94,7 +94,7 @@ class MachineFamily final
             i_family = family::w;
            }
         else if( (s.contains("active") && (s.ends_with('f') || s.ends_with('e'))) ||
-                 (s.ends_with("strato") && s.ends_with('s')) )
+                 (s.contains("strato") && s.ends_with('s')) )
            {
             i_family = family::s;
            }

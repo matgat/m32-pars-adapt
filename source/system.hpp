@@ -7,8 +7,6 @@
 #include <concepts> // std::convertible_to
 #include <string>
 #include <string_view>
-//#include <fstream>
-#include <cstdio> // std::fopen, ...
 #include <cstdlib> // std::getenv
 #include <filesystem> // std::filesystem
 namespace fs = std::filesystem;
@@ -27,19 +25,27 @@ namespace fs = std::filesystem;
 #endif
 
 #if defined(MS_WINDOWS)
-  #include <Windows.h>
-  //#include <unistd.h> // _stat
-  #include <shellapi.h> // FindExecutableA
-  #include <shlwapi.h> // AssocQueryString
-  #include <cctype> // std::tolower
+    #include <cstdio> // fopen_s (Microsoft 'deprecated' std::fopen)
+    #include <cctype> // std::tolower
+  namespace win
+   {
+    #include <Windows.h>
+    //#include <unistd.h> // _stat
+    #include <shellapi.h> // FindExecutableA
+    #include <shlwapi.h> // AssocQueryString
+   }
 #elif defined(POSIX)
-  #include <unistd.h> // unlink, exec*, fork, ...
-  #include <fcntl.h> // open
-  #include <sys/mman.h> // mmap, munmap
-  #include <sys/stat.h> // fstat
-  #include <time.h>   // nanosleep
-  //#include <sys/types.h>
-  #include <sys/wait.h> // waitpid
+    #include <cstdio> // std::fopen
+  namespace psx
+   {
+    #include <unistd.h> // unlink, exec*, fork, ...
+    #include <fcntl.h> // open
+    #include <sys/mman.h> // mmap, munmap
+    #include <sys/stat.h> // fstat
+    #include <time.h>   // nanosleep
+    //#include <sys/types.h>
+    #include <sys/wait.h> // waitpid
+   }
 #endif
 
 
@@ -47,17 +53,23 @@ namespace fs = std::filesystem;
 namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
+  #if defined(MS_WINDOWS)
+    using namespace win;
+  #elif defined(POSIX)
+    using namespace psx;
+  #endif
+
 
 //---------------------------------------------------------------------------
 void sleep_ms( const int ms )
 {
   #if defined(MS_WINDOWS)
-    ::Sleep(ms);
+    win::Sleep(ms);
   #elif defined(POSIX)
-    timespec ts;
+    psx::timespec ts;
     ts.tv_sec = ms / 1000;
     ts.tv_nsec = (ms % 1000) * 1000000;
-    nanosleep(&ts, NULL);
+    psx::nanosleep(&ts, NULL);
   #endif
 }
 
@@ -100,19 +112,19 @@ void sleep_ms( const int ms )
     //#include <system_error>
     //std::string message = std::system_category().message(e);
 
-    if(e==0) e = ::GetLastError(); // ::WSAGetLastError()
+    if(e==0) e = win::GetLastError(); // ::WSAGetLastError()
     const DWORD buf_siz = 1024;
     TCHAR buf[buf_siz];
     const DWORD siz =
-        ::FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
-                         FORMAT_MESSAGE_IGNORE_INSERTS|
-                         FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                         nullptr,
-                         e,
-                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                         buf,
-                         buf_siz,
-                         nullptr );
+        win::FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
+                            FORMAT_MESSAGE_IGNORE_INSERTS|
+                            FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                            nullptr,
+                            e,
+                            0, // MAKELANGID deprecated
+                            buf,
+                            buf_siz,
+                            nullptr );
 
     return siz>0 ? fmt::format("[{}] {}", e, std::string(buf, siz))
                  : fmt::format("[{}] Unknown error", e);
@@ -122,9 +134,8 @@ void sleep_ms( const int ms )
 [[nodiscard]] std::string find_executable_by_file(const std::string& doc) noexcept
 {
     char buf[MAX_PATH + 1] = {'\0'};
-    ::FindExecutableA(doc.c_str(), NULL, buf);
-    std::string exe_path(buf);
-    return exe_path;
+    win::FindExecutableA(doc.c_str(), NULL, buf);
+    return std::string(buf);
 }
 
 //---------------------------------------------------------------------------
@@ -133,7 +144,7 @@ void sleep_ms( const int ms )
 {
     DWORD buf_len = MAX_PATH;
     TCHAR buf[MAX_PATH+1];
-    HRESULT hr = ::AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
+    HRESULT hr = win::AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
     if(hr==E_POINTER)
        {
         throw std::runtime_error("AssocQueryString: buffer too small to hold the entire path");
@@ -148,8 +159,8 @@ void sleep_ms( const int ms )
 //---------------------------------------------------------------------------
 void shell_execute(const char* const pth, const char* const args =nullptr) noexcept
 {
-    SHELLEXECUTEINFOA ShExecInfo = {0};
-    ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFOA);
+    win::SHELLEXECUTEINFOA ShExecInfo = {0};
+    ShExecInfo.cbSize = sizeof(win::SHELLEXECUTEINFOA);
     ShExecInfo.fMask = 0;
     ShExecInfo.hwnd = NULL;
     ShExecInfo.lpVerb = "open";
@@ -158,7 +169,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL;
     ShExecInfo.nShow = SW_SHOW;
     ShExecInfo.hInstApp = NULL;
-    ::ShellExecuteEx(&ShExecInfo);
+    win::ShellExecuteEx(&ShExecInfo);
 }
 
 //---------------------------------------------------------------------------
@@ -167,8 +178,8 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     const bool show = true;
     const bool wait = true;
 
-    SHELLEXECUTEINFO ShExecInfo = {0};
-    ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+    win::SHELLEXECUTEINFO ShExecInfo = {0};
+    ShExecInfo.cbSize = sizeof(win::SHELLEXECUTEINFO);
     ShExecInfo.fMask = (wait ? SEE_MASK_NOCLOSEPROCESS : 0) // SEE_MASK_DEFAULT
                        // | SEE_MASK_FLAG_NO_UI // Do not show error dialog in case of exe not found
                        // | SEE_MASK_DOENVSUBST // Substitute environment vars
@@ -181,7 +192,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL; // base_dir.empty() ? NULL : base_dir.c_str();
     ShExecInfo.nShow = show ? SW_SHOW : SW_HIDE;
     ShExecInfo.hInstApp = NULL;
-    if( !::ShellExecuteEx(&ShExecInfo) )
+    if( !win::ShellExecuteEx(&ShExecInfo) )
        {
         throw std::runtime_error( fmt::format("Cannot run {}: {}", pth, sys::get_lasterr_msg()) );
        }
@@ -190,9 +201,8 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
 
     if( wait )
        {
-        DWORD WaitResult;
         do {
-            WaitResult = ::WaitForSingleObject(ShExecInfo.hProcess, 500);
+            const win::DWORD WaitResult = win::WaitForSingleObject(ShExecInfo.hProcess, 500);
             if( WaitResult == WAIT_TIMEOUT )
                {// Still executing...
                 sys::sleep_ms(100); //Application->ProcessMessages();
@@ -203,15 +213,15 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
                }
             else
                {
-                ::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+                win::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
                 throw std::runtime_error( fmt::format("ShellExecuteEx: spawn error of {}",pth) );
                }
            }
         while(true);
 
         // If here process ended
-        ::GetExitCodeProcess(ShExecInfo.hProcess, &ret);
-        ::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+        win::GetExitCodeProcess(ShExecInfo.hProcess, &ret);
+        win::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
        }
 
     return ret;
@@ -226,9 +236,9 @@ void launch_file(const std::string& pth) noexcept
   #if defined(MS_WINDOWS)
     shell_execute( pth.c_str() );
   #elif defined(POSIX)
-    if( const auto pid=fork(); pid==0 ) // pid_t
+    if( const auto pid=psx::fork(); pid==0 ) // psx::pid_t
        {
-        execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
+        psx::execlp("xdg-open", "xdg-open", pth.c_str(), nullptr);
        }
   #endif
 }
@@ -253,14 +263,14 @@ void execute(const char* const exe, Args&&... args) noexcept
        }
     catch(...){}
   #elif defined(POSIX)
-    if( const auto pid=fork(); pid==0 ) // pid_t
+    if( const auto pid=psx::fork(); pid==0 ) // psx::pid_t
        {
         struct loc
            {// Extract char pointer for posix api exec*
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
            };
-        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+        psx::execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
        }
   #endif
 }
@@ -286,7 +296,7 @@ template<std::convertible_to<std::string> ...Args>
        }
     catch(...){}
   #elif defined(POSIX)
-    const auto pid_child = fork(); // pid_t
+    const auto pid_child = psx::fork(); // psx::pid_t
     if( pid_child==0 )
        {// Fork successful, inside child process
         struct loc
@@ -294,14 +304,14 @@ template<std::convertible_to<std::string> ...Args>
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
            };
-        execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
+        psx::execlp(exe, exe, loc::c_str(std::forward<Args>(args))..., nullptr);
        }
     else if( pid_child!=-1 )
        {// Fork successful, inside parent process: wait child
-        pid_t pid;
+        psx::pid_t pid;
         int status;
         do {
-            pid = waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
+            pid = psx::waitpid(pid_child, &status, WUNTRACED | WCONTINUED);
             if(pid==-1) return -2; // waitpid error
             else if( WIFEXITED(status) ) return WEXITSTATUS(status); // Exited, return result
             else if( WIFSIGNALED(status) ) return -1; // Killed by WTERMSIG(status)
@@ -326,37 +336,37 @@ class MemoryMappedFile final
       : i_path(pth)
        {
       #if defined(MS_WINDOWS)
-        hFile = ::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
+        hFile = win::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
         if(hFile == INVALID_HANDLE_VALUE)
            {
             throw std::runtime_error( fmt::format("Couldn't open {} ({}))", i_path, get_lasterr_msg()));
            }
-        i_bufsiz = ::GetFileSize(hFile, nullptr);
+        i_bufsiz = win::GetFileSize(hFile, nullptr);
 
-        hMapping = ::CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+        hMapping = win::CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
         if(hMapping == nullptr)
            {
-            ::CloseHandle(hFile);
+            win::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't map {} ({})", i_path, get_lasterr_msg()));
            }
         //
-        i_buf = static_cast<const char*>( ::MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
+        i_buf = static_cast<const char*>( win::MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
         if(i_buf == nullptr)
            {
-            ::CloseHandle(hMapping);
-            ::CloseHandle(hFile);
+            win::CloseHandle(hMapping);
+            win::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't create view of {} ({})", i_path, get_lasterr_msg()) );
            }
       #elif defined(POSIX)
-        const int fd = open(i_path.c_str(), O_RDONLY);
+        const int fd = psx::open(i_path.c_str(), O_RDONLY);
         if(fd == -1) throw std::runtime_error( fmt::format("Couldn't open {}", i_path) );
 
         // obtain file size
-        struct stat sbuf {};
-        if(fstat(fd, &sbuf) == -1) throw std::runtime_error("Cannot stat file size");
+        psx::stat sbuf {};
+        if(psx::fstat(fd, &sbuf) == -1) throw std::runtime_error("Cannot stat file size");
         i_bufsiz = static_cast<std::size_t>(sbuf.st_size);
 
-        i_buf = static_cast<const char*>(mmap(nullptr, i_bufsiz, PROT_READ, MAP_PRIVATE, fd, 0U));
+        i_buf = static_cast<const char*>(psx::mmap(nullptr, i_bufsiz, PROT_READ, MAP_PRIVATE, fd, 0U));
         if(i_buf == MAP_FAILED)
            {
             i_buf = nullptr;
@@ -370,11 +380,11 @@ class MemoryMappedFile final
         if(i_buf)
            {
           #if defined(MS_WINDOWS)
-            ::UnmapViewOfFile(i_buf);
-            if(hMapping) ::CloseHandle(hMapping);
-            if(hFile!=INVALID_HANDLE_VALUE) ::CloseHandle(hFile);
+            win::UnmapViewOfFile(i_buf);
+            if(hMapping) win::CloseHandle(hMapping);
+            if(hFile!=INVALID_HANDLE_VALUE) win::CloseHandle(hFile);
           #elif defined(POSIX)
-            /* const int ret = */ munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
+            /* const int ret = */ psx::munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
             //if(ret==-1) std::cerr << "munmap() failed\n";
           #endif
            }
@@ -428,21 +438,8 @@ class MemoryMappedFile final
 class file_write final
 {
  public:
-    // cppcheck-suppress uninitMemberVar
     explicit file_write(const std::string& pth)
-    #if defined(MS_WINDOWS)
-      : i_File(nullptr)
-    #elif defined(POSIX)
-      : i_File(fopen(pth.c_str(), "wb")) // "a" for append
-    #endif
-       {
-      #if defined(MS_WINDOWS)
-        const errno_t err = fopen_s(&i_File, pth.c_str(), "wb"); // "a" for append
-        if(err) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
-      #elif defined(POSIX)
-        if(!i_File) throw std::runtime_error( fmt::format("Cannot write to: {}",pth) );
-      #endif
-       }
+      : i_File(my_fopen(pth.c_str(), "wb")) {} // "a" for append
 
     ~file_write() noexcept
        {
@@ -473,7 +470,21 @@ class file_write final
        }
 
  private:
-    FILE* i_File;
+    std::FILE* i_File;
+
+    [[nodiscard]] static inline std::FILE* my_fopen( const char* filename, const char* mode )
+       {
+        std::FILE* f =
+      #if defined(MS_WINDOWS)
+        nullptr;
+        const errno_t err = fopen_s(&f, filename, mode);
+        if(err) f = nullptr;
+      #elif defined(POSIX)
+        std::fopen(filename, mode);
+      #endif
+        if(!f) throw std::runtime_error( fmt::format("file_write: Cannot open {}",filename) );
+        return f;
+       }
 };
 
 

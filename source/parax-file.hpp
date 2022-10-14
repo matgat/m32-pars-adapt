@@ -88,7 +88,7 @@ class File final
                 [[nodiscard]] std::string_view tag_name() const noexcept { return m_tagname; }
                 [[nodiscard]] std::size_t line_idx() const noexcept { return m_line_idx; }
                 [[nodiscard]] const auto& collected_fields() const noexcept { return m_collected_fields; }
-                [[nodiscard]] auto& modify_collected_fields() noexcept { return m_collected_fields; }
+                [[nodiscard]] auto& mutable_collected_fields() noexcept { return m_collected_fields; }
 
             private:
                 std::string_view m_tagname;
@@ -125,7 +125,7 @@ class File final
                                }
                             else
                                {
-                                const auto [it, inserted] = i_axblocks.insert({ax_name, std::move(curr_ax_block.collected_fields())});
+                                const auto [it, inserted] = i_axblocks.insert({ax_name, std::move(curr_ax_block.mutable_collected_fields())});
                                 assert(curr_ax_block.collected_fields().empty()); // After move should be empty
                                 if( !inserted )
                                    {
@@ -152,7 +152,7 @@ class File final
                     else
                        {
                         // Populate the map of fields
-                        const auto [it, inserted] = curr_ax_block.modify_collected_fields().try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
+                        const auto [it, inserted] = curr_ax_block.mutable_collected_fields().try_emplace(line.assignment().var_name(), line.assignment(), i_lines.size());
                         if( !inserted )
                            {
                             parse_issues.push_back( fmt::format("Field {} at line {} was not inserted"sv, line.assignment().var_name(), i_lines.size()+1) );

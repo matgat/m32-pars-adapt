@@ -15,7 +15,7 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
 //---------------------------------------------------------------------------
-// Similarity based on Sørensen–Dice index
+// String similarity [0÷1] based on Sørensen–Dice index
 double calc_similarity_sorensen( const std::string_view s1, const std::string_view s2 )
 {
     // Check banal cases
@@ -59,7 +59,8 @@ double calc_similarity_sorensen( const std::string_view s1, const std::string_vi
                 // Skipping single-character words (as in the original article http://www.catalysoft.com/articles/StrikeAMatch.html)
                 if( std::isspace(s[i]) ) ; // Skip
                 else if( std::isspace(s[i+1]) ) ++i; // Skip also next
-                else chpairs.emplace_back( std::tolower(s[i]), std::tolower(s[i+1]) );
+                else chpairs.emplace_back( static_cast<char>(std::tolower(s[i])),
+                                           static_cast<char>(std::tolower(s[i+1])) );
 
                 // Accepting also single-character words (the second is whatever)
                 //if( !std::isspace(s[i]) ) chpairs.emplace_back( std::tolower(s[i]), std::tolower(s[i+1]) );
@@ -128,8 +129,7 @@ double calc_similarity_sorensen( const std::string_view s1, const std::string_vi
 //       {
 //        const auto dist = s1.size()<s2.size() ? get_edit_distance(s1,s2)
 //                                              : get_edit_distance(s2,s1);
-//        return (
-//        static_cast<double>(max_len) - static_cast<double>(dist)) / static_cast<double>(max_len);
+//        return (static_cast<double>(max_len) - static_cast<double>(dist)) / static_cast<double>(max_len);
 //       }
 //    return 1.0;
 //}

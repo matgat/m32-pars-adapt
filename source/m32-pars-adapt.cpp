@@ -234,7 +234,7 @@ class Arguments final
        }
 
     [[nodiscard]] const auto& job() const noexcept { return i_job; }
-    [[nodiscard]] auto& modify_job() noexcept { return i_job; }
+    [[nodiscard]] auto& mutable_job() noexcept { return i_job; }
     [[nodiscard]] bool quiet() const noexcept { return i_quiet; }
     [[nodiscard]] bool verbose() const noexcept { return i_verbose; }
 
@@ -322,7 +322,7 @@ class Arguments final
                }
             catch( std::exception& e )
                {
-                issues.push_back( fmt::format("{} has an invalid vaMachName \"{}\": {}", args.job().target_file().path().filename().string(), vaMachName->value(), e.what()) );
+                issues.push_back( fmt::format("{} has an invalid vaMachName {}: {}", args.job().target_file().path().filename().string(), vaMachName->value(), e.what()) );
                }
             if( !udt_mach_type.options().is_empty() )
                {
@@ -339,11 +339,11 @@ class Arguments final
     else
        {// Machine type not explicitly specified
         // Ask for machine type
-        //args.modify_job().set_machine_type( macotec::MachineType::ask_user() );
+        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user() );
         // Extract machine type from udt file
         if( const auto vaMachName = udt_file.get_field("vaMachName") )
            {
-            args.modify_job().set_machine_type( str::unquoted(vaMachName->value()) );
+            args.mutable_job().set_machine_type( str::unquoted(vaMachName->value()) );
            }
         else
            {
@@ -408,7 +408,7 @@ class Arguments final
     if( !args.job().machine_type() )
        {// Machine type not explicitly specified
         // Ask for machine type
-        //args.modify_job().set_machine_type( macotec::MachineType::ask_user() );
+        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user() );
         throw std::invalid_argument("Machine not specified");
        }
 
