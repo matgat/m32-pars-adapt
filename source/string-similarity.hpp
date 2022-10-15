@@ -4,11 +4,11 @@
 //  String utilities
 //  ---------------------------------------------
 #include <cassert> // assert
-#include <algorithm> // std::copy, std::min
-#include <cctype> // std::tolower, ...
+#include <type_traits> // std::is_same_v
+//#include <algorithm> // std::min, std::max
+#include <cctype> // std::tolower, std::isspace
 #include <string_view>
-
-using namespace std::literals; // "..."sv
+#include <vector>
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -16,7 +16,7 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //---------------------------------------------------------------------------
 // String similarity [0÷1] based on Sørensen–Dice index
-double calc_similarity_sorensen( const std::string_view s1, const std::string_view s2 )
+[[nodiscard]] double calc_similarity_sorensen( const std::string_view s1, const std::string_view s2 )
 {
     // Check banal cases
     if( s1.empty() || s2.empty() )
@@ -133,6 +133,18 @@ double calc_similarity_sorensen( const std::string_view s1, const std::string_vi
 //       }
 //    return 1.0;
 //}
+
+//---------------------------------------------------------------------------
+[[nodiscard]] bool are_similar( const std::string_view s1, const std::string_view s2, const double threshold )
+{
+    const auto similarity = calc_similarity_sorensen(s1, s2);
+
+    static_assert(std::is_same_v<double, std::decay_t<decltype(similarity)>>); // wrong similarity type
+    assert( similarity>=0.0 && similarity<=1.0); // wrong similarity value
+    assert( threshold>=0.0 && threshold<=1.0); // wrong threshold
+
+    return similarity > threshold;
+}
 
 } //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

@@ -10,7 +10,7 @@
 #include <fmt/core.h> // fmt::format
 
 #include "system.hpp" // sys::MemoryMappedFile, sys::file_write
-#include "string-similarity.hpp" // str::calc_similarity_sorensen
+#include "string-similarity.hpp" // str::are_similar
 #include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
 
@@ -138,9 +138,7 @@ class File final
                 if( my_assgnm.var_name() == his_assgnm.var_name() )
                    {
                     // Se il commento è abbastanza simile, è lui!
-                    const auto comment_similarity = str::calc_similarity_sorensen(my_assgnm.comment(), his_assgnm.comment());
-                    assert( comment_similarity>=0.0 && comment_similarity<=1.0 );
-                    if( comment_similarity > 0.85 ) return &my_assgnm;
+                    if( str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) ) return &my_assgnm;
                    }
                 // Potrei essere più tollerante accettando anche registri indici dello
                 // stesso tipo con indici vicini, ma meglio evitare falsi positivi
