@@ -40,7 +40,7 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
     //std::cout << msg << '\n';
   #if defined(MS_WINDOWS)
-    win::_cputs( msg.c_str() );
+    win::_cputs( msg.data(), msg.size() );
     return static_cast<char>(win::_getch());
   #elif defined(POSIX)
     return '\0';

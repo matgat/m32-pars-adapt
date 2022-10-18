@@ -7,6 +7,7 @@
 #include <concepts> // std::convertible_to
 //#include <algorithm> // std::find_if
 #include <cctype> // std::isdigit, std::tolower, ...
+//#include <limits> // std::numeric_limits
 #include <string>
 #include <string_view>
 #include <charconv> // std::from_chars

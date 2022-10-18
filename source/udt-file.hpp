@@ -5,6 +5,7 @@
 //  Consists in a list of name=value assignments
 //  ---------------------------------------------
 #include <stdexcept>
+#include <cmath> // std::abs
 #include <string_view>
 #include <map>
 #include <fmt/core.h> // fmt::format
@@ -13,6 +14,7 @@
 #include "string-similarity.hpp" // str::are_similar
 #include "time-stamp.hpp" // sys::get_formatted_time_stamp()
 #include "sipro-parser.hpp" // sipro::Parser
+#include "sipro-register.hpp" // sipro::Register
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -132,16 +134,36 @@ class File final
     [[nodiscard]] Assignment* detect_rename_of(const Assignment& his_assgnm) noexcept
        {
         try{
+            const sipro::Register his_reg(his_assgnm.var_name());
+                                              
             for( auto& [my_varlbl, my_assgnm] : i_assignments )
                {
-                // Deve corrispondere l'indirizzo del registro
+                // Se il registro è lo stesso...
                 if( my_assgnm.var_name() == his_assgnm.var_name() )
                    {
-                    // Se il commento è abbastanza simile, è lui!
-                    if( str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) ) return &my_assgnm;
+                    // ...E se il commento è abbastanza simile, è una ridenominazione
+                    if( str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) )
+                       {
+                        return &my_assgnm;
+                       }
                    }
-                // Potrei essere più tollerante accettando anche registri indici dello
-                // stesso tipo con indici vicini, ma meglio evitare falsi positivi
+                // Oppure...
+                else if( his_reg.is_valid() )
+                   {
+                    if( const sipro::Register my_reg(my_assgnm.var_name());
+                        my_reg.is_valid() )
+                       {
+                        // ...Se il registro è omogeneo e abbastanza vicino, stesso
+                        // valore e commento molto simile, è una ridenominazione
+                        if( are_same_type(my_reg,his_reg) &&
+                            std::abs(my_reg.index()-his_reg.index())<20 &&
+                            my_assgnm.value() == his_assgnm.value() &&
+                            str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) )
+                           {
+                            return &my_assgnm;
+                           }
+                       }
+                   }
                }
            } catch(...){}
         return nullptr;

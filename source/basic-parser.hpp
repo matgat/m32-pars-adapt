@@ -6,6 +6,7 @@
 //  Unix line end '\n' (are you using a typewriter?)
 //  ---------------------------------------------
 #include <cctype> // std::isdigit, std::isblank, ...
+//#include <limits> // std::numeric_limits
 #include <string_view>
 #include <stdexcept> // std::exception, std::runtime_error, ...
 #include <fmt/core.h> // fmt::format
@@ -342,10 +343,12 @@ class BasicParser
            {
             throw create_parse_error("Index can\'t be negative");
            }
+
         if( !std::isdigit(buf[i]) )
            {
             throw create_parse_error(fmt::format("Invalid char \'{}\' in index", buf[i]));
            }
+
         std::size_t result = (buf[i]-'0');
         const std::size_t base = 10u;
         while( ++i<siz && std::isdigit(buf[i]) )

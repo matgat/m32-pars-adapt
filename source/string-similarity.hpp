@@ -139,9 +139,14 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
     const auto similarity = calc_similarity_sorensen(s1, s2);
 
-    static_assert(std::is_same_v<double, std::decay_t<decltype(similarity)>>); // wrong similarity type
-    assert( similarity>=0.0 && similarity<=1.0); // wrong similarity value
-    assert( threshold>=0.0 && threshold<=1.0); // wrong threshold
+    static_assert(std::is_same_v<double, std::decay_t<decltype(similarity)>>); // similarity type
+    assert( similarity>=0.0 && similarity<=1.0); // similarity range
+    assert( threshold>=0.0 && threshold<=1.0); // threshold range
+
+    if( s2.starts_with("[s] Tempo salita/discesa utensile intestatura") )
+    {xxx
+        int i = 1;
+    }
 
     return similarity > threshold;
 }

@@ -31,7 +31,7 @@ goto select_test
 :menu1
 rem Test udt update
 %exe% -v -tgt "%udt_w%" -db %old_udt%
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 goto select_test
 
 
@@ -41,7 +41,7 @@ rem Test udt adaptation (W)
 set mach=ActWR-4.0/4.6;no-buf;combo
 ::set mach=wr/4.0
 %exe% -v -tgt "%udt_w%" -db "%udt_db%" -m "%mach%"
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 goto select_test
 
 
@@ -49,7 +49,7 @@ goto select_test
 rem Test udt adaptation (S)
 set mach=ActiveF-4.6/3.2-(rot)
 %exe% -v -tgt "%udt_s%" -db "%udt_db%" -m "%mach%"
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 goto select_test
 
 
@@ -57,7 +57,7 @@ goto select_test
 rem Test parax adaptation (W)
 set mach=ActHP-4.9/4.6;no-buf;combo
 %exe% -v -tgt "%parax_w%" -db "%parax_db%" -m "%mach%"
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 goto select_test
 
 
@@ -65,7 +65,7 @@ goto select_test
 rem Test parax adaptation (S)
 set mach=ActiveF-3.7-buf
 %exe% -v -tgt "%parax_s%" -db "%parax_db%" -m "%mach%"
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 goto select_test
 
 
@@ -78,7 +78,7 @@ rem Copy here the file
 copy /Y "%udt_w%" "%loc_udt%"
 rem Create my updated udt
 %exe% -v -q --tgt "%loc_udt%" --db %old_udt% --out "%new_udt_mine%"
-echo ret=%errorlevel%
+echo ---- ret=%errorlevel% ----
 rem Create the other
 rem with MachSettings-tool.js
 ::cscript "%src_pth_w%\userdata\configs\MachSettings-tool.js" -tgt="%old_udt%" -tpl="%loc_udt%" -out="%new_udt_theirs%" -quiet

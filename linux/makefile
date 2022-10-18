@@ -2,7 +2,7 @@ PRJNAME = m32-pars-adapt
 SRCDIR = ../source
 BLDDIR = ./build
 VPATH := $(SRCDIR)
-MAIN = $(SRCDIR)/m32-pars-adapt.cpp
+MAIN = $(SRCDIR)/$(PRJNAME).cpp
 HEADERS = $(wildcard $(SRCDIR)/*.hpp)
 #OBJS := $(HEADERS:.hpp=.o)
 #OBJS := $(SRCS:%.cpp=BLDDIR/%.o)
