@@ -14,6 +14,7 @@
 
 #include "vectset.hpp" // mat::vectset
 #include "string-utilities.hpp" // str::tolower
+//#include "prompt-user.hpp" // sys::choice
 
 using namespace std::literals; // "..."sv
 
@@ -503,6 +504,7 @@ class MachineType final
     [[nodiscard]] static MachineType ask_user() noexcept
        {
         MachineType mach;
+        //sys::choice
         return mach;
        }
 };

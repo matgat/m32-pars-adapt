@@ -17,7 +17,7 @@
 #if defined(MS_WINDOWS)
   namespace win
    {
-    #include <conio.h> // _getch, _cputs
+    #include <conio.h> // _getch, _putch, _cputs
    }
 #elif defined(POSIX)
     //#include <cstdio> // std::puts
@@ -38,7 +38,9 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
   #if defined(MS_WINDOWS)
     win::_cputs(msg);
-    return static_cast<char>(win::_getch()); // Blocks until key pressed
+    const auto ch = win::_getch(); // Blocks until key pressed
+    _putch(ch); // Show pressed key
+    return static_cast<char>(ch);
   #elif defined(POSIX)
     return '\0';
   #endif
