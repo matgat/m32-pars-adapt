@@ -12,7 +12,7 @@
 #include <fmt/core.h> // fmt::format
 
 #include "string-utilities.hpp" // str::escape
-#include "debug.hpp" // D#LOG
+#include "debug.hpp" // DLOG#
 
 using namespace std::literals; // "..."sv
 

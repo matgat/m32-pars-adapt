@@ -143,13 +143,23 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     assert( similarity>=0.0 && similarity<=1.0); // similarity range
     assert( threshold>=0.0 && threshold<=1.0); // threshold range
 
-    if( s2.starts_with("[s] Tempo salita/discesa utensile intestatura") )
-    {xxx
-        int i = 1;
-    }
+    //fmt::print(fg(fmt::color::sky_blue) | fmt::emphasis::italic, "\n{}\n{}\n{:.2f}\n",s1,s2,similarity);
 
     return similarity > threshold;
 }
+
+
+//---------------------------------------------------------------------------
+[[nodiscard]] bool have_same_prefix( const std::string_view s1, const std::string_view s2, const std::size_t n )
+{
+    if( n>=s1.size() || n>=s2.size() ) return false;
+    for( std::size_t i=0; i<n; ++i )
+       {
+        if( s1[i]!=s2[i] ) return false;
+       }
+    return true;
+}
+
 
 } //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

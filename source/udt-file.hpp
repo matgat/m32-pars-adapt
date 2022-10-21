@@ -135,31 +135,33 @@ class File final
        {
         try{
             const sipro::Register his_reg(his_assgnm.var_name());
-                                              
+
             for( auto& [my_varlbl, my_assgnm] : i_assignments )
                {
-                // Se il registro è lo stesso...
-                if( my_assgnm.var_name() == his_assgnm.var_name() )
+                if( my_assgnm.var_name() == his_assgnm.var_name() ) // Stesso registro...
                    {
-                    // ...E se il commento è abbastanza simile, è una ridenominazione
-                    if( str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) )
-                       {
+                    if( str::have_same_prefix(my_assgnm.comment(), his_assgnm.comment(), 3) && //...Stesso inizio commento (unità di misura)...
+                        str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.7) ) //...Commento piuttosto simile
+                       {//...È una ridenominazione
                         return &my_assgnm;
                        }
                    }
-                // Oppure...
-                else if( his_reg.is_valid() )
+                else if( his_reg.is_valid() ) //...Il suo è un registro Sipro...
                    {
                     if( const sipro::Register my_reg(my_assgnm.var_name());
-                        my_reg.is_valid() )
+                        my_reg.is_valid() ) //...Anche il mio è un registro Sipro...
                        {
-                        // ...Se il registro è omogeneo e abbastanza vicino, stesso
-                        // valore e commento molto simile, è una ridenominazione
-                        if( are_same_type(my_reg,his_reg) &&
-                            std::abs(my_reg.index()-his_reg.index())<20 &&
-                            my_assgnm.value() == his_assgnm.value() &&
-                            str::are_similar(my_assgnm.comment(), his_assgnm.comment(), 0.85) )
-                           {
+                        const int delta_idx = std::abs(my_reg.index()-his_reg.index());
+                        const auto sim_threshold = [](const int delta) constexpr -> double
+                           {// Parto da 0.7 e tendo verso 1.0 allontanandomi
+                            return 1.0 - ( (1.0-0.7) / (1.0 + 0.05*static_cast<double>(delta-1)));
+                           };
+                        if( are_same_type(my_reg,his_reg) && //...Registri dello stesso tipo...
+                            delta_idx<20 && // ...L'indirizzo non è troppo lontano...
+                            my_assgnm.value() == his_assgnm.value() && // ...Stesso letterale del valore...
+                            str::have_same_prefix(my_assgnm.comment(), his_assgnm.comment(), 3) && //...Stesso inizio commento (unità di misura)...
+                            str::are_similar(my_assgnm.comment(), his_assgnm.comment(), sim_threshold(delta_idx)) ) //...Commento simile in base a distanza registri...
+                           {//...È una ridenominazione
                             return &my_assgnm;
                            }
                        }

@@ -1,5 +1,5 @@
-#ifndef GUARD_prompt_hpp
-#define GUARD_prompt_hpp
+#ifndef GUARD_prompt_user_hpp
+#define GUARD_prompt_user_hpp
 //  ---------------------------------------------
 //  Get data from user
 //  ---------------------------------------------
@@ -27,8 +27,6 @@
    }
 #endif
 
-#include <string_view>
-
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,12 +34,11 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //---------------------------------------------------------------------------
-[[nodiscard]] char choice( const std::string_view msg ) noexcept
+[[nodiscard]] char choice( const char* const msg ) noexcept
 {
-    //std::cout << msg << '\n';
   #if defined(MS_WINDOWS)
-    win::_cputs( msg.data(), msg.size() );
-    return static_cast<char>(win::_getch());
+    win::_cputs(msg);
+    return static_cast<char>(win::_getch()); // Blocks until key pressed
   #elif defined(POSIX)
     return '\0';
   #endif
