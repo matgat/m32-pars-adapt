@@ -45,11 +45,12 @@ the file to be modified will be backupped in the same directory and
 then silently overwritten.
 
 
-
 _________________________________________________________________________
 ## Requirements
-In Windows for the manual merging is performed
-invoking the external utility *WinMerge*.
+C++ runtime [`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+
+The utility [WinMerge](https://winmerge.org) is invoked whenever a manual
+comparison of the files is needed.
 The program will try the following paths:
 ```
 "C:\Macotec\Apps\WinMerge\WinMergeU.exe"
@@ -58,11 +59,13 @@ The program will try the following paths:
 And as fallback the association with the extension `.WinMerge`
 
 
-
 _________________________________________________________________________
 ## Parameters database
+The parameters database consists of a text file containing
+an extended/simplified json-like syntax.
+
+_________________________________________________________________________
 ### Syntax
-The format is an extended/simplified json syntax:
 * Key names can be unquoted, double quotes necessary just if name contains special chars
 * Separators like comma or semicolons are not strictly necessary
 * Supported multiple (comma separated) keys
@@ -89,25 +92,7 @@ The format is an extended/simplified json syntax:
 ```
 
 _________________________________________________________________________
-### Structure for MachSettings.udt
-Here is the expected database structure used to adapt
-a `MachSettings.udt` file:
-```
-root┐
-    ├mach┐
-    │    ├"common"-{nam=val,...}
-    │    ├"cut-bridge"
-    │    │  ├"dim"-{nam=val,...}
-    │    │  ├"dim"-{nam=val,...}
-    │    │  └···
-    │    ├"algn-span"
-    │    │ ├"dim"-{nam=val,...}
-    │    │ ├"dim"-{nam=val,...}
-    │    │ └···
-    │    ├"+option"-{nam=val,...}
-    │    └···
-    └···
-```
+### Content
 First level keys are the machine type:
 
 | *id*  | *Machine*  | *Type*    |
@@ -143,42 +128,146 @@ Recognized  dimensions:
 
 
 _________________________________________________________________________
+### Structure for MachSettings.udt
+Here is the expected database structure used to adapt
+a `MachSettings.udt` file:
+```
+┐
+├mach┐
+│    ├"common"-{nam=val,...}
+│    ├"cut-bridge"
+│    │  ├"dim"-{nam=val,...}
+│    │  ├"dim"-{nam=val,...}
+│    │  └···
+│    ├"algn-span"
+│    │ ├"dim"-{nam=val,...}
+│    │ ├"dim"-{nam=val,...}
+│    │ └···
+│    ├"+option"-{nam=val,...}
+│    └···
+└···
+```
+
+Example:
+```js
+WR,HP :
+   {
+    "common" :
+       {
+        vqProbe1_DX: 0.1
+       }
+
+    "cut-bridge" :
+       {
+        "6.0" :
+           {
+            vnAlgnBlks_N: 8
+           }
+       }
+
+    "algn-span" :
+       {
+        "3.2" :
+           {
+            vqX_AlgnTableEnd: 3780
+           }
+
+        "4.6" :
+           {
+            vqX_AlgnTableEnd: 5280
+           }
+       }
+   }
+
+HP :
+   {
+    "common" :
+       {
+        vnMach_Type: 11
+       }
+
+    "+fast" :
+       {// Velocizzazioni taglio
+        vqBlade_SpdMax: 160000
+       }
+   }
+```
+
+
+_________________________________________________________________________
 ### Structure for par2kax.txt
 Here is the expected database structure used to adapt
 a `par2kax.txt` file:
 ```
-root┐
-    ├mach┐
-    │    ├"common"┐
-    │    │        ├"ax"-{nam=val,...}
-    │    │        ├"ax"-{nam=val,...}
-    │    │        └···
-    │    ├"cut-bridge"┐
-    │    │            ├"dim"┐
-    │    │            │     ├"ax"-{nam=val,...}
-    │    │            │     ├"ax"-{nam=val,...}
-    │    │            │     └···
-    │    │            ├"dim"┐
-    │    │            │     ├"ax"-{nam=val,...}
-    │    │            │     ├"ax"-{nam=val,...}
-    │    │            │     └···
-    │    │            └···
-    │    ├"algn-span"┐
-    │    │           ├"dim"┐
-    │    │           │     ├"ax"-{nam=val,...}
-    │    │           │     ├"ax"-{nam=val,...}
-    │    │           │     └···
-    │    │           ├"dim"┐
-    │    │           │     ├"ax"-{nam=val,...}
-    │    │           │     ├"ax"-{nam=val,...}
-    │    │           │     └···
-    │    │           └···
-    │    ├"+option"┐
-    │    │         ├"ax"-{nam=val,...}
-    │    │         ├"ax"-{nam=val,...}
-    │    │         └···
-    │    └···
-    └···
+┐
+├mach┐
+│    ├"common"┐
+│    │        ├"ax"-{nam=val,...}
+│    │        ├"ax"-{nam=val,...}
+│    │        └···
+│    ├"cut-bridge"┐
+│    │            ├"dim"┐
+│    │            │     ├"ax"-{nam=val,...}
+│    │            │     ├"ax"-{nam=val,...}
+│    │            │     └···
+│    │            ├"dim"┐
+│    │            │     ├"ax"-{nam=val,...}
+│    │            │     ├"ax"-{nam=val,...}
+│    │            │     └···
+│    │            └···
+│    ├"algn-span"┐
+│    │           ├"dim"┐
+│    │           │     ├"ax"-{nam=val,...}
+│    │           │     ├"ax"-{nam=val,...}
+│    │           │     └···
+│    │           ├"dim"┐
+│    │           │     ├"ax"-{nam=val,...}
+│    │           │     ├"ax"-{nam=val,...}
+│    │           │     └···
+│    │           └···
+│    ├"+option"┐
+│    │         ├"ax"-{nam=val,...}
+│    │         ├"ax"-{nam=val,...}
+│    │         └···
+│    └···
+└···
+```
+
+Example:
+```js
+W,WR,HP :
+   {
+    "cut-bridge" :
+       {
+        "4.0" :
+           {
+            "Ysup", "Yinf" :
+               {
+                MaxPos = 4282
+               }
+           }
+       }
+
+    "+opp" :
+       {
+        "Xr", "Ysup", "Yinf", "Zg" :
+           {
+            InvDir = 1
+            InvEnc = 1
+           }
+       }
+   }
+
+HP :
+   {
+    "common" :
+       {
+        "Xs" :
+           {
+            MmRif = 1.45646391 // 1/86.28 40pi
+           }
+       }
+   }
 ```
 
 _________________________________________________________________________
