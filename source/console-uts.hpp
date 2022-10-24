@@ -14,56 +14,54 @@
   #undef POSIX
 #endif
 
-#if defined(MS_WINDOWS)
-  namespace win
-   {
-    #include <Windows.h> // Beep (Utilapiset.h)
-    #include <conio.h> // _getch, _putch, _cputs
-   }
-#elif defined(POSIX)
-    //#include <cstdio> // std::puts
-  namespace psx
-   {
-    #include <unistd.h> // read(), ...
-   }
-#endif
-#include <cctype> // std::iscntrl
 #include <string>
 #include <string_view>
+
+#if defined(MS_WINDOWS)
+  #include <Windows.h> // Beep (Utilapiset.h)
+  #include <conio.h> // _getch, _putch, _cputs
+#elif defined(POSIX)
+  #include <cstdio> // std::putchar, std::puts
+  #include <unistd.h> // STDIN_FILENO
+  #include <termios.h> // struct termios
+#endif
+
 
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
-  #if defined(MS_WINDOWS)
-    using namespace win;
-  #elif defined(POSIX)
-    using namespace psx;
-  #endif
-
 
 //---------------------------------------------------------------------------
 void print(const char ch) noexcept
 {
+  #if defined(MS_WINDOWS)
     _putch(ch);
+  #elif defined(POSIX)
+    std::putchar(ch);
+  #endif
 }
 
 //---------------------------------------------------------------------------
 void print(const char* const msg) noexcept
 {
+  #if defined(MS_WINDOWS)
     _cputs(msg);
+  #elif defined(POSIX)
+    std::puts(msg);
+  #endif
 }
 void println(const char* const msg) noexcept
 {
-    _cputs(msg);
+    print(msg);
     print('\n');
 }
 
 //---------------------------------------------------------------------------
 void print(const std::string_view msg) noexcept
 {
-    for(const char ch : msg) _putch(ch);
+    for(const char ch : msg) print(ch);
 }
 void println(const std::string_view msg) noexcept
 {
@@ -83,23 +81,51 @@ void println(const std::string& msg) noexcept
 }
 
 //---------------------------------------------------------------------------
+[[nodiscard]] int get_char() noexcept
+{
+  #if defined(MS_WINDOWS)
+    return _getch();
+  #elif defined(POSIX)
+    struct termios attr;
+    tcgetattr( STDIN_FILENO, &attr );
+    const tcflag_t orig_c_lflag = attr.c_lflag;
+    const tcflag_t c_lflag_mask = ICANON | ISIG | ECHO; // Remove echo to print char
+    // attr.c_cc[VMIN] = 1;
+    // attr.c_cc[VTIME] = 0;
+    attr.c_lflag &= ~c_lflag_mask;
+    tcsetattr( STDIN_FILENO, TCSANOW, &attr );
+    const int ch = std::getchar();
+    attr.c_lflag = orig_c_lflag;
+    tcsetattr( STDIN_FILENO, TCSANOW, &attr );
+    return ch;
+  #endif
+}
+
+//---------------------------------------------------------------------------
 [[nodiscard]] std::string input_string(const char* const msg)
 {
     std::string s;
 
-    _cputs(msg);
+    print(msg);
     do {
-        const char ch = static_cast<char>(_getch()); // Blocks until key pressed
-        if( std::iscntrl(static_cast<unsigned char>(ch)) )
-           {// Pressed enter or...
-            _putch('\n');
+        const char ch = static_cast<char>(get_char());
+
+        if( static_cast<unsigned char>(ch)>=' ' )
+           {// A printable char
+            print(ch); // Show pressed character
+            s += ch;
+           }
+        else if( ch=='\r' || ch=='\n' )
+           {// Pressed enter
+            print('\n');
             break;
            }
         else
-           {
-            _putch(ch); // Show pressed character
-            s += ch;
+           {// A control character (ESC?)
+            s.clear();
+            break;
            }
+
        }
     while(true);
 
@@ -110,8 +136,6 @@ void println(const std::string& msg) noexcept
 //---------------------------------------------------------------------------
 [[nodiscard]] char choice(const char* const msg, const char* const allowed_chars) noexcept
 {
-  #if defined(MS_WINDOWS)
-    char ch;
     const auto is_one_of = [](const char ch, const char* chars) noexcept -> bool
        {
         while( *chars )
@@ -122,142 +146,27 @@ void println(const std::string& msg) noexcept
         return false;
        };
 
-    _cputs(msg);
+    print(msg);
+    char ch;
     do {
-        ch = static_cast<char>(_getch()); // Blocks until key pressed
+        ch = static_cast<char>(get_char());
+
         if( is_one_of(ch, allowed_chars) )
            {
             break;
            }
+
+      #if defined(MS_WINDOWS)
         Beep(0x25, 200); // freq [0x25÷0x7FFF Hz], duration [ms]
+      #elif defined(POSIX)
+        print('\a');
+      #endif
        }
     while(true);
-    _putch(ch); // Show pressed character
-    _putch('\n');
+    print(ch); // Show pressed character
+    print('\n');
     return ch;
-  #elif defined(POSIX)
-    return '\0';
-  #endif
 }
-
-
-///**
-// Linux (POSIX) implementation of _kbhit().
-// Morgan McGuire, morgan@cs.brown.edu
-// */
-//#include <stdio.h>
-//#include <sys/select.h>
-//#include <termios.h>
-//#include <stropts.h>
-//
-//int _kbhit() {
-//    static const int STDIN = 0;
-//    static bool initialized = false;
-//
-//    if (! initialized) {
-//        // Use termios to turn off line buffering
-//        termios term;
-//        tcgetattr(STDIN, &term);
-//        term.c_lflag &= ~ICANON;
-//        tcsetattr(STDIN, TCSANOW, &term);
-//        setbuf(stdin, NULL);
-//        initialized = true;
-//    }
-//
-//    int bytesWaiting;
-//    ioctl(STDIN, FIONREAD, &bytesWaiting);
-//    return bytesWaiting;
-//}
-//
-////////////////////////////////////////////////
-////    Simple demo of _kbhit()
-//
-//#include <unistd.h>
-//
-//int main(int argc, char** argv) {
-//    printf("Press any key");
-//    while (! _kbhit()) {
-//        printf(".");
-//        fflush(stdout);
-//        usleep(1000);
-//    }
-//    printf("\nDone.\n");
-//
-//    return 0;
-//}
-
-
-//#include <unistd.h> // read()
-//#include <termios.h>
-//class keyboard{
-//    public:
-//        keyboard(){
-//            tcgetattr(0,&initial_settings);
-//            new_settings = initial_settings;
-//            new_settings.c_lflag &= ~ICANON;
-//            new_settings.c_lflag &= ~ECHO;
-//            new_settings.c_lflag &= ~ISIG;
-//            new_settings.c_cc[VMIN] = 1;
-//            new_settings.c_cc[VTIME] = 0;
-//            tcsetattr(0, TCSANOW, &new_settings);
-//            peek_character=-1;
-//        }
-//
-//        ~keyboard(){
-//            tcsetattr(0, TCSANOW, &initial_settings);
-//        }
-//
-//        int kbhit(){
-//            unsigned char ch;
-//            int nread;
-//            if(peek_character != -1) return 1;
-//            new_settings.c_cc[VMIN]=0;
-//            tcsetattr(0, TCSANOW, &new_settings);
-//            nread = read(0,&ch,1);
-//            new_settings.c_cc[VMIN]=1;
-//            tcsetattr(0, TCSANOW, &new_settings);
-//
-//            if (nread == 1){
-//                peek_character = ch;
-//                return 1;
-//            }
-//            return 0;
-//        }
-//
-//        int getch(){
-//            char ch;
-//
-//            if (peek_character != -1){
-//                ch = peek_character;
-//                peek_character = -1;
-//            }
-//            else read(0,&ch,1);
-//            return ch;
-//        }
-//
-//    private:
-//        struct termios initial_settings, new_settings;
-//        int peek_character;
-//};
-
-
-
-//#include <ncurses.h>
-//int main()
-//{
-//    initscr();
-//    cbreak();
-//    noecho();
-//    scrollok(stdscr, TRUE);
-//    nodelay(stdscr, TRUE);
-//    while (true) {
-//        if (getch() == 'g') {
-//            printw("You pressed G\n");
-//        }
-//        napms(500);
-//        printw("Running\n");
-//    }
-//}
 
 
 }//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

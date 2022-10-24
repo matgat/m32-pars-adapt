@@ -25,27 +25,22 @@ namespace fs = std::filesystem;
 #endif
 
 #if defined(MS_WINDOWS)
-    #include <cstdio> // fopen_s (Microsoft 'deprecated' std::fopen)
-    #include <cctype> // std::tolower
-  namespace win
-   {
-    #include <Windows.h>
-    //#include <unistd.h> // _stat
-    #include <shellapi.h> // FindExecutableA
-    #include <shlwapi.h> // AssocQueryString
-   }
+  #include <cstdio> // fopen_s (Microsoft 'deprecated' std::fopen)
+  #include <cctype> // std::tolower
+
+  #include <Windows.h>
+  //#include <unistd.h> // _stat
+  #include <shellapi.h> // FindExecutableA
+  #include <shlwapi.h> // AssocQueryString
 #elif defined(POSIX)
-    #include <cstdio> // std::fopen
-  namespace psx
-   {
-    #include <unistd.h> // unlink, exec*, fork, ...
-    #include <fcntl.h> // open
-    #include <sys/mman.h> // mmap, munmap
-    #include <sys/stat.h> // fstat
-    #include <time.h>   // nanosleep
-    //#include <sys/types.h>
-    #include <sys/wait.h> // waitpid
-   }
+  #include <cstdio> // std::fopen
+
+  #include <unistd.h> // unlink, exec*, fork, ...
+  #include <fcntl.h> // open
+  #include <sys/mman.h> // mmap, munmap
+  #include <sys/stat.h> // fstat
+  #include <time.h>   // nanosleep
+  #include <sys/wait.h> // waitpid
 #endif
 
 
@@ -53,18 +48,12 @@ namespace fs = std::filesystem;
 namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 {
 
-  #if defined(MS_WINDOWS)
-    using namespace win;
-  #elif defined(POSIX)
-    using namespace psx;
-  #endif
-
 
 //---------------------------------------------------------------------------
 void sleep_ms( const int ms )
 {
   #if defined(MS_WINDOWS)
-    win::Sleep(ms);
+    Sleep(ms);
   #elif defined(POSIX)
     timespec ts;
     ts.tv_sec = ms / 1000;
@@ -112,11 +101,11 @@ void sleep_ms( const int ms )
     //#include <system_error>
     //std::string message = std::system_category().message(e);
 
-    if(e==0) e = win::GetLastError(); // ::WSAGetLastError()
+    if(e==0) e = GetLastError(); // ::WSAGetLastError()
     const DWORD buf_siz = 1024;
     TCHAR buf[buf_siz];
     const DWORD siz =
-        win::FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
+        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
                             FORMAT_MESSAGE_IGNORE_INSERTS|
                             FORMAT_MESSAGE_MAX_WIDTH_MASK,
                             nullptr,
@@ -134,7 +123,7 @@ void sleep_ms( const int ms )
 [[nodiscard]] std::string find_executable_by_file(const std::string& doc) noexcept
 {
     char buf[MAX_PATH + 1] = {'\0'};
-    win::FindExecutableA(doc.c_str(), NULL, buf);
+    FindExecutableA(doc.c_str(), NULL, buf);
     return std::string(buf);
 }
 
@@ -144,7 +133,7 @@ void sleep_ms( const int ms )
 {
     DWORD buf_len = MAX_PATH;
     TCHAR buf[MAX_PATH+1];
-    HRESULT hr = win::AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
+    HRESULT hr = AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
     if(hr==E_POINTER)
        {
         throw std::runtime_error("AssocQueryString: buffer too small to hold the entire path");
@@ -159,8 +148,8 @@ void sleep_ms( const int ms )
 //---------------------------------------------------------------------------
 void shell_execute(const char* const pth, const char* const args =nullptr) noexcept
 {
-    win::SHELLEXECUTEINFOA ShExecInfo = {0};
-    ShExecInfo.cbSize = sizeof(win::SHELLEXECUTEINFOA);
+    SHELLEXECUTEINFOA ShExecInfo = {0};
+    ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFOA);
     ShExecInfo.fMask = 0;
     ShExecInfo.hwnd = NULL;
     ShExecInfo.lpVerb = "open";
@@ -169,7 +158,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL;
     ShExecInfo.nShow = SW_SHOW;
     ShExecInfo.hInstApp = NULL;
-    win::ShellExecuteEx(&ShExecInfo);
+    ShellExecuteEx(&ShExecInfo);
 }
 
 //---------------------------------------------------------------------------
@@ -178,8 +167,8 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     const bool show = true;
     const bool wait = true;
 
-    win::SHELLEXECUTEINFO ShExecInfo = {0};
-    ShExecInfo.cbSize = sizeof(win::SHELLEXECUTEINFO);
+    SHELLEXECUTEINFO ShExecInfo = {0};
+    ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
     ShExecInfo.fMask = (wait ? SEE_MASK_NOCLOSEPROCESS : 0) // SEE_MASK_DEFAULT
                        // | SEE_MASK_FLAG_NO_UI // Do not show error dialog in case of exe not found
                        // | SEE_MASK_DOENVSUBST // Substitute environment vars
@@ -192,7 +181,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL; // base_dir.empty() ? NULL : base_dir.c_str();
     ShExecInfo.nShow = show ? SW_SHOW : SW_HIDE;
     ShExecInfo.hInstApp = NULL;
-    if( !win::ShellExecuteEx(&ShExecInfo) )
+    if( !ShellExecuteEx(&ShExecInfo) )
        {
         throw std::runtime_error( fmt::format("Cannot run {}: {}", pth, sys::get_lasterr_msg()) );
        }
@@ -202,7 +191,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     if( wait )
        {
         do {
-            const win::DWORD WaitResult = win::WaitForSingleObject(ShExecInfo.hProcess, 500);
+            const DWORD WaitResult = WaitForSingleObject(ShExecInfo.hProcess, 500);
             if( WaitResult == WAIT_TIMEOUT )
                {// Still executing...
                 sys::sleep_ms(100); //Application->ProcessMessages();
@@ -213,15 +202,15 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
                }
             else
                {
-                win::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+                CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
                 throw std::runtime_error( fmt::format("ShellExecuteEx: spawn error of {}",pth) );
                }
            }
         while(true);
 
         // If here process ended
-        win::GetExitCodeProcess(ShExecInfo.hProcess, &ret);
-        win::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+        GetExitCodeProcess(ShExecInfo.hProcess, &ret);
+        CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
        }
 
     return ret;
@@ -336,25 +325,25 @@ class MemoryMappedFile final
       : i_path(pth)
        {
       #if defined(MS_WINDOWS)
-        hFile = win::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
+        hFile = CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
         if(hFile == INVALID_HANDLE_VALUE)
            {
             throw std::runtime_error( fmt::format("Couldn't open {} ({}))", i_path, get_lasterr_msg()));
            }
-        i_bufsiz = win::GetFileSize(hFile, nullptr);
+        i_bufsiz = GetFileSize(hFile, nullptr);
 
-        hMapping = win::CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+        hMapping = CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
         if(hMapping == nullptr)
            {
-            win::CloseHandle(hFile);
+            CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't map {} ({})", i_path, get_lasterr_msg()));
            }
         //
-        i_buf = static_cast<const char*>( win::MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
+        i_buf = static_cast<const char*>( MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
         if(i_buf == nullptr)
            {
-            win::CloseHandle(hMapping);
-            win::CloseHandle(hFile);
+            CloseHandle(hMapping);
+            CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't create view of {} ({})", i_path, get_lasterr_msg()) );
            }
       #elif defined(POSIX)
@@ -380,9 +369,9 @@ class MemoryMappedFile final
         if(i_buf)
            {
           #if defined(MS_WINDOWS)
-            win::UnmapViewOfFile(i_buf);
-            if(hMapping) win::CloseHandle(hMapping);
-            if(hFile!=INVALID_HANDLE_VALUE) win::CloseHandle(hFile);
+            UnmapViewOfFile(i_buf);
+            if(hMapping) CloseHandle(hMapping);
+            if(hFile!=INVALID_HANDLE_VALUE) CloseHandle(hFile);
           #elif defined(POSIX)
             /* const int ret = */ munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
             //if(ret==-1) std::cerr << "munmap() failed\n";

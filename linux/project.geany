@@ -32,11 +32,11 @@ current_page=0
 FILE_NAME_0=593;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
 
 [VTE]
-last_dir=/home/mat/dev/m32-pars-adapt/source
+last_dir=/home/mat/dev/m32-pars-adapt
 
 [build-menu]
 EX_00_LB=Run
-EX_00_CM=./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-old.udt
+EX_00_CM=./m32-pars-adapt -v -m ActiveHP
 EX_00_WD=%p/linux/build
 EX_01_LB=Test
 EX_01_CM=time ./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-ovl.txt --mach StratoHP-4.9/3.2
@@ -57,11 +57,11 @@ NF_00_WD=%p/linux
 NF_01_LB=Make Custom _Target...
 NF_01_CM=make
 NF_01_WD=%p/linux
-NF_02_LB=_Lint
-NF_02_CM=cppcheck --language=c++ --enable=warning,style --inline-suppr --suppress=passedByValue --template=gcc "%f"
-NF_02_WD=%d
-NF_03_LB=clang-tidy
-NF_03_CM=clang-tidy --header-filter=\\.hpp$ "source/m32-pars-adapt.cpp" -- -std=c++2b -funsigned-char -lfmt
+NF_02_LB=git status
+NF_02_CM=git status
+NF_02_WD=%p
+NF_03_LB=git pull
+NF_03_CM=git pull
 NF_03_WD=%p
 
 [prjorg]

@@ -465,7 +465,7 @@ class MachineType final
             sys::println(mach.cutbridge_dim().string());
 
             switch( sys::choice("\n Choose align span\n"
-                                "[s]3.2, [m]4.6: ", "sm") )
+                                "[s]3.2, [m]4.6 : ", "sm") )
                {
                 case 's': mach.mutable_align_dim().assign(3.2); break;
                 default : mach.mutable_align_dim().assign(4.6);
