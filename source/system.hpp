@@ -36,9 +36,9 @@ namespace fs = std::filesystem;
    }
 #elif defined(POSIX)
     #include <cstdio> // std::fopen
-    #include <unistd.h> // unlink, exec*, fork, ...
   namespace psx
    {
+    #include <unistd.h> // unlink, exec*, fork, ...
     #include <fcntl.h> // open
     #include <sys/mman.h> // mmap, munmap
     #include <sys/stat.h> // fstat

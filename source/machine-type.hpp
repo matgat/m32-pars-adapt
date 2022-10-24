@@ -14,7 +14,8 @@
 
 #include "vectset.hpp" // mat::vectset
 #include "string-utilities.hpp" // str::tolower
-//#include "prompt-user.hpp" // sys::choice
+#include "console-uts.hpp" // sys::choice, sys::prompt_string
+#include "string-split.hpp" // str::Splitter
 
 using namespace std::literals; // "..."sv
 
@@ -117,11 +118,39 @@ class MachineFamily final
            }
        }
 
+    //-----------------------------------------------------------------------
+    //void assign(const char ch)
+    //   {
+    //    switch( ch )
+    //       {
+    //        case 'h' : i_family = family::hp;
+    //        case 'r' : i_family = family::wr;
+    //        case 'w' : i_family = family::w;
+    //        case 's' : i_family = family::s;
+    //        case 'c' : i_family = family::scut;
+    //        case 'm' : i_family = family::msfr;
+    //        case 'v' : i_family = family::msfrv;
+    //        default  : throw std::runtime_error( fmt::format("Unrecognized machine char \'{}\'", c) );
+    //       }
+    //   }
+    //[[nodiscard]] const char* const mach_chars() const noexcept { return "hrwscmv"; }
+
+
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_family!=family::undefined; }
     //[[nodiscard]] constexpr bool is_undefined() const noexcept { return i_family==family::undefined; }
+
     [[nodiscard]] constexpr bool is_float() const noexcept { return i_family>family::undefined && i_family<family::s; }
     [[nodiscard]] constexpr bool is_strato() const noexcept { return i_family>=family::s; }
     [[nodiscard]] constexpr bool is_strato_s() const noexcept { return i_family==family::s; }
+
+    constexpr void set_as_strato_hp()  noexcept { i_family = family::hp; }
+    constexpr void set_as_strato_wr()  noexcept { i_family = family::wr; }
+    constexpr void set_as_strato_w()   noexcept { i_family = family::w; }
+    constexpr void set_as_strato_s()   noexcept { i_family = family::s; }
+    constexpr void set_as_float_frv()  noexcept { i_family = family::msfrv; }
+    constexpr void set_as_float_fr()   noexcept { i_family = family::msfr; }
+    constexpr void set_as_float_scut() noexcept { i_family = family::scut; }
+
     [[nodiscard]] constexpr std::string_view id_string() const noexcept { return mach_ids[to_underlying(i_family)]; }
     [[nodiscard]] constexpr std::string_view name() const noexcept { return mach_names[to_underlying(i_family)]; }
 };
@@ -186,7 +215,7 @@ class CutBridgeDim final
 
     //-----------------------------------------------------------------------
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_dimcat!=cutbridgedim::undefined; }
-    [[nodiscard]] constexpr std::string_view id_string() const noexcept { return cutbridgedim_ids[to_underlying(i_dimcat)]; }
+    [[nodiscard]] constexpr std::string_view string() const noexcept { return cutbridgedim_ids[to_underlying(i_dimcat)]; }
 };
 
 
@@ -232,7 +261,7 @@ class AlignSpanDim final
 
     //-----------------------------------------------------------------------
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_dimcat!=aligndim::undefined; }
-    [[nodiscard]] constexpr std::string_view id_string() const noexcept { return aligndim_ids[to_underlying(i_dimcat)]; }
+    [[nodiscard]] constexpr std::string_view string() const noexcept { return aligndim_ids[to_underlying(i_dimcat)]; }
 };
 
 
@@ -329,34 +358,36 @@ class MachineType final
     void assign(const std::string_view s) { *this = recognize_machine(s); }
 
     [[nodiscard]] operator bool() const noexcept { return i_family.is_defined(); }
+    [[nodiscard]] bool is_incomplete() const noexcept { return i_family.is_strato() && !has_cutbridge_dim(); }
 
     [[nodiscard]] constexpr MachineFamily family() const noexcept { return i_family; }
-    [[nodiscard]] constexpr bool is_float() const noexcept { return i_family.is_float(); }
-    [[nodiscard]] constexpr bool is_strato() const noexcept { return i_family.is_strato(); }
-    [[nodiscard]] constexpr bool is_strato_s() const noexcept { return i_family.is_strato_s(); }
+    [[nodiscard]] constexpr MachineFamily& mutable_family() noexcept { return i_family; }
 
-    [[nodiscard]] constexpr CutBridgeDim cutbridge_dim() const noexcept { return i_cutbridgedim; }
     [[nodiscard]] constexpr bool has_cutbridge_dim() const noexcept { return i_cutbridgedim.is_defined(); }
+    [[nodiscard]] constexpr CutBridgeDim cutbridge_dim() const noexcept { return i_cutbridgedim; }
+    [[nodiscard]] constexpr CutBridgeDim& mutable_cutbridge_dim() noexcept { return i_cutbridgedim; }
 
-    [[nodiscard]] constexpr AlignSpanDim align_dim() const noexcept { return i_algndim; }
     [[nodiscard]] constexpr bool has_align_dim() const noexcept { return i_algndim.is_defined(); }
+    [[nodiscard]] constexpr AlignSpanDim align_dim() const noexcept { return i_algndim; }
+    [[nodiscard]] constexpr AlignSpanDim& mutable_align_dim() noexcept { return i_algndim; }
 
-    [[nodiscard]] constexpr MachineOptions options() const noexcept { return i_options; }
+    [[nodiscard]] constexpr const MachineOptions& options() const noexcept { return i_options; }
+    [[nodiscard]] constexpr MachineOptions& mutable_options() noexcept { return i_options; }
 
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string string() const
        {
         std::string s{ family().name() };
-        if( is_strato() )
+        if( family().is_strato() )
            {
             if( has_cutbridge_dim() )
                {
                 s += '-';
-                s += cutbridge_dim().id_string();
+                s += cutbridge_dim().string();
                 if( has_align_dim() )
                    {
                     s += '/';
-                    s += align_dim().id_string();
+                    s += align_dim().string();
                    }
                }
            }
@@ -368,6 +399,108 @@ class MachineType final
             s += ')';
            }
         return s;
+       }
+
+    //------------------------------------------------------------------------
+    // cppcheck-suppress unusedPrivateFunction
+    [[nodiscard]] static MachineType ask_user(const MachineFamily given_mach_family)
+       {
+        MachineType mach;
+
+        // [family]
+        if( given_mach_family.is_defined() )
+           {
+            mach.mutable_family() = given_mach_family;
+           }
+        else
+           {
+            switch( sys::choice("\n Choose machine family\n"
+                                "[s]ActiveE/F, [w]ActiveW, [r]ActiveWR, [h]ActiveHP, "
+                                "[c]StarCut, [m]MsFR, [v]MsFRV : ", "hrswcmv") )
+               {
+                case 'h': mach.mutable_family().set_as_strato_hp(); break;
+                case 'r': mach.mutable_family().set_as_strato_wr(); break;
+                case 'w': mach.mutable_family().set_as_strato_w();  break;
+                case 's': mach.mutable_family().set_as_strato_s();  break;
+                case 'v': mach.mutable_family().set_as_float_frv(); break;
+                case 'm': mach.mutable_family().set_as_float_fr();  break;
+                default : mach.mutable_family().set_as_float_scut();
+               }
+            sys::println(mach.family().name());
+           }
+
+        // [strato dimensions]
+        if( mach.family().is_strato_s() )
+           {// Laminati semplici
+            switch( sys::choice("\n Choose cut bridge\n"
+                                "[s]3.7, [m]4.6 : ", "sm") )
+               {
+                case 's': mach.mutable_cutbridge_dim().assign(3.7, mach.family()); break;
+                default : mach.mutable_cutbridge_dim().assign(4.6, mach.family());
+               }
+            sys::println(mach.cutbridge_dim().string());
+
+            // I riscontri sono sempre 3.2
+            mach.mutable_align_dim().assign(3.2);
+            sys::println(mach.align_dim().string());
+
+            // [options]
+            const auto opts = sys::input_string("\n Indicate known options\n"
+                                                "[o]Opposta, [l]Low-E, [b]Buffer, [r]Girapezzi : ");
+            if(opts.contains('o')) mach.mutable_options().add_option("opp");
+            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
+            if(opts.contains('b')) mach.mutable_options().add_option("buf");
+            if(opts.contains('r')) mach.mutable_options().add_option("rot");
+            sys::println(mach.options().string());
+           }
+        else if( mach.family().is_strato() )
+           {// Laminati grandi
+            switch( sys::choice("\n Choose cut bridge\n"
+                                "[s]4.0, [m]4.9, [l]6.0 : ", "sml") )
+               {
+                case 's': mach.mutable_cutbridge_dim().assign(4.0, mach.family()); break;
+                case 'm': mach.mutable_cutbridge_dim().assign(4.9, mach.family()); break;
+                default : mach.mutable_cutbridge_dim().assign(6.0, mach.family());
+               }
+            sys::println(mach.cutbridge_dim().string());
+
+            switch( sys::choice("\n Choose align span\n"
+                                "[s]3.2, [m]4.6: ", "sm") )
+               {
+                case 's': mach.mutable_align_dim().assign(3.2); break;
+                default : mach.mutable_align_dim().assign(4.6);
+               }
+            sys::println(mach.align_dim().string());
+
+            // [options]
+            const auto opts = sys::input_string("\n Indicate known options\n"
+                                                "[o]Opposta, [l]Low-E, [n]No-buffer : ");
+            if(opts.contains('o')) mach.mutable_options().add_option("opp");
+            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
+            if(opts.contains('n')) mach.mutable_options().add_option("no-buf");
+            sys::println(mach.options().string());
+           }
+        //else if( mach.family().is_float() )
+        //   {
+        //   }
+
+        // [additional options]
+        const auto opts_csv = sys::input_string("\n Additional options\n"
+                                                "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
+        str::Splitter opts(opts_csv, ',');
+        while( opts.has_data() )
+           {
+            const auto opt = opts.get_next();
+            if( !opt.empty() )
+               {
+                mach.mutable_options().add_option(opt);
+               }
+           }
+        //sys::println(mach.options().string());
+
+        //sys::print('\n'); sys::println(mach.string());
+
+        return mach;
        }
 
  private:
@@ -469,7 +602,7 @@ class MachineType final
         if( parser.is_digit() )
            {
             const double dim1 = parser.extract_num();
-            if( mach.is_strato() )
+            if( mach.family().is_strato() )
                {
                 mach.i_cutbridgedim.assign( dim1, mach.i_family );
                }
@@ -479,7 +612,7 @@ class MachineType final
             if( parser.is_digit() )
                {
                 const double dim2 = parser.extract_num();
-                if( mach.is_strato() )
+                if( mach.family().is_strato() )
                    {
                     mach.i_algndim.assign( dim2 );
                    }
@@ -496,15 +629,6 @@ class MachineType final
            }
 
         // If here, all ok
-        return mach;
-       }
-
-    //------------------------------------------------------------------------
-    // cppcheck-suppress unusedPrivateFunction
-    [[nodiscard]] static MachineType ask_user() noexcept
-       {
-        MachineType mach;
-        //sys::choice
         return mach;
        }
 };

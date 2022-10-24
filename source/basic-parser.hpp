@@ -289,6 +289,7 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_token() noexcept
        {
+        assert(i<siz);
         const std::size_t i_start = i;
         while( i<siz && !std::isspace(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -298,6 +299,7 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_identifier() noexcept
        {
+        assert(i<siz);
         const std::size_t i_start = i;
         while( i<siz && is_identifier(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -307,6 +309,7 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_numeric_value() noexcept
        {
+        assert(i<siz);
         const std::size_t i_start = i;
         while( i<siz && is_numeric_literal(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);
@@ -316,6 +319,7 @@ class BasicParser
     //-----------------------------------------------------------------------
     [[nodiscard]] std::string_view collect_digits() noexcept
        {
+        assert(i<siz);
         const std::size_t i_start = i;
         while( i<siz && std::isdigit(buf[i]) ) ++i;
         return std::string_view(buf+i_start, i-i_start);

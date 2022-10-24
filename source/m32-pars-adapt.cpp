@@ -2,10 +2,10 @@
 //  Utility to handle the parametrization of
 //  m32 based machines
 //  ---------------------------------------------
+#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 #include <vector>
-#include <stdexcept> // std::runtime_error
 #include <fmt/core.h> // fmt::*
 
 #include "system.hpp" // sys::*, fs::*
@@ -81,8 +81,9 @@ class JobUnit final
        };
 
  public:
-    [[nodiscard]] const auto& machine_type() const noexcept { return i_machinetype; }
+    [[nodiscard]] const auto& mach() const noexcept { return i_machinetype; }
     void set_machine_type(const std::string_view s) { i_machinetype.assign(s); }
+    void set_machine_type(macotec::MachineType&& m) noexcept { i_machinetype = m; }
 
     [[nodiscard]] const auto& target_file() const noexcept { return i_targetfile; }
     void set_target_file(const std::string_view s) { i_targetfile.assign(s); }
@@ -124,9 +125,9 @@ class Arguments final
                 switch( status )
                    {
                     case STS::GET_MACHTYPE :
-                        if( i_job.machine_type() )
+                        if( i_job.mach() )
                            {
-                            throw std::invalid_argument( fmt::format("Machine type was already set to {}",i_job.machine_type().string()) );
+                            throw std::invalid_argument( fmt::format("Machine type was already set to {}",i_job.mach().string()) );
                            }
                         i_job.set_machine_type(arg);
                         status = STS::SEE_ARG;
@@ -270,7 +271,7 @@ class Arguments final
 {
     // [Machine type]
     // The machine type shouldn't be explicitly given
-    if( args.job().machine_type() )
+    if( args.job().mach() )
        {
         throw std::invalid_argument( "Machine type shouldn't be specified for a UDT update" );
        }
@@ -311,8 +312,15 @@ class Arguments final
     udt::File udt_file(args.job().target_file().path(), issues);
 
     // [Machine type]
-    if( args.job().machine_type() )
+    if( args.job().mach() )
        {// Machine type specified
+
+        // Ensure to have all required data
+        if( args.job().mach().is_incomplete() )
+           {// Ask missing data to user
+            args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+           }
+
         if( const auto vaMachName = udt_file.get_field("vaMachName") )
            {
             // Better check that the target file has already superimposed options
@@ -329,7 +337,7 @@ class Arguments final
                 throw std::runtime_error( fmt::format("{} had already options: {}", args.job().target_file().path().filename().string(), udt_mach_type.options().string()) );
                }
             // Overwrite the specified machine type in the file
-            vaMachName->modify_value( str::quoted(args.job().machine_type().string()) );
+            vaMachName->modify_value( str::quoted(args.job().mach().string()) );
            }
         else
            {
@@ -338,8 +346,6 @@ class Arguments final
        }
     else
        {// Machine type not explicitly specified
-        // Ask for machine type
-        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user() );
         // Extract machine type from udt file
         if( const auto vaMachName = udt_file.get_field("vaMachName") )
            {
@@ -355,12 +361,12 @@ class Arguments final
     ParsDB udt_db;
     udt_db.parse( args.job().db_file().path(), issues );
     // Extract the pertinent data for this machine
-    const auto mach_udt_db = macotec::extract_mach_udt_db(udt_db.root(), args.job().machine_type(), issues);
+    const auto mach_udt_db = macotec::extract_mach_udt_db(udt_db.root(), args.job().mach(), issues);
 
     // [Summarize the job]
     if( args.verbose() )
        {
-        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
+        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().mach().string(), args.job().db_file().path().filename().string());
         fmt::print("  .udt file: {}\n", udt_file.info());
         fmt::print("  .DB: {}\n", udt_db.info());
         //udt_db.print();
@@ -399,29 +405,33 @@ class Arguments final
 
 
 //---------------------------------------------------------------------------
-[[nodiscard]] fs::path adapt_parax(const Arguments& args, std::vector<std::string>& issues)
+[[nodiscard]] fs::path adapt_parax(Arguments& args, std::vector<std::string>& issues)
 {
     // [The parax file to adapt]
     parax::File parax_file(args.job().target_file().path(), issues);
 
     // [Machine type]
-    if( !args.job().machine_type() )
+    if( !args.job().mach() )
        {// Machine type not explicitly specified
-        // Ask for machine type
-        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user() );
         throw std::invalid_argument("Machine not specified");
+       }
+
+    // Ensure to have all required data
+    if( args.job().mach().is_incomplete() )
+       {// Ask missing data to user
+        args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
        }
 
     // [Parameters DB]
     ParsDB parax_db;
     parax_db.parse( args.job().db_file().path(), issues );
     // Extract the pertinent data for this machine
-    const auto mach_parax_db = macotec::extract_mach_parax_db(parax_db.root(), args.job().machine_type(), issues);
+    const auto mach_parax_db = macotec::extract_mach_parax_db(parax_db.root(), args.job().mach(), issues);
 
     // [Summarize the job]
     if( args.verbose() )
        {
-        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().machine_type().string(), args.job().db_file().path().filename().string());
+        fmt::print("Adapting {} for {} basing on DB {}\n", args.job().target_file().path().filename().string(), args.job().mach().string(), args.job().db_file().path().filename().string());
         fmt::print("  .parax file: {}\n", parax_file.info());
         fmt::print("  .DB: {}\n", parax_db.info());
         //parax_db.print();
@@ -465,7 +475,7 @@ class Arguments final
 
     // Write output file
     fs::path out_pth = get_out_path(args.job().target_file().path(), args);
-    parax_file.write( out_pth, args.job().machine_type().string() );
+    parax_file.write( out_pth, args.job().mach().string() );
     return out_pth;
 }
 
@@ -540,17 +550,6 @@ int main( const int argc, const char* const argv[] )
             fmt::print( "Running in: {}\n", fs::current_path().string() );
            }
 
-        // Check job data
-        // Target abd DB files must always be given
-        if( !args.job().target_file() )
-           {
-            throw std::invalid_argument("No target file specified");
-           }
-        if( !args.job().db_file() )
-           {
-            throw std::invalid_argument("No DB file specified");
-           }
-
         //====================================================================
         if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )
            {// Updating an old udt file (db) to a newer one (target)
@@ -572,9 +571,16 @@ int main( const int argc, const char* const argv[] )
             handle_adapted_file(out_pth, args);
            }
 
+        //====================================================================
+        else if( args.job().mach() && args.job().mach().is_incomplete() && !args.job().target_file() && !args.job().db_file() )
+           {// Just ask machine informations to user
+            const auto mach = macotec::MachineType::ask_user(args.job().mach().family());
+            fmt::print("\n{}\n", mach.string());
+           }
+
         else
            {
-            throw std::invalid_argument( fmt::format("Don't know what to do with {} and {}", args.job().target_file().path().filename().string(), args.job().db_file().path().filename().string()) );
+            throw std::invalid_argument("Don't know what to do with these arguments");
            }
 
 

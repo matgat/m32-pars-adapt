@@ -32,7 +32,7 @@ To update an old `MachSettings.udt` to a new one:
 To valorize a Sipro parameter file:
 ```
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\param
-> m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --machine StratoHP-6.0/4.6
+> m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --machine StratoHP-6.0/4.6-(buf-rot,fast)
 ```
 
 Normally no file will be overwritten: the program will create a temporary

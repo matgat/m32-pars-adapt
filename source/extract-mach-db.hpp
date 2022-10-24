@@ -65,13 +65,13 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                {
                 if( mach.has_cutbridge_dim() )
                    {
-                    if( const json::Node* const cutbridge_db = child.get_child(mach.cutbridge_dim().id_string()) )
+                    if( const json::Node* const cutbridge_db = child.get_child(mach.cutbridge_dim().string()) )
                        {
                         mach_db.emplace_back( *cutbridge_db );
                        }
                     else
                        {
-                        issues.push_back( fmt::format("DB: Cut bridge dimension {} not found in {}:{{{}}}", mach.cutbridge_dim().id_string(), mach.family().id_string(), child_id) );
+                        issues.push_back( fmt::format("DB: Cut bridge dimension {} not found in {}:{{{}}}", mach.cutbridge_dim().string(), mach.family().id_string(), child_id) );
                        }
                    }
                }
@@ -79,13 +79,13 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                {
                 if( mach.has_align_dim() )
                    {
-                    if( const json::Node* const alignspan_db = child.get_child(mach.align_dim().id_string()) )
+                    if( const json::Node* const alignspan_db = child.get_child(mach.align_dim().string()) )
                        {
                         mach_db.emplace_back( *alignspan_db );
                        }
                     else
                        {
-                        issues.push_back( fmt::format("DB: Align dimension {} not found in {}:{{{}}}", mach.align_dim().id_string(), mach.family().id_string(), child_id) );
+                        issues.push_back( fmt::format("DB: Align dimension {} not found in {}:{{{}}}", mach.align_dim().string(), mach.family().id_string(), child_id) );
                        }
                    }
                }
@@ -188,13 +188,13 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                {
                 if( mach.has_cutbridge_dim() )
                    {
-                    if( const json::Node* const cutbridge_db = child.get_child(mach.cutbridge_dim().id_string()) )
+                    if( const json::Node* const cutbridge_db = child.get_child(mach.cutbridge_dim().string()) )
                        {
                         add_axfields_of(*cutbridge_db);
                        }
                     else
                        {
-                        issues.push_back( fmt::format("DB: Cut bridge dimension {} not found in {}:{{{}}}", mach.cutbridge_dim().id_string(), mach.family().id_string(), child_id) );
+                        issues.push_back( fmt::format("DB: Cut bridge dimension {} not found in {}:{{{}}}", mach.cutbridge_dim().string(), mach.family().id_string(), child_id) );
                        }
                    }
                }
@@ -202,13 +202,13 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                {
                 if( mach.has_align_dim() )
                    {
-                    if( const json::Node* const alignspan_db = child.get_child(mach.align_dim().id_string()) )
+                    if( const json::Node* const alignspan_db = child.get_child(mach.align_dim().string()) )
                        {
                         add_axfields_of(*alignspan_db);
                        }
                     else
                        {
-                        issues.push_back( fmt::format("DB: Align dimension {} not found in {}:{{{}}}", mach.align_dim().id_string(), mach.family().id_string(), child_id) );
+                        issues.push_back( fmt::format("DB: Align dimension {} not found in {}:{{{}}}", mach.align_dim().string(), mach.family().id_string(), child_id) );
                        }
                    }
                }
