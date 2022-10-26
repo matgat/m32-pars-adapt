@@ -312,15 +312,14 @@ class Arguments final
     udt::File udt_file(args.job().target_file().path(), issues);
 
     // [Machine type]
+    // Ensure to have all required machine data
+    if( args.job().mach().is_incomplete() )
+       {// Ask missing data to user
+        args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+       }
+
     if( args.job().mach() )
-       {// Machine type specified
-
-        // Ensure to have all required data
-        if( args.job().mach().is_incomplete() )
-           {// Ask missing data to user
-            args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
-           }
-
+       {// Now that I have the machine data
         if( const auto vaMachName = udt_file.get_field("vaMachName") )
            {
             // Better check that the target file has already superimposed options
@@ -345,8 +344,7 @@ class Arguments final
            }
        }
     else
-       {// Machine type not explicitly specified
-        // Extract machine type from udt file
+       {// Machine type not yet known, extract from udt file (not so useful)
         if( const auto vaMachName = udt_file.get_field("vaMachName") )
            {
             args.mutable_job().set_machine_type( str::unquoted(vaMachName->value()) );

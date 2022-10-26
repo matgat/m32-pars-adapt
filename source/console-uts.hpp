@@ -3,19 +3,10 @@
 //  ---------------------------------------------
 //  Utilities for console I/O
 //  ---------------------------------------------
-#if defined(_WIN32) || defined(_WIN64)
-  #define MS_WINDOWS 1
-  #undef POSIX
-#elif defined(__unix__) || defined(__linux__)
-  #undef MS_WINDOWS
-  #define POSIX 1
-#else
-  #undef MS_WINDOWS
-  #undef POSIX
-#endif
-
 #include <string>
 #include <string_view>
+
+#include "os-detect.hpp" // MS_WINDOWS, POSIX
 
 #if defined(MS_WINDOWS)
   #include <Windows.h> // Beep (Utilapiset.h)

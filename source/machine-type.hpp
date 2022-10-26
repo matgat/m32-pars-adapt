@@ -358,7 +358,10 @@ class MachineType final
     void assign(const std::string_view s) { *this = recognize_machine(s); }
 
     [[nodiscard]] operator bool() const noexcept { return i_family.is_defined(); }
-    [[nodiscard]] bool is_incomplete() const noexcept { return i_family.is_strato() && !has_cutbridge_dim(); }
+    [[nodiscard]] bool is_incomplete() const noexcept
+       {
+        return !i_family.is_defined() || (i_family.is_strato() && !has_cutbridge_dim());
+       }
 
     [[nodiscard]] constexpr MachineFamily family() const noexcept { return i_family; }
     [[nodiscard]] constexpr MachineFamily& mutable_family() noexcept { return i_family; }
@@ -415,8 +418,8 @@ class MachineType final
         else
            {
             switch( sys::choice("\n Choose machine family\n"
-                                "[s]ActiveE/F, [w]ActiveW, [r]ActiveWR, [h]ActiveHP, "
-                                "[c]StarCut, [m]MsFR, [v]MsFRV : ", "hrswcmv") )
+                                "[s]ActiveE/F  [w]ActiveW  [r]ActiveWR  [h]ActiveHP, "
+                                "[c]StarCut  [m]MsFR  [v]MsFRV : ", "hrswcmv") )
                {
                 case 'h': mach.mutable_family().set_as_strato_hp(); break;
                 case 'r': mach.mutable_family().set_as_strato_wr(); break;
@@ -433,7 +436,7 @@ class MachineType final
         if( mach.family().is_strato_s() )
            {// Laminati semplici
             switch( sys::choice("\n Choose cut bridge\n"
-                                "[s]3.7, [m]4.6 : ", "sm") )
+                                "[s]3.7  [m]4.6 : ", "sm") )
                {
                 case 's': mach.mutable_cutbridge_dim().assign(3.7, mach.family()); break;
                 default : mach.mutable_cutbridge_dim().assign(4.6, mach.family());
@@ -446,7 +449,7 @@ class MachineType final
 
             // [options]
             const auto opts = sys::input_string("\n Indicate known options\n"
-                                                "[o]Opposta, [l]Low-E, [b]Buffer, [r]Girapezzi : ");
+                                                "[o]Opposta  [l]Low-E  [b]Buffer  [r]Girapezzi : ");
             if(opts.contains('o')) mach.mutable_options().add_option("opp");
             if(opts.contains('l')) mach.mutable_options().add_option("lowe");
             if(opts.contains('b')) mach.mutable_options().add_option("buf");
@@ -456,7 +459,7 @@ class MachineType final
         else if( mach.family().is_strato() )
            {// Laminati grandi
             switch( sys::choice("\n Choose cut bridge\n"
-                                "[s]4.0, [m]4.9, [l]6.0 : ", "sml") )
+                                "[s]4.0  [m]4.9  [l]6.0 : ", "sml") )
                {
                 case 's': mach.mutable_cutbridge_dim().assign(4.0, mach.family()); break;
                 case 'm': mach.mutable_cutbridge_dim().assign(4.9, mach.family()); break;
@@ -465,7 +468,7 @@ class MachineType final
             sys::println(mach.cutbridge_dim().string());
 
             switch( sys::choice("\n Choose align span\n"
-                                "[s]3.2, [m]4.6 : ", "sm") )
+                                "[s]3.2  [m]4.6 : ", "sm") )
                {
                 case 's': mach.mutable_align_dim().assign(3.2); break;
                 default : mach.mutable_align_dim().assign(4.6);
@@ -474,7 +477,7 @@ class MachineType final
 
             // [options]
             const auto opts = sys::input_string("\n Indicate known options\n"
-                                                "[o]Opposta, [l]Low-E, [n]No-buffer : ");
+                                                "[o]Opposta  [l]Low-E  [n]No-buffer : ");
             if(opts.contains('o')) mach.mutable_options().add_option("opp");
             if(opts.contains('l')) mach.mutable_options().add_option("lowe");
             if(opts.contains('n')) mach.mutable_options().add_option("no-buf");

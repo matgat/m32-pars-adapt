@@ -13,16 +13,7 @@ namespace fs = std::filesystem;
 #include <regex> // std::regex*
 #include <fmt/core.h> // fmt::format
 
-#if defined(_WIN32) || defined(_WIN64)
-  #define MS_WINDOWS 1
-  #undef POSIX
-#elif defined(__unix__) || defined(__linux__)
-  #undef MS_WINDOWS
-  #define POSIX 1
-#else
-  #undef MS_WINDOWS
-  #undef POSIX
-#endif
+#include "os-detect.hpp" // MS_WINDOWS, POSIX
 
 #if defined(MS_WINDOWS)
   #include <cstdio> // fopen_s (Microsoft 'deprecated' std::fopen)
@@ -53,7 +44,7 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void sleep_ms( const int ms )
 {
   #if defined(MS_WINDOWS)
-    Sleep(ms);
+    ::Sleep(ms);
   #elif defined(POSIX)
     timespec ts;
     ts.tv_sec = ms / 1000;
@@ -101,21 +92,21 @@ void sleep_ms( const int ms )
     //#include <system_error>
     //std::string message = std::system_category().message(e);
 
-    if(e==0) e = GetLastError(); // ::WSAGetLastError()
+    if(e==0) e = ::GetLastError(); // ::WSAGetLastError()
     const DWORD buf_siz = 1024;
     TCHAR buf[buf_siz];
     const DWORD siz =
-        FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
-                            FORMAT_MESSAGE_IGNORE_INSERTS|
-                            FORMAT_MESSAGE_MAX_WIDTH_MASK,
-                            nullptr,
-                            e,
-                            0, // MAKELANGID deprecated
-                            buf,
-                            buf_siz,
-                            nullptr );
+        ::FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM |
+                         FORMAT_MESSAGE_IGNORE_INSERTS|
+                         FORMAT_MESSAGE_MAX_WIDTH_MASK,
+                         nullptr,
+                         e,
+                         0, // MAKELANGID deprecated
+                         buf,
+                         buf_siz,
+                         nullptr );
 
-    return siz>0 ? fmt::format("[{}] {}", e, std::string(buf, siz))
+    return siz>0 ? fmt::format("[{}] {}", e, std::string_view(buf, siz))
                  : fmt::format("[{}] Unknown error", e);
 }
 
@@ -123,7 +114,7 @@ void sleep_ms( const int ms )
 [[nodiscard]] std::string find_executable_by_file(const std::string& doc) noexcept
 {
     char buf[MAX_PATH + 1] = {'\0'};
-    FindExecutableA(doc.c_str(), NULL, buf);
+    ::FindExecutableA(doc.c_str(), NULL, buf);
     return std::string(buf);
 }
 
@@ -133,7 +124,7 @@ void sleep_ms( const int ms )
 {
     DWORD buf_len = MAX_PATH;
     TCHAR buf[MAX_PATH+1];
-    HRESULT hr = AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
+    HRESULT hr = ::AssocQueryString(ASSOCF_NOTRUNCATE, ASSOCSTR_EXECUTABLE, ext_with_dot, "open", buf, &buf_len);
     if(hr==E_POINTER)
        {
         throw std::runtime_error("AssocQueryString: buffer too small to hold the entire path");
@@ -158,7 +149,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL;
     ShExecInfo.nShow = SW_SHOW;
     ShExecInfo.hInstApp = NULL;
-    ShellExecuteEx(&ShExecInfo);
+    ::ShellExecuteEx(&ShExecInfo);
 }
 
 //---------------------------------------------------------------------------
@@ -181,7 +172,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL; // base_dir.empty() ? NULL : base_dir.c_str();
     ShExecInfo.nShow = show ? SW_SHOW : SW_HIDE;
     ShExecInfo.hInstApp = NULL;
-    if( !ShellExecuteEx(&ShExecInfo) )
+    if( !::ShellExecuteEx(&ShExecInfo) )
        {
         throw std::runtime_error( fmt::format("Cannot run {}: {}", pth, sys::get_lasterr_msg()) );
        }
@@ -191,7 +182,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     if( wait )
        {
         do {
-            const DWORD WaitResult = WaitForSingleObject(ShExecInfo.hProcess, 500);
+            const DWORD WaitResult = ::WaitForSingleObject(ShExecInfo.hProcess, 500);
             if( WaitResult == WAIT_TIMEOUT )
                {// Still executing...
                 sys::sleep_ms(100); //Application->ProcessMessages();
@@ -202,15 +193,15 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
                }
             else
                {
-                CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+                ::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
                 throw std::runtime_error( fmt::format("ShellExecuteEx: spawn error of {}",pth) );
                }
            }
         while(true);
 
         // If here process ended
-        GetExitCodeProcess(ShExecInfo.hProcess, &ret);
-        CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
+        ::GetExitCodeProcess(ShExecInfo.hProcess, &ret);
+        ::CloseHandle(ShExecInfo.hProcess); // SEE_MASK_NOCLOSEPROCESS
        }
 
     return ret;
@@ -325,25 +316,25 @@ class MemoryMappedFile final
       : i_path(pth)
        {
       #if defined(MS_WINDOWS)
-        hFile = CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
+        hFile = ::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
         if(hFile == INVALID_HANDLE_VALUE)
            {
             throw std::runtime_error( fmt::format("Couldn't open {} ({}))", i_path, get_lasterr_msg()));
            }
-        i_bufsiz = GetFileSize(hFile, nullptr);
+        i_bufsiz = ::GetFileSize(hFile, nullptr);
 
-        hMapping = CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+        hMapping = ::CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
         if(hMapping == nullptr)
            {
-            CloseHandle(hFile);
+            ::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't map {} ({})", i_path, get_lasterr_msg()));
            }
         //
-        i_buf = static_cast<const char*>( MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
+        i_buf = static_cast<const char*>( ::MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
         if(i_buf == nullptr)
            {
-            CloseHandle(hMapping);
-            CloseHandle(hFile);
+            ::CloseHandle(hMapping);
+            ::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't create view of {} ({})", i_path, get_lasterr_msg()) );
            }
       #elif defined(POSIX)
@@ -369,9 +360,9 @@ class MemoryMappedFile final
         if(i_buf)
            {
           #if defined(MS_WINDOWS)
-            UnmapViewOfFile(i_buf);
-            if(hMapping) CloseHandle(hMapping);
-            if(hFile!=INVALID_HANDLE_VALUE) CloseHandle(hFile);
+            ::UnmapViewOfFile(i_buf);
+            if(hMapping) ::CloseHandle(hMapping);
+            if(hFile!=INVALID_HANDLE_VALUE) ::CloseHandle(hFile);
           #elif defined(POSIX)
             /* const int ret = */ munmap(static_cast<void*>(const_cast<char*>(i_buf)), i_bufsiz);
             //if(ret==-1) std::cerr << "munmap() failed\n";
