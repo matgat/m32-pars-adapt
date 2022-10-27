@@ -286,7 +286,7 @@ class MachineOptions final
                && unrecognized.contains(other.unrecognized); // Contains also unknown ones
        }
 
-    [[nodiscard]] constexpr bool is_empty() const noexcept { return bit_mask==0; }
+    [[nodiscard]] constexpr bool is_empty() const noexcept { return bit_mask==0 && unrecognized.is_empty(); }
     //void reset() noexcept { bit_mask=0; }
 
     [[nodiscard]] constexpr bool is_opp() const noexcept { return has_bit(bits::opp); }
@@ -482,26 +482,22 @@ class MachineType final
             if(opts.contains('l')) mach.mutable_options().add_option("lowe");
             if(opts.contains('n')) mach.mutable_options().add_option("no-buf");
             sys::println(mach.options().string());
+
+            // [additional options]
+            const auto opts_csv = sys::input_string("\n Additional options\n"
+                                                    "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
+            str::Splitter addopts(opts_csv, ',');
+            while( addopts.has_data() )
+               {
+                if( const auto opt = addopts.get_next(); !opt.empty() )
+                   {
+                    mach.mutable_options().add_option(opt);
+                   }
+               }
            }
         //else if( mach.family().is_float() )
         //   {
         //   }
-
-        // [additional options]
-        const auto opts_csv = sys::input_string("\n Additional options\n"
-                                                "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
-        str::Splitter opts(opts_csv, ',');
-        while( opts.has_data() )
-           {
-            const auto opt = opts.get_next();
-            if( !opt.empty() )
-               {
-                mach.mutable_options().add_option(opt);
-               }
-           }
-        //sys::println(mach.options().string());
-
-        //sys::print('\n'); sys::println(mach.string());
 
         return mach;
        }

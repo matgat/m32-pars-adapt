@@ -9,6 +9,7 @@
 #include <fmt/core.h> // fmt::*
 
 #include "system.hpp" // sys::*, fs::*
+#include "clipboard.hpp" // sys::Clipboard
 #include "string-utilities.hpp" // str::tolower, str::unquoted
 #include "text-files-tools.hpp" // sys::edit_text_file, sys::compare_wait
 
@@ -121,7 +122,7 @@ class Arguments final
             //for( const auto arg : args | std::views::transform([](const char* const a){ return std::string_view(a);}) )
             for( int i=1; i<argc; ++i )
                {
-                const std::string_view arg{ argv[i] };
+                std::string_view arg{ argv[i] };
                 switch( status )
                    {
                     case STS::GET_MACHTYPE :
@@ -129,7 +130,14 @@ class Arguments final
                            {
                             throw std::invalid_argument( fmt::format("Machine type was already set to {}",i_job.mach().string()) );
                            }
-                        i_job.set_machine_type(arg);
+                        if( arg=="?" || arg=="ask" || arg=="choose" )
+                           {
+                            i_job.set_machine_type( macotec::MachineType::ask_user(i_job.mach().family()) );
+                           }
+                        else
+                           {
+                            i_job.set_machine_type(arg);
+                           }
                         status = STS::SEE_ARG;
                         break;
 
@@ -161,43 +169,41 @@ class Arguments final
                         break;
 
                     default :
-                        if( arg.length()>1 && arg[0]=='-' )
+                        if( arg.size()>=2 && arg[0]=='-' )
                            {// A command switch!
-                            // Skip hyphen, tolerate also doubled ones
-                            const std::size_t skip = arg[1]=='-' ? 2 : 1;
-                            const std::string_view swtch{ arg.data()+skip, arg.length()-skip};
-                            if( swtch=="machine"sv || swtch=="mach"sv || swtch=="m"sv )
+                            arg.remove_prefix(arg[1]=='-' ? 2 : 1); // Skip hyphen(s)
+                            if( arg=="machine"sv || arg=="mach"sv || arg=="m"sv )
                                {
                                 status = STS::GET_MACHTYPE;
                                }
-                            else if( swtch=="target"sv || swtch=="tgt"sv )
+                            else if( arg=="target"sv || arg=="tgt"sv )
                                {
                                 status = STS::GET_TGTFILEPATH;
                                }
-                            else if( swtch=="db"sv )
+                            else if( arg=="db"sv )
                                {
                                 status = STS::GET_DBFILEPATH;
                                }
-                            else if( swtch=="out"sv || swtch=="o"sv )
+                            else if( arg=="out"sv || arg=="o"sv )
                                {
                                 status = STS::GET_OUTFILENAM;
                                }
-                            else if( swtch=="quiet"sv || swtch=="q"sv )
+                            else if( arg=="quiet"sv || arg=="q"sv )
                                {
                                 i_quiet = true;
                                }
-                            else if( swtch=="verbose"sv || swtch=="v"sv )
+                            else if( arg=="verbose"sv || arg=="v"sv )
                                {
                                 i_verbose = true;
                                }
-                            else if( swtch=="help"sv || swtch=="h"sv )
+                            else if( arg=="help"sv || arg=="h"sv )
                                {
                                 print_help();
                                 throw std::invalid_argument("Aborting after printing help");
                                }
                             else
                                {
-                                throw std::invalid_argument( fmt::format("Unknown command switch: {}",swtch) );
+                                throw std::invalid_argument( fmt::format("Unknown command switch: {}",arg) );
                                }
                            }
                         else
@@ -570,10 +576,16 @@ int main( const int argc, const char* const argv[] )
            }
 
         //====================================================================
-        else if( args.job().mach() && args.job().mach().is_incomplete() && !args.job().target_file() && !args.job().db_file() )
-           {// Just ask machine informations to user
-            const auto mach = macotec::MachineType::ask_user(args.job().mach().family());
-            fmt::print("\n{}\n", mach.string());
+        else if( args.job().mach() && !args.job().target_file() && !args.job().db_file() )
+           {// Ensure to select a machine and copy the full name to clipboard
+            if( args.job().mach().is_incomplete() )
+               {
+                args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+               }
+            const auto mach_fullname = args.job().mach().string();
+            fmt::print("\n{}\n", mach_fullname);
+            sys::Clipboard clipboard;
+            clipboard.set( mach_fullname );
            }
 
         else
