@@ -23,111 +23,119 @@ class Parser final : public BasicParser
     Parser(const std::string& pth, const std::string_view dat, std::vector<std::string>& lst, const bool fus)
       : BasicParser(pth,dat,lst,fus) {}
 
-
     //-----------------------------------------------------------------------
     void collect_childs_of(Node& n_parent, const int nest_lvl =0, const std::size_t line_start =1)
        {
-        //EVTLOG("collect_node: offset:{} char:{}", i, buf[i])
-        // Skip comments
-        while( i<siz )
-           {
-            skip_any_space();
-            if( skip_possible_comment() )
+        try{//EVTLOG("collect_childs_of: offset:{} char:{}", i, buf[i])
+            while( true )
                {
-                continue;
-               }
-            else if( i>=siz )
-               {// No more data
-                // Detect unclosed bracket
-                if( nest_lvl>0 )
-                   {
-                    throw create_parse_error( fmt::format("Unclosed block (nesting level={}) opened at line {}", nest_lvl, line_start) );
-                   }
-                return;
-               }
-            else if( buf[i]==',' || buf[i]==';' )
-               {// Tolerating these separators after values
-                ++i; // Skip ';'
-                continue;
-               }
-            else if( buf[i]=='}' )
-               {// Childs block closed
-                ++i; // Skip '}'
-                return;
-               }
-            else
-               {
-                // Here expecting one or more keys
-                const auto keys = extract_keys();
-                assert( !keys.empty() );
-                //DLOG1("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
-                // What I'm expecting after a key?
-
-                // Get key/value separator
-                if( i>=siz )
-                   {
-                    throw create_parse_error(fmt::format("No data after key \"{}\"", keys.back()));
-                   }
-                assert( !std::isspace(buf[i]) );
-                const char separator = buf[i++];
-                if( separator!=':' && separator!='=' ) // Extension: Also '='
-                   {
-                    throw create_parse_error(fmt::format("Invalid separator '{}' after key \"{}\"", str::escape(separator), keys.back()));
-                   }
-
-                // I'll support comments also here
                 skip_any_space();
-                if( skip_possible_comment() )
-                   {
-                    skip_any_space();
-                   }
-
-                // Now expecting a value or further childs
                 if( i>=siz )
-                   {
-                    throw create_parse_error( fmt::format("Missing value of key \"{}\"", keys.back()) );
+                   {// No more data!
+                    break;
                    }
-                else if( buf[i]=='{' )
-                   {// Collect subchilds
-                    ++i; // Skip '{'
+                else if( skip_possible_comment() )
+                   {
+                    continue;
+                   }
+                else if( buf[i]==',' || buf[i]==';' )
+                   {// Tolerating these separators after values
+                    ++i; // Skip ','
+                    continue;
+                   }
+                else if( buf[i]=='}' )
+                   {// Childs block closed
+                    ++i; // Skip '}'
+                    return;
+                   }
+                else
+                   {
+                    // Here expecting one or more keys
+                    const auto keys = extract_keys();
+                    assert( !keys.empty() );
+                    //DLOG1("{}[{}] Found node \"{}\"\n", std::string(nest_lvl,'\t'), line, fmt::join(keys, ", "))
+                    // What I'm expecting after a key?
 
-                    // In this case I strictly enforce a colon
-                    if( separator!=':' )
+                    // Get key/value separator
+                    if( i>=siz )
                        {
-                        throw create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
+                        throw create_parse_error(fmt::format("No data after key \"{}\"", keys.back()));
+                       }
+                    assert( !std::isspace(buf[i]) );
+                    const char separator = buf[i++];
+                    if( separator!=':' && separator!='=' ) // Extension: Also '='
+                       {
+                        throw create_parse_error(fmt::format("Invalid separator '{}' after key \"{}\"", str::escape(separator), keys.back()));
                        }
 
-                    if( keys.size()>1 )
-                       {// I'll ensure a child for each key
-                        Node n_tmp; // An empty bag to collect just this block
-                        collect_childs_of(n_tmp, nest_lvl+1, line);
-                        //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), fmt::join(keys, ", "))
+                    // I'll support comments also here
+                    skip_any_space();
+                    if( skip_possible_comment() )
+                       {
+                        skip_any_space();
+                       }
 
-                        // Copy retrieved subchilds to all childs
-                        for( const auto& key : keys )
+                    // Now expecting a value or further childs
+                    if( i>=siz )
+                       {
+                        throw create_parse_error( fmt::format("Missing value of key \"{}\"", keys.back()) );
+                       }
+                    else if( buf[i]=='{' )
+                       {// Collect subchilds
+                        ++i; // Skip '{'
+
+                        // In this case I strictly enforce a colon
+                        if( separator!=':' )
                            {
-                            Node& n_child = n_parent.ensure_child( key );
-                            n_child.insert_childs_of(n_tmp);
+                            throw create_parse_error(fmt::format("Key \"{}\" must be followed by ':'", keys.back()));
+                           }
+
+                        if( keys.size()>1 )
+                           {// I'll ensure a child for each key
+                            Node n_tmp; // An empty bag to collect just this block
+                            collect_childs_of(n_tmp, nest_lvl+1, line);
+                            //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), fmt::join(keys, ", "))
+
+                            // Copy retrieved subchilds to all childs
+                            for( const auto& key : keys )
+                               {
+                                Node& n_child = n_parent.ensure_child( key );
+                                n_child.insert_childs_of(n_tmp);
+                               }
+                           }
+                        else
+                           {
+                            Node& child = n_parent.ensure_child( keys.front() );
+                            collect_childs_of(child, nest_lvl+1, line);
+                            //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), keys.front())
                            }
                        }
                     else
-                       {
+                       {// A single value
+                        if( keys.size()>1 )
+                           {
+                            throw create_parse_error("A value cannot have multiple keys");
+                           }
                         Node& child = n_parent.ensure_child( keys.front() );
-                        collect_childs_of(child, nest_lvl+1, line);
-                        //DLOG2("{}[{}] Found {} childs for \"{}\"\n", std::string(nest_lvl,'\t'), line, n_tmp.childs_count(), keys.front())
+                        child.set_value( extract_value() );
+                        //DLOG2("{}[{}] Assigned {} = {}\n", std::string(nest_lvl,'\t'), line, keys.front(), child.value())
                        }
-                   }
-                else
-                   {// A single value
-                    if( keys.size()>1 )
-                       {
-                        throw create_parse_error("A value cannot have multiple keys");
-                       }
-                    Node& child = n_parent.ensure_child( keys.front() );
-                    child.set_value( extract_value() );
-                    //DLOG2("{}[{}] Assigned {} = {}\n", std::string(nest_lvl,'\t'), line, keys.front(), child.value())
                    }
                }
+
+            // No more data: Detect unclosed block
+            if( nest_lvl>0 )
+               {
+                throw create_parse_error( fmt::format("Unclosed block (nesting level={}) opened at line {}", nest_lvl, line_start) );
+               }
+           }
+        catch(parse_error&)
+           {
+            throw;
+           }
+        catch(std::exception& e)
+           {
+            throw create_parse_error(e.what());
            }
        }
 
@@ -164,7 +172,7 @@ class Parser final : public BasicParser
                 //    if( buf[i]=='*' && buf[i+1]=='/' )
                 //       {
                 //        i += 2; // Skip "*/"
-                //        return;
+                //        return true;
                 //       }
                 //    else if( buf[i]=='\n' )
                 //       {
@@ -173,7 +181,6 @@ class Parser final : public BasicParser
                 //    ++i;
                 //   }
                 //throw create_parse_error("Unclosed block comment", line_start, i_start);
-                //return true;
                }
            }
         return false;
@@ -252,6 +259,8 @@ class Parser final : public BasicParser
         assert( i<siz && !std::isspace(buf[i]) );
         const std::string_view key = buf[i]=='\"' ? collect_quoted_key()
                                                   : collect_identifier();
+        skip_any_space(); // Possible spaces after key
+
         if( key.empty() )
            {
             throw create_parse_error( "Empty key" );
@@ -267,14 +276,12 @@ class Parser final : public BasicParser
         std::vector<std::string_view> keys;
 
         keys.push_back( extract_key() ); // Note: This ensures keys not empty
-        skip_any_space();
         // Extension: Support multiple keys (comma separated)
         while( i<siz && buf[i]==',' )
            {
             ++i; // Skip ','
             skip_any_space(); // Possible spaces after comma
             keys.push_back( extract_key() );
-            skip_any_space(); // Possible spaces before next comma
            }
         // What I'm expecting here? I'll let the main cycle deal with that
         return keys;
@@ -300,18 +307,7 @@ class Parser final : public BasicParser
 void parse(const std::string& file_path, const std::string_view buf, Node& root, std::vector<std::string>& issues, const bool fussy)
 {
     Parser parser(file_path, buf, issues, fussy);
-
-    try{
-        parser.collect_childs_of(root);
-       }
-    catch(parse_error&)
-       {
-        throw;
-       }
-    catch(std::exception& e)
-       {
-        throw parser.create_parse_error(e.what());
-       }
+    parser.collect_childs_of(root);
 }
 
 

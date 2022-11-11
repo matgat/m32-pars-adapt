@@ -66,8 +66,8 @@ an extended/simplified json-like syntax.
 
 _________________________________________________________________________
 ### Syntax
-* Key names can be unquoted, double quotes necessary just if name contains special chars
-* Separators like comma or semicolons are not strictly necessary
+* Key names can be unquoted (double quotes necessary in case of spaces or other special chars)
+* New line acts as a key-value separator (in that case other separators like comma are optional)
 * Supported multiple (comma separated) keys
 * Equal sign is tolerated for plain `key=value` assignments
 * Supported double slash line comments (`//`) as shown in the example below
@@ -85,8 +85,8 @@ _________________________________________________________________________
 
     subkey2 :
        {
-        name3: "a quoted value"
-        name4: unquoted
+        unquoted_key: "quoted value"
+        "quoted key": unquoted_value
        }
    }
 ```

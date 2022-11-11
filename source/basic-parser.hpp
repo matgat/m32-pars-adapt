@@ -6,7 +6,7 @@
 //  Unix line end '\n' (are you using a typewriter?)
 //  ---------------------------------------------
 #include <cctype> // std::isdigit, std::isblank, ...
-//#include <limits> // std::numeric_limits
+#include <vector>
 #include <string_view>
 #include <stdexcept> // std::exception, std::runtime_error, ...
 #include <fmt/core.h> // fmt::format
@@ -152,21 +152,21 @@ class BasicParser
  protected:
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] static bool is_identifier(const char c) noexcept
+    [[nodiscard]] static bool is_identifier(const char ch) noexcept
        {
-        return std::isalnum(c) || c=='_';
+        return std::isalnum(ch) || ch=='_';
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] static bool is_numeric_literal(const char c) noexcept
+    [[nodiscard]] static bool is_numeric_literal(const char ch) noexcept
        {
-        return std::isdigit(c) || c=='+' || c=='-' || c=='.' || c=='E';
+        return std::isdigit(ch) || ch=='+' || ch=='-' || ch=='.' || ch=='E';
        }
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] static bool is_blank(const char c) noexcept
+    [[nodiscard]] static bool is_blank(const char ch) noexcept
        {
-        return std::isspace(c) && c!='\n';
+        return std::isspace(ch) && ch!='\n';
        }
 
     //-----------------------------------------------------------------------
@@ -175,6 +175,19 @@ class BasicParser
        {
         while( i<siz && is_blank(buf[i]) ) ++i;
        }
+
+    //-----------------------------------------------------------------------
+    // Tell if skipped space chars except new line
+    //[[nodiscard]] bool eat_blanks() noexcept
+    //   {
+    //    assert(i<siz);
+    //    if( is_blank(buf[i]) )
+    //       {
+    //        do{ ++i; } while( i<siz && is_blank(buf[i]) );
+    //        return true;
+    //       }
+    //    return false;
+    //   }
 
     //-----------------------------------------------------------------------
     // Get blank chars
@@ -198,6 +211,23 @@ class BasicParser
             ++i;
            }
        }
+
+    //-----------------------------------------------------------------------
+    // Tell if skipped any space, including new line
+    //[[nodiscard]] bool eat_any_space() noexcept
+    //   {
+    //    assert(i<siz);
+    //    if( std::isspace(buf[i]) )
+    //       {
+    //        do {
+    //            if( buf[i]=='\n' ) ++line;
+    //            ++i;
+    //           }
+    //        while( i<siz && std::isspace(buf[i]) );
+    //        return true;
+    //       }
+    //    return false;
+    //   }
 
     //-----------------------------------------------------------------------
     [[maybe_unused]] bool eat_line_end() noexcept
@@ -490,12 +520,12 @@ class BasicParser
 
 
     //-----------------------------------------------------------------------
-    //[[nodiscard]] std::string_view collect_until_char(const char c)
+    //[[nodiscard]] std::string_view collect_until_char(const char ch)
     //   {
     //    const std::size_t i_start = i;
     //    while( i<siz )
     //       {
-    //        if( buf[i]==c )
+    //        if( buf[i]==ch )
     //           {
     //            //DLOG1("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
     //            return std::string_view(buf+i_start, i-i_start);
@@ -503,17 +533,17 @@ class BasicParser
     //        else if( buf[i]=='\n' ) ++line;
     //        ++i;
     //       }
-    //    throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(c)));
+    //    throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(ch)));
     //   }
 
 
     //-----------------------------------------------------------------------
-    //[[nodiscard]] std::string_view collect_until_char_same_line(const char c)
+    //[[nodiscard]] std::string_view collect_until_char_same_line(const char ch)
     //   {
     //    const std::size_t i_start = i;
     //    while( i<siz )
     //       {
-    //        if( buf[i]==c )
+    //        if( buf[i]==ch )
     //           {
     //            //DLOG1("    [*] Collected \"{}\" at line {}\n", std::string_view(buf+i_start, i-i_start), line)
     //            return std::string_view(buf+i_start, i-i_start);
@@ -521,21 +551,21 @@ class BasicParser
     //        else if( buf[i]=='\n' ) break;
     //        ++i;
     //       }
-    //    throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(c)));
+    //    throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(ch)));
     //   }
 
 
     //-----------------------------------------------------------------------
-    [[nodiscard]] std::string_view collect_until_char_trimmed(const char c)
+    [[nodiscard]] std::string_view collect_until_char_trimmed(const char ch)
        {
         const std::size_t line_start = line; // Store current line...
         const std::size_t i_start = i;       // ...and position
         std::size_t i_end = i_start; // Index past last char not blank
         while( i<siz )
            {
-            if( buf[i]==c )
+            if( buf[i]==ch )
                {
-                //++i; // Nah, do not eat c
+                //++i; // Nah, do not eat ch
                 return std::string_view(buf+i_start, i_end-i_start);
                }
             else if( buf[i]=='\n' )
@@ -549,7 +579,7 @@ class BasicParser
                 else ++i;
                }
            }
-        throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(c)), line_start, i_start);
+        throw create_parse_error(fmt::format("Unclosed content (\'{}\' expected)", str::escape(ch)), line_start, i_start);
        }
 
 
@@ -595,9 +625,9 @@ class BasicParser
 
 
     //-----------------------------------------------------------------------
-    //[[nodiscard]] bool eat_character(const char c) noexcept
+    //[[nodiscard]] bool eat_character(const char ch) noexcept
     //   {
-    //    if( i<siz && buf[i]==c )
+    //    if( i<siz && buf[i]==ch )
     //       {
     //        ++i;
     //        return true;

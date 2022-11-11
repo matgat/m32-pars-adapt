@@ -58,11 +58,11 @@ void sleep_ms( const int ms )
 //std::string expand_env_variables( const std::string& s )
 //{
 //    const std::string::size_type i_start = s.find("${");
-//    if( i_start == std::string::npos ) return s;
+//    if( i_start==std::string::npos ) return s;
 //    std::string_view pre( s.data(), i_start );
 //    i_start += 2; // Skip "$("
 //    const std::string::size_type i_end = s.find('}', i_start);
-//    if( i_end == std::string::npos ) return s;
+//    if( i_end==std::string::npos ) return s;
 //    std::string_view post = ( s.data()+i_end+1, s.length()-(i_end+1) );
 //    std::string_view variable( s.data()+i_start, i_end-i_start );
 //    std::string value { std::getenv(variable.c_str()) };
@@ -183,11 +183,11 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
        {
         do {
             const DWORD WaitResult = ::WaitForSingleObject(ShExecInfo.hProcess, 500);
-            if( WaitResult == WAIT_TIMEOUT )
+            if( WaitResult==WAIT_TIMEOUT )
                {// Still executing...
                 sys::sleep_ms(100); //Application->ProcessMessages();
                }
-            else if( WaitResult == WAIT_OBJECT_0 )
+            else if( WaitResult==WAIT_OBJECT_0 )
                {
                 break;
                }
@@ -317,21 +317,21 @@ class MemoryMappedFile final
        {
       #if defined(MS_WINDOWS)
         hFile = ::CreateFileA(i_path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, nullptr);
-        if(hFile == INVALID_HANDLE_VALUE)
+        if(hFile==INVALID_HANDLE_VALUE)
            {
             throw std::runtime_error( fmt::format("Couldn't open {} ({}))", i_path, get_lasterr_msg()));
            }
         i_bufsiz = ::GetFileSize(hFile, nullptr);
 
         hMapping = ::CreateFileMappingA(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
-        if(hMapping == nullptr)
+        if(hMapping==nullptr)
            {
             ::CloseHandle(hFile);
             throw std::runtime_error( fmt::format("Couldn't map {} ({})", i_path, get_lasterr_msg()));
            }
         //
         i_buf = static_cast<const char*>( ::MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0) );
-        if(i_buf == nullptr)
+        if(i_buf==nullptr)
            {
             ::CloseHandle(hMapping);
             ::CloseHandle(hFile);
@@ -339,15 +339,15 @@ class MemoryMappedFile final
            }
       #elif defined(POSIX)
         const int fd = open(i_path.c_str(), O_RDONLY);
-        if(fd == -1) throw std::runtime_error( fmt::format("Couldn't open {}", i_path) );
+        if(fd==-1) throw std::runtime_error( fmt::format("Couldn't open {}", i_path) );
 
         // obtain file size
         struct stat sbuf {};
-        if(fstat(fd, &sbuf) == -1) throw std::runtime_error("Cannot stat file size");
+        if(fstat(fd, &sbuf)==-1) throw std::runtime_error("Cannot stat file size");
         i_bufsiz = static_cast<std::size_t>(sbuf.st_size);
 
         i_buf = static_cast<const char*>(mmap(nullptr, i_bufsiz, PROT_READ, MAP_PRIVATE, fd, 0U));
-        if(i_buf == MAP_FAILED)
+        if(i_buf==MAP_FAILED)
            {
             i_buf = nullptr;
             throw std::runtime_error("Cannot map file");
@@ -398,6 +398,7 @@ class MemoryMappedFile final
     [[nodiscard]] const char* begin() const noexcept { return i_buf; }
     [[nodiscard]] const char* end() const noexcept { return i_buf + i_bufsiz; }
     [[nodiscard]] std::string_view as_string_view() const noexcept { return std::string_view{i_buf, i_bufsiz}; }
+    //[[nodiscard]] char operator[](const std::size_t i) const { return i_buf[i]; }
 
     [[nodiscard]] const std::string& path() const noexcept { return i_path; }
 

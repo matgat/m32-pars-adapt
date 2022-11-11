@@ -36,9 +36,9 @@ class Node final
            }
         if( has_value() )
            {
-            throw std::runtime_error( fmt::format("Cannot overwrite value \"{}\" on already existing \"{}\"", newval, i_value) );
+            throw std::runtime_error( fmt::format("Cannot overwrite already existing value \"{}\" with \"{}\"", m_value, newval) );
            }
-        i_value = newval;
+        m_value = newval;
        }
 
     //-----------------------------------------------------------------------
@@ -48,38 +48,38 @@ class Node final
         //   {
         //    throw std::runtime_error("No value available") );
         //   }
-        return i_value;
+        return m_value;
        }
 
     //-----------------------------------------------------------------------
     [[nodiscard]] bool has_value() const noexcept
        {
-        return !i_value.empty();
+        return !m_value.empty();
        }
 
     //-----------------------------------------------------------------------
     // Is a key:value assignment node, so no childs and has a value
     [[nodiscard]] bool is_leaf() const noexcept
        {
-        return i_childs.empty() && !i_value.empty();
+        return m_childs.empty() && !m_value.empty();
        }
 
     //-----------------------------------------------------------------------
     [[nodiscard]] bool has_childs() const noexcept
        {
-        return !i_childs.empty();
+        return !m_childs.empty();
        }
 
     //-----------------------------------------------------------------------
     [[nodiscard]] const auto& childs() const noexcept
        {
-        return i_childs;
+        return m_childs;
        }
 
     //-----------------------------------------------------------------------
     [[maybe_unused]] Node& ensure_child(const std::string_view key)
        {
-        const auto [it, success] = i_childs.insert({key_type(key), Node()});
+        const auto [it, success] = m_childs.insert({key_type(key), Node()});
         //if( !success )
         //   {
         //    throw std::runtime_error( fmt::format("Cannot insert child \"{}\"", key) );
@@ -91,8 +91,8 @@ class Node final
     // Access childs
     //[[nodiscard]] const Node& operator[](const key_type& key) const
     //   {
-    //    const auto it = i_childs.find(key);
-    //    if( it==i_childs.end() )
+    //    const auto it = m_childs.find(key);
+    //    if( it==m_childs.end() )
     //       {
     //        throw std::runtime_error( fmt::format("child \"{}\" not found", key) );
     //       }
@@ -104,8 +104,8 @@ class Node final
     template<std::convertible_to<std::string_view> T, std::convertible_to<std::string_view>... Args>
     [[nodiscard]] const Node* get_child(T&& childname, Args&&... subchilds) const noexcept
        {
-        if( const auto it_child = i_childs.find(childname); it_child!=i_childs.end() )
-            {
+        if( const auto it_child = m_childs.find(childname); it_child!=m_childs.end() )
+           {
             if constexpr( sizeof...(subchilds) > 0 )
                {
                 return it_child->second.get_child(std::forward<Args>(subchilds)...);
@@ -114,7 +114,7 @@ class Node final
                {
                 return &(it_child->second);
                }
-            }
+           }
         return nullptr;
        }
 
@@ -127,9 +127,9 @@ class Node final
            }
 
         // Check for clashes
-        for( const auto& other_pair : other.i_childs )
+        for( const auto& other_pair : other.m_childs )
            {
-            if( auto it_child = i_childs.find(other_pair.first); it_child!=i_childs.end() )
+            if( auto it_child = m_childs.find(other_pair.first); it_child!=m_childs.end() )
                {// I already have this child!
                 if( it_child->second.is_leaf() && other_pair.second.is_leaf() )
                    {// Two values: Don't know which one to keep, better avoid multiple definitions
@@ -151,7 +151,7 @@ class Node final
             else
                {// I don't already have this child
                 //fmt::print(" Inserting {}\n", other_pair.first);
-                i_childs.insert(other_pair); // Won't update existing ones, leaves other untouched
+                m_childs.insert(other_pair); // Won't update existing ones, leaves other untouched
                }
            }
        }
@@ -160,7 +160,7 @@ class Node final
     //-----------------------------------------------------------------------
     [[nodiscard]] std::size_t childs_count() const noexcept
        {
-        return i_childs.size();
+        return m_childs.size();
        }
 
 
@@ -168,7 +168,7 @@ class Node final
     //[[nodiscard]] std::size_t descendants_count() const noexcept
     //   {
     //    std::size_t n = 0;
-    //    for( const auto& pair : i_childs )
+    //    for( const auto& pair : m_childs )
     //       {
     //        n += 1 + pair.second.descendants_count();
     //       }
@@ -181,7 +181,7 @@ class Node final
        {
         if( is_leaf() ) return 1;
         std::size_t n = 0;
-        for( const auto& pair : i_childs )
+        for( const auto& pair : m_childs )
            {
             // cppcheck-suppress useStlAlgorithm
             n += pair.second.values_count();
@@ -196,17 +196,17 @@ class Node final
         std::string s;
         if( is_leaf() )
            {
-            s += i_value;
+            s += m_value;
            }
         else
            {
             s += '{';
-            auto ip = i_childs.begin();
-            //if( ip!=i_childs.end() ) // Already true if here
+            auto ip = m_childs.begin();
+            //if( ip!=m_childs.end() ) // Already true if here
             s += ip->first;
             s += ':';
             s += ip->second.string();
-            while( ++ip!=i_childs.end() )
+            while( ++ip!=m_childs.end() )
                {
                 s += ',';
                 s += ip->first;
@@ -223,12 +223,12 @@ class Node final
        {
         if( is_leaf() )
            {
-            fmt::print(":{}", i_value);
+            fmt::print(":{}", m_value);
            }
         else
            {
-            const auto it_last = std::prev(i_childs.end());
-            auto it = i_childs.begin();
+            const auto it_last = std::prev(m_childs.end());
+            auto it = m_childs.begin();
             //if( indent.empty() ) fmt::print("\n┐");
             while( it != it_last )
                {
@@ -244,8 +244,8 @@ class Node final
        }
 
  private:
-    childs_type i_childs;
-    value_type i_value;
+    childs_type m_childs;
+    value_type m_value;
 };
 
 
