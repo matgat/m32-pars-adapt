@@ -316,7 +316,7 @@ template<typename T> [[nodiscard]] constexpr std::optional<T> as_num(const std::
     utf8.reserve( (3 * ansi.size()) / 2 );
     for( std::size_t i=0; i<ansi.size(); ++i )
        {
-        if( ansi[i] < 128 )
+        if( !(ansi[i] & '\x80') ) // ansi[i] < 128
            {
             utf8 += ansi[i];
            }

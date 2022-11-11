@@ -21,7 +21,7 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     class WinGlobalMemLock final
     {
      public:
-        WinGlobalMemLock(HGLOBAL h) noexcept
+        explicit WinGlobalMemLock(HGLOBAL h) noexcept
            : m_hmem(h)
            , m_ptr(::GlobalLock(m_hmem)) {}
 
@@ -54,7 +54,7 @@ class Clipboard final
             throw std::runtime_error("Cannot access clipboard");
            }
       #elif defined(POSIX)
-        <implement>
+        //<implement>
       #endif
        }
 
@@ -63,11 +63,11 @@ class Clipboard final
       #if defined(MS_WINDOWS)
         ::CloseClipboard();
       #elif defined(POSIX)
-        <implement>
+        //<implement>
       #endif
        }
 
-    void set(const std::string_view sv) const noexcept
+    void set([[maybe_unused]] const std::string_view sv) const noexcept
        {
       #if defined(MS_WINDOWS)
         ::EmptyClipboard();
@@ -76,11 +76,11 @@ class Clipboard final
            {
             char* const txt_arr = static_cast<char*>(mem.data());
             std::memcpy(txt_arr, sv.data(), sv.size());
-            txt_arr[sv.size()] = '\0'; 
+            txt_arr[sv.size()] = '\0';
             ::SetClipboardData(CF_TEXT, mem.handle());
            }
       #elif defined(POSIX)
-        <implement>
+        //<implement>
       #endif
        }
 
@@ -99,7 +99,7 @@ class Clipboard final
                }
            }
       #elif defined(POSIX)
-        <implement>
+        //<implement>
       #endif
         return text;
        }
