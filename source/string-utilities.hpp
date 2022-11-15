@@ -322,8 +322,8 @@ template<typename T> [[nodiscard]] constexpr std::optional<T> as_num(const std::
            }
         else
            {
-            utf8 += 0xC0 | (ansi[i] >> 6);
-            utf8 += 0x80 | (ansi[i] & 0x3f);
+            utf8 += '\xC0' | (ansi[i] >> 6);
+            utf8 += '\x80' | (ansi[i] & '\x3f');
            }
        }
     return utf8;
