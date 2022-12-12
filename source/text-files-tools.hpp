@@ -31,7 +31,7 @@ void edit_text_file(const std::string& pth, [[maybe_unused]] const std::size_t l
 
 //---------------------------------------------------------------------------
 // Launch files/folders compare program
-template<typename ... Args> void compare(Args&& ... args)
+template<typename ... Args> void compare_files(Args&& ... args)
 {
   #ifdef MS_WINDOWS
     winmerge::compare(std::forward<Args>(args) ...);
@@ -43,7 +43,7 @@ template<typename ... Args> void compare(Args&& ... args)
 
 //---------------------------------------------------------------------------
 // Launch files/folders compare program waiting for its termination
-template<typename ... Args> [[maybe_unused]] int compare_wait(Args&& ... args)
+template<typename ... Args> [[maybe_unused]] int compare_files_wait(Args&& ... args)
 {
   #ifdef MS_WINDOWS
     return winmerge::compare_wait(std::forward<Args>(args) ...);

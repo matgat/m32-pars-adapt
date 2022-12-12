@@ -120,6 +120,17 @@ class File final
            }
        }
 
+
+    //-----------------------------------------------------------------------
+    [[nodiscard]] const Assignment* get_field(const std::string_view varlbl) const noexcept
+       {
+        if( const auto it=i_assignments.find(varlbl); it!=i_assignments.end() )
+           {
+            return &(it->second);
+           }
+        return nullptr;
+       }
+
     //-----------------------------------------------------------------------
     [[nodiscard]] Assignment* get_field(const std::string_view varlbl) noexcept
        {
@@ -154,7 +165,7 @@ class File final
                         const int delta_idx = std::abs(my_reg.index()-his_reg.index());
                         const auto sim_threshold = [](const int delta) constexpr -> double
                            {// Parto da 0.7 e tendo verso 1.0 allontanandomi
-                            return 1.0 - ( (1.0-0.7) / (1.0 + 0.05*static_cast<double>(delta-1)));
+                            return 1.0 - ( (1.0-0.7) / (1.0 + 0.05*static_cast<double>(delta-1)) );
                            };
                         if( are_same_type(my_reg,his_reg) && //...Registri dello stesso tipo...
                             delta_idx<20 && // ...L'indirizzo non è troppo lontano...

@@ -11,7 +11,7 @@
 #include "system.hpp" // sys::*, fs::*
 #include "clipboard.hpp" // sys::Clipboard
 #include "string-utilities.hpp" // str::tolower, str::unquoted
-#include "text-files-tools.hpp" // sys::edit_text_file, sys::compare_wait
+#include "text-files-tools.hpp" // sys::edit_text_file, sys::compare_files_wait
 
 #include "machine-type.hpp" // macotec::MachineType
 #include "extract-mach-db.hpp" // macotec::extract_mach_*_db
@@ -273,7 +273,29 @@ class Arguments final
 
 
 //---------------------------------------------------------------------------
-[[nodiscard]] fs::path update_udt(const Arguments& args, std::vector<std::string>& issues)
+[[nodiscard]] bool refer_to_same_machine(const udt::File& udt1, const udt::File& udt2) noexcept
+{
+    try{
+        if( const auto vaMachName1 = udt1.get_field("vaMachName") )
+        if( const auto vaMachName2 = udt2.get_field("vaMachName") )
+           {
+            const auto mac1 = macotec::MachineType::recognize_machine( str::unquoted(vaMachName1->value()) );
+            const auto mac2 = macotec::MachineType::recognize_machine( str::unquoted(vaMachName2->value()) );
+            return mac1.family()==mac2.family();
+                   //mac1.cutbridge_dim()==mac2.cutbridge_dim() &&
+                   //mac1.align_dim()==mac2.align_dim();
+           }
+       }
+    catch(...)
+       {
+       }
+    return false;
+}
+
+
+//---------------------------------------------------------------------------
+struct updated_file_t { fs::path path; bool same_mach; };
+[[nodiscard]] updated_file_t update_udt(const Arguments& args, std::vector<std::string>& issues)
 {
     // [Machine type]
     // The machine type shouldn't be explicitly given
@@ -287,6 +309,9 @@ class Arguments final
 
     // [The original UDT file to upgrade (oldest)]
     const udt::File old_udt_file(args.job().db_file().path(), issues);
+
+    // Are both referring to the same machine type?
+    const bool same_mach = refer_to_same_machine(old_udt_file, new_udt_file);
 
     // [Summarize the job]
     if( args.verbose() )
@@ -307,7 +332,7 @@ class Arguments final
     // Write output file
     fs::path out_pth = get_out_path(args.job().db_file().path(), args);
     new_udt_file.write( out_pth );
-    return out_pth;
+    return {out_pth, same_mach};
 }
 
 
@@ -485,7 +510,7 @@ class Arguments final
 
 
 //---------------------------------------------------------------------------
-void handle_adapted_file(const fs::path& out_pth, const Arguments& args)
+void handle_adapted_file(fs::path&& adapted_file_path, const Arguments& args)
 {
     if( args.quiet() )
        {// No user intervention
@@ -493,23 +518,23 @@ void handle_adapted_file(const fs::path& out_pth, const Arguments& args)
            {// Output file not specified, is a temporary
             sys::backup_file_same_dir( args.job().target_file().path() );
             fs::remove( args.job().target_file().path() );
-            fs::rename( out_pth, args.job().target_file().path() );
+            fs::rename( adapted_file_path, args.job().target_file().path() );
            }
        }
     else
        {// Manual merge
-        sys::compare_wait(out_pth.string().c_str(), args.job().target_file().path().string().c_str());
+        sys::compare_files_wait(adapted_file_path.string().c_str(), args.job().target_file().path().string().c_str());
 
         if( args.job().out_file_name().empty() )
            {
-            fs::remove( out_pth );
+            fs::remove( adapted_file_path );
            }
        }
 }
 
 
 //---------------------------------------------------------------------------
-void handle_updated_file(const fs::path& out_pth, const Arguments& args)
+void handle_updated_file(updated_file_t&& updated_file, const Arguments& args)
 {
     if( args.quiet() )
        {// No user intervention
@@ -517,25 +542,28 @@ void handle_updated_file(const fs::path& out_pth, const Arguments& args)
            {// Output file not specified, is a temporary
             sys::backup_file_same_dir( args.job().db_file().path() );
             fs::remove( args.job().db_file().path() );
-            fs::rename( out_pth, args.job().db_file().path() );
+            fs::rename( updated_file.path, args.job().db_file().path() );
            }
        }
     else
        {// Manual merge
         // Compare updated with the original
-        sys::compare_wait(  out_pth.string().c_str(),
-                            args.job().db_file().path().string().c_str()  );
-        // Compare the template with the merged one
-        sys::compare_wait(  args.job().target_file().path().string().c_str(),
-                            args.job().db_file().path().string().c_str()  );
-        // Compare all three
-        //sys::compare_wait(  args.job().target_file().path().string().c_str(),
-        //                    out_pth.string().c_str(),
-        //                    args.job().db_file().path().string().c_str()  );
+        sys::compare_files_wait( updated_file.path.string().c_str(),
+                                 args.job().db_file().path().string().c_str() );
+        if( updated_file.same_mach )
+           {
+            // Compare the template with the merged one
+            sys::compare_files_wait( args.job().target_file().path().string().c_str(),
+                                     args.job().db_file().path().string().c_str() );
+            // Compare all three
+            //sys::compare_files_wait( args.job().target_file().path().string().c_str(),
+            //                         updated_file.path.string().c_str(),
+            //                         args.job().db_file().path().string().c_str() );
+           }
 
         if( args.job().out_file_name().empty() )
            {// Output file is a temporary
-            fs::remove( out_pth );
+            fs::remove( updated_file.path );
            }
        }
 }
@@ -557,22 +585,22 @@ int main( const int argc, const char* const argv[] )
         //====================================================================
         if( args.job().target_file().is_udt() && args.job().db_file().is_udt() )
            {// Updating an old udt file (db) to a newer one (target)
-            const fs::path out_pth = update_udt(args, issues);
-            handle_updated_file(out_pth, args);
+            auto updated_file = update_udt(args, issues);
+            handle_updated_file( std::move(updated_file), args);
            }
 
         //====================================================================
         else if( args.job().target_file().is_udt() && args.job().db_file().is_txt() )
            {// Adapting an udt file given overlays database and machine type
-            const fs::path out_pth = adapt_udt(args, issues);
-            handle_adapted_file(out_pth, args);
+            fs::path adapted_file_path = adapt_udt(args, issues);
+            handle_adapted_file( std::move(adapted_file_path), args);
            }
 
         //====================================================================
         else if( args.job().target_file().is_parax() && args.job().db_file().is_txt() )
            {// Adapting a par2kax.txt file given overlays database and machine type
-            const fs::path out_pth = adapt_parax(args, issues);
-            handle_adapted_file(out_pth, args);
+            fs::path adapted_file_path = adapt_parax(args, issues);
+            handle_adapted_file(std::move(adapted_file_path), args);
            }
 
         //====================================================================
@@ -592,7 +620,6 @@ int main( const int argc, const char* const argv[] )
            {
             throw std::invalid_argument("Don't know what to do with these arguments");
            }
-
 
         if( issues.size()>0 )
            {

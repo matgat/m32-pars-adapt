@@ -135,6 +135,7 @@ class MachineFamily final
     //   }
     //[[nodiscard]] const char* const mach_chars() const noexcept { return "hrwscmv"; }
 
+    [[nodiscard]] constexpr bool operator==(const MachineFamily other) const noexcept { return i_family==other.i_family; }
 
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_family!=family::undefined; }
     //[[nodiscard]] constexpr bool is_undefined() const noexcept { return i_family==family::undefined; }
@@ -214,6 +215,7 @@ class CutBridgeDim final
        }
 
     //-----------------------------------------------------------------------
+    [[nodiscard]] constexpr bool operator==(const CutBridgeDim other) const noexcept { return i_dimcat==other.i_dimcat; }
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_dimcat!=cutbridgedim::undefined; }
     [[nodiscard]] constexpr std::string_view string() const noexcept { return cutbridgedim_ids[to_underlying(i_dimcat)]; }
 };
@@ -260,6 +262,7 @@ class AlignSpanDim final
        }
 
     //-----------------------------------------------------------------------
+    [[nodiscard]] constexpr bool operator==(const AlignSpanDim other) const noexcept { return i_dimcat==other.i_dimcat; }
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_dimcat!=aligndim::undefined; }
     [[nodiscard]] constexpr std::string_view string() const noexcept { return aligndim_ids[to_underlying(i_dimcat)]; }
 };
@@ -354,6 +357,12 @@ class MachineOptions final
 /////////////////////////////////////////////////////////////////////////////
 class MachineType final
 {
+ private:
+    MachineFamily i_family;
+    CutBridgeDim i_cutbridgedim;
+    AlignSpanDim i_algndim;
+    MachineOptions i_options;
+
  public:
     void assign(const std::string_view s) { *this = recognize_machine(s); }
 
@@ -403,110 +412,6 @@ class MachineType final
            }
         return s;
        }
-
-    //------------------------------------------------------------------------
-    // cppcheck-suppress unusedPrivateFunction
-    [[nodiscard]] static MachineType ask_user(const MachineFamily given_mach_family)
-       {
-        MachineType mach;
-
-        // [family]
-        if( given_mach_family.is_defined() )
-           {
-            mach.mutable_family() = given_mach_family;
-           }
-        else
-           {
-            switch( sys::choice("\n Choose machine family\n"
-                                "[s]ActiveE/F  [w]ActiveW  [r]ActiveWR  [h]ActiveHP, "
-                                "[c]StarCut  [m]MsFR  [v]MsFRV : ", "hrswcmv") )
-               {
-                case 'h': mach.mutable_family().set_as_strato_hp(); break;
-                case 'r': mach.mutable_family().set_as_strato_wr(); break;
-                case 'w': mach.mutable_family().set_as_strato_w();  break;
-                case 's': mach.mutable_family().set_as_strato_s();  break;
-                case 'v': mach.mutable_family().set_as_float_frv(); break;
-                case 'm': mach.mutable_family().set_as_float_fr();  break;
-                default : mach.mutable_family().set_as_float_scut();
-               }
-            sys::println(mach.family().name());
-           }
-
-        // [strato dimensions]
-        if( mach.family().is_strato_s() )
-           {// Laminati semplici
-            switch( sys::choice("\n Choose cut bridge\n"
-                                "[s]3.7  [m]4.6 : ", "sm") )
-               {
-                case 's': mach.mutable_cutbridge_dim().assign(3.7, mach.family()); break;
-                default : mach.mutable_cutbridge_dim().assign(4.6, mach.family());
-               }
-            sys::println(mach.cutbridge_dim().string());
-
-            // I riscontri sono sempre 3.2
-            mach.mutable_align_dim().assign(3.2);
-            sys::println(mach.align_dim().string());
-
-            // [options]
-            const auto opts = sys::input_string("\n Indicate known options\n"
-                                                "[o]Opposta  [l]Low-E  [b]Buffer  [r]Girapezzi : ");
-            if(opts.contains('o')) mach.mutable_options().add_option("opp");
-            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
-            if(opts.contains('b')) mach.mutable_options().add_option("buf");
-            if(opts.contains('r')) mach.mutable_options().add_option("rot");
-            sys::println(mach.options().string());
-           }
-        else if( mach.family().is_strato() )
-           {// Laminati grandi
-            switch( sys::choice("\n Choose cut bridge\n"
-                                "[s]4.0  [m]4.9  [l]6.0 : ", "sml") )
-               {
-                case 's': mach.mutable_cutbridge_dim().assign(4.0, mach.family()); break;
-                case 'm': mach.mutable_cutbridge_dim().assign(4.9, mach.family()); break;
-                default : mach.mutable_cutbridge_dim().assign(6.0, mach.family());
-               }
-            sys::println(mach.cutbridge_dim().string());
-
-            switch( sys::choice("\n Choose align span\n"
-                                "[s]3.2  [m]4.6 : ", "sm") )
-               {
-                case 's': mach.mutable_align_dim().assign(3.2); break;
-                default : mach.mutable_align_dim().assign(4.6);
-               }
-            sys::println(mach.align_dim().string());
-
-            // [options]
-            const auto opts = sys::input_string("\n Indicate known options\n"
-                                                "[o]Opposta  [l]Low-E  [n]No-buffer : ");
-            if(opts.contains('o')) mach.mutable_options().add_option("opp");
-            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
-            if(opts.contains('n')) mach.mutable_options().add_option("no-buf");
-            sys::println(mach.options().string());
-
-            // [additional options]
-            const auto opts_csv = sys::input_string("\n Additional options\n"
-                                                    "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
-            str::Splitter addopts(opts_csv, ',');
-            while( addopts.has_data() )
-               {
-                if( const auto opt = addopts.get_next(); !opt.empty() )
-                   {
-                    mach.mutable_options().add_option(opt);
-                   }
-               }
-           }
-        //else if( mach.family().is_float() )
-        //   {
-        //   }
-
-        return mach;
-       }
-
- private:
-    MachineFamily i_family;
-    CutBridgeDim i_cutbridgedim;
-    AlignSpanDim i_algndim;
-    MachineOptions i_options;
 
     //------------------------------------------------------------------------
     [[nodiscard]] static MachineType recognize_machine(const std::string_view sv)
@@ -628,6 +533,104 @@ class MachineType final
            }
 
         // If here, all ok
+        return mach;
+       }
+
+    //------------------------------------------------------------------------
+    // cppcheck-suppress unusedPrivateFunction
+    [[nodiscard]] static MachineType ask_user(const MachineFamily given_mach_family)
+       {
+        MachineType mach;
+
+        // [family]
+        if( given_mach_family.is_defined() )
+           {
+            mach.mutable_family() = given_mach_family;
+           }
+        else
+           {
+            switch( sys::choice("\n Choose machine family\n"
+                                "[s]ActiveE/F  [w]ActiveW  [r]ActiveWR  [h]ActiveHP, "
+                                "[c]StarCut  [m]MsFR  [v]MsFRV : ", "hrswcmv") )
+               {
+                case 'h': mach.mutable_family().set_as_strato_hp(); break;
+                case 'r': mach.mutable_family().set_as_strato_wr(); break;
+                case 'w': mach.mutable_family().set_as_strato_w();  break;
+                case 's': mach.mutable_family().set_as_strato_s();  break;
+                case 'v': mach.mutable_family().set_as_float_frv(); break;
+                case 'm': mach.mutable_family().set_as_float_fr();  break;
+                default : mach.mutable_family().set_as_float_scut();
+               }
+            sys::println(mach.family().name());
+           }
+
+        // [strato dimensions]
+        if( mach.family().is_strato_s() )
+           {// Laminati semplici
+            switch( sys::choice("\n Choose cut bridge\n"
+                                "[s]3.7  [m]4.6 : ", "sm") )
+               {
+                case 's': mach.mutable_cutbridge_dim().assign(3.7, mach.family()); break;
+                default : mach.mutable_cutbridge_dim().assign(4.6, mach.family());
+               }
+            sys::println(mach.cutbridge_dim().string());
+
+            // I riscontri sono sempre 3.2
+            mach.mutable_align_dim().assign(3.2);
+            sys::println(mach.align_dim().string());
+
+            // [options]
+            const auto opts = sys::input_string("\n Indicate known options\n"
+                                                "[o]Opposta  [l]Low-E  [b]Buffer  [r]Girapezzi : ");
+            if(opts.contains('o')) mach.mutable_options().add_option("opp");
+            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
+            if(opts.contains('b')) mach.mutable_options().add_option("buf");
+            if(opts.contains('r')) mach.mutable_options().add_option("rot");
+            sys::println(mach.options().string());
+           }
+        else if( mach.family().is_strato() )
+           {// Laminati grandi
+            switch( sys::choice("\n Choose cut bridge\n"
+                                "[s]4.0  [m]4.9  [l]6.0 : ", "sml") )
+               {
+                case 's': mach.mutable_cutbridge_dim().assign(4.0, mach.family()); break;
+                case 'm': mach.mutable_cutbridge_dim().assign(4.9, mach.family()); break;
+                default : mach.mutable_cutbridge_dim().assign(6.0, mach.family());
+               }
+            sys::println(mach.cutbridge_dim().string());
+
+            switch( sys::choice("\n Choose align span\n"
+                                "[s]3.2  [m]4.6 : ", "sm") )
+               {
+                case 's': mach.mutable_align_dim().assign(3.2); break;
+                default : mach.mutable_align_dim().assign(4.6);
+               }
+            sys::println(mach.align_dim().string());
+
+            // [options]
+            const auto opts = sys::input_string("\n Indicate known options\n"
+                                                "[o]Opposta  [l]Low-E  [n]No-buffer : ");
+            if(opts.contains('o')) mach.mutable_options().add_option("opp");
+            if(opts.contains('l')) mach.mutable_options().add_option("lowe");
+            if(opts.contains('n')) mach.mutable_options().add_option("no-buf");
+            sys::println(mach.options().string());
+
+            // [additional options]
+            const auto opts_csv = sys::input_string("\n Additional options\n"
+                                                    "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
+            str::Splitter addopts(opts_csv, ',');
+            while( addopts.has_data() )
+               {
+                if( const auto opt = addopts.get_next(); !opt.empty() )
+                   {
+                    mach.mutable_options().add_option(opt);
+                   }
+               }
+           }
+        //else if( mach.family().is_float() )
+        //   {
+        //   }
+
         return mach;
        }
 };
