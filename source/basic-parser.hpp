@@ -73,21 +73,10 @@ class BasicParser
       , issues(lst)
       , fussy(fus)
        {
-        // Check possible BOM    |  Encoding    |   Bytes     | Chars |
-        //                       |--------------|-------------|-------|
-        //                       | UTF-8        | EF BB BF    | ï»¿   |
-        //                       | UTF-16 (BE)  | FE FF       | þÿ    |
-        //                       | UTF-16 (LE)  | FF FE       | ÿþ    |
-        //                       | UTF-32 (BE)  | 00 00 FE FF | ..þÿ  |
-        //                       | UTF-32 (LE)  | FF FE 00 00 | ÿþ..  |
-        if( siz < 1 )
+        check_and_skip_bom();
+        if( i>=siz )
            {
-            throw std::runtime_error("Empty file");
-           }
-        // I'll accept just UTF-8 or any other 8-bit encodings
-        if( buf[0]=='\xFF' || buf[0]=='\xFE' || buf[0]=='\x00' )
-           {
-            throw std::runtime_error("Bad encoding, not UTF-8");
+            throw std::runtime_error("No data to parse (empty file?)");
            }
 
         // Doesn't play well with windows EOL "\r\n", since uses string_view extensively, cannot eat '\r'
@@ -668,6 +657,38 @@ class BasicParser
     //       }
     //    throw create_parse_error(fmt::format("Unclosed block (\"{}{}\" expected)",c1,c2), line_start, i_start);
     //   }
+
+ private:
+
+    //-----------------------------------------------------------------------
+    void check_and_skip_bom()
+       {//      +--------------+-------------+-------+
+        //      |  Encoding    |   Bytes     | Chars |
+        //      |--------------|-------------|-------|
+        //      | UTF-8        | EF BB BF    | ï»¿   |
+        //      | UTF-16 (BE)  | FE FF       | þÿ    |
+        //      | UTF-16 (LE)  | FF FE       | ÿþ    |
+        //      | UTF-32 (BE)  | 00 00 FE FF | ..þÿ  |
+        //      | UTF-32 (LE)  | FF FE 00 00 | ÿþ..  |
+        //      +--------------+-------------+-------+
+        // I'll accept just UTF-8 or any other 8-bit encodings
+        if( siz>=4 && ( (buf[0]=='\xFF' && buf[1]=='\xFE' && buf[2]=='\x00' && buf[3]=='\x00') ||
+                        (buf[0]=='\x00' && buf[1]=='\x00' && buf[2]=='\xFE' && buf[3]=='\xFF') ) )
+           {
+            i = 4;
+            throw std::runtime_error("UTF-32 not supported, convert to UTF-8");
+           }
+        else if( siz>=2 && ( (buf[0]=='\xFF' && buf[1]=='\xFE') ||
+                             (buf[0]=='\xFE' && buf[1]=='\xFF') ) )
+           {
+            i = 2;
+            throw std::runtime_error("UTF-16 not supported, convert to UTF-8");
+           }
+        else if( siz>=3 && buf[0]=='\xEF' && buf[1]=='\xBB' && buf[2]=='\xBF' )
+           {
+            i = 3;
+           }
+       }
 };
 
 //#undef notify_error

@@ -617,7 +617,7 @@ class MachineType final
 
             // [additional options]
             const auto opts_csv = sys::input_string("\n Additional options\n"
-                                                    "(buf-rot,combo,fast,enc-ext-cs-shaft,...) : ");
+                                                    "(buf-rot,blade-inf,ciclo-65,combo,fast,enc-ext-cs-shaft,...) : ");
             str::Splitter addopts(opts_csv, ',');
             while( addopts.has_data() )
                {

@@ -4,6 +4,7 @@
 //  System utilities
 //  ---------------------------------------------
 #include <stdexcept>
+#include <cassert> // assert
 #include <concepts> // std::convertible_to
 #include <string>
 #include <string_view>
@@ -24,7 +25,7 @@ namespace fs = std::filesystem;
   #include <shellapi.h> // FindExecutableA
   #include <shlwapi.h> // AssocQueryString
 #elif defined(POSIX)
-  #include <cstdio> // std::fopen
+  #include <cstdio> // std::fopen, ...
 
   #include <unistd.h> // unlink, exec*, fork, ...
   #include <fcntl.h> // open
@@ -420,51 +421,67 @@ class file_write final
 {
  public:
     explicit file_write(const std::string& pth)
-      : i_File(my_fopen(pth.c_str(), "wb")) {} // "a" for append
+      : m_handle( open(pth.c_str(), "wb") ) // "a" for append
+       {}
 
     ~file_write() noexcept
        {
-        fclose(i_File);
+        if( m_handle )
+           {
+            std::fclose(m_handle);
+           }
        }
 
-    file_write(const file_write&) = delete;
-    file_write(file_write&&) = delete;
+    file_write(const file_write&) = delete; // Prevent copy
     file_write& operator=(const file_write&) = delete;
-    file_write& operator=(file_write&&) = delete;
+
+    file_write(file_write&& rval) noexcept
+      : m_handle(rval.m_handle)
+       {
+        rval.m_handle = nullptr;
+       }
+
+    file_write& operator=(file_write&& rval) noexcept
+       {
+        std::swap(m_handle, rval.m_handle);
+       }
+
 
     const file_write& operator<<(const char c) const noexcept
        {
-        fputc(c, i_File);
+        assert(m_handle!=nullptr);
+        std::fputc(c, m_handle);
         return *this;
        }
 
     const file_write& operator<<(const std::string_view s) const noexcept
        {
-        fwrite(s.data(), sizeof(std::string_view::value_type), s.length(), i_File);
+        assert(m_handle!=nullptr);
+        std::fwrite(s.data(), sizeof(std::string_view::value_type), s.length(), m_handle);
         return *this;
        }
 
     const file_write& operator<<(const std::string& s) const noexcept
        {
-        fwrite(s.data(), sizeof(std::string::value_type), s.length(), i_File);
+        assert(m_handle!=nullptr);
+        std::fwrite(s.data(), sizeof(std::string::value_type), s.length(), m_handle);
         return *this;
        }
 
  private:
-    std::FILE* i_File;
+    std::FILE* m_handle;
 
-    [[nodiscard]] static inline std::FILE* my_fopen( const char* filename, const char* mode )
+    [[nodiscard]] static inline std::FILE* open( const char* const filename, const char* const mode )
        {
-        std::FILE* f =
       #if defined(MS_WINDOWS)
-        nullptr;
+        std::FILE* f = nullptr;
         const errno_t err = fopen_s(&f, filename, mode);
         if(err) f = nullptr;
       #elif defined(POSIX)
-        std::fopen(filename, mode);
+        std::FILE* const f = std::fopen(filename, mode);
       #endif
         // cppcheck-suppress syntaxError
-        if(!f) throw std::runtime_error( fmt::format("file_write: Cannot open {}",filename) );
+        if(!f) throw std::runtime_error( fmt::format("file_write: Cannot open {} as '{}'",filename,mode) );
         return f;
        }
 };
@@ -556,6 +573,8 @@ class file_write final
     //   .'fs::absolute' implementation may need the file existence
     //   .'fs::weakly_canonical' may need to be called multiple times
   #if defined(MS_WINDOWS)
+    // Windows filesystem is case insensitive
+    // For case insensitive comparison could use std::memicmp (<cstring>)
     const auto tolower = [](std::string&& s) noexcept -> std::string
        {
         for(char& c : s) c = static_cast<char>(std::tolower(c));
