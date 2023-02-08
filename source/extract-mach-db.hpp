@@ -95,8 +95,14 @@ namespace macotec //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::
                 if( mach.options().has_option(opt) )
                    {
                     options_db.emplace_back( child );
+                    // Support dimensions here?
+                    //if( mach.has_cutbridge_dim() && const json::Node* const cutbridge_db = child.get_child(mach.cutbridge_dim().string()) )
+                    //   {
+                    //   }
+                    //if( mach.has_align_dim() && const json::Node* const alignspan_db = child.get_child(mach.align_dim().string()) )
+                    //   {
+                    //   }
                    }
-                //else issues.push_back( fmt::format("DB: Ignoring option \"{}\" for {}", opt, mach.string()) );
                }
             else
                {
