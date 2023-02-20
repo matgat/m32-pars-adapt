@@ -26,22 +26,22 @@ class parse_error final : public std::exception
                          const std::string_view pth,
                          const std::size_t lin,
                          const std::size_t off) noexcept
-       : i_msg(fmt::format("{} ({}:{})",msg,pth,lin))
-       , i_filepath(pth)
-       , i_line(lin)
-       , i_pos(off) {}
+       : m_msg(fmt::format("{} ({}:{})",msg,pth,lin))
+       , m_filepath(pth)
+       , m_line(lin)
+       , m_pos(off) {}
 
-    const char* what() const noexcept override { return i_msg.c_str(); } // Could rise a '-Wweak-vtables'
+    const char* what() const noexcept override { return m_msg.c_str(); } // Could rise a '-Wweak-vtables'
 
-    const std::string& file_path() const noexcept { return i_filepath; }
-    std::size_t line() const noexcept { return i_line; }
-    std::size_t pos() const noexcept { return i_pos; }
+    const std::string& file_path() const noexcept { return m_filepath; }
+    std::size_t line() const noexcept { return m_line; }
+    std::size_t pos() const noexcept { return m_pos; }
 
  private:
-    std::string i_msg;
-    std::string i_filepath;
-    std::size_t i_line, // Line
-                i_pos; // Character offset
+    std::string m_msg;
+    std::string m_filepath;
+    std::size_t m_line; // Line
+    std::size_t m_pos; // Character offset
 };
 
 
