@@ -198,7 +198,7 @@ class Node final
            {
             s += m_value;
            }
-        else
+        if( has_childs() )
            {
             s += '{';
             auto ip = m_childs.begin();

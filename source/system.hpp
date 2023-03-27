@@ -444,6 +444,7 @@ class file_write final
     file_write& operator=(file_write&& rval) noexcept
        {
         std::swap(m_handle, rval.m_handle);
+        return *this;
        }
 
 
