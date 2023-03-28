@@ -435,15 +435,15 @@ class file_write final
     file_write(const file_write&) = delete; // Prevent copy
     file_write& operator=(const file_write&) = delete;
 
-    file_write(file_write&& rval) noexcept
-      : m_handle(rval.m_handle)
+    file_write(file_write&& other) noexcept
+      : m_handle(other.m_handle)
        {
-        rval.m_handle = nullptr;
+        other.m_handle = nullptr;
        }
 
-    file_write& operator=(file_write&& rval) noexcept
+    file_write& operator=(file_write&& other) noexcept
        {
-        std::swap(m_handle, rval.m_handle);
+        std::swap(m_handle, other.m_handle);
         return *this;
        }
 

@@ -194,7 +194,7 @@ class Node final
     [[nodiscard]] std::string string() const
        {
         std::string s;
-        if( is_leaf() )
+        if( has_value() )
            {
             s += m_value;
            }
@@ -221,16 +221,16 @@ class Node final
     //-----------------------------------------------------------------------
     void print(std::string&& indent ="") const
        {
-        if( is_leaf() )
+        if( has_value() )
            {
             fmt::print(":{}", m_value);
            }
-        else
+        if( has_childs() )
            {
             const auto it_last = std::prev(m_childs.end());
             auto it = m_childs.begin();
             //if( indent.empty() ) fmt::print("\n┐");
-            while( it != it_last )
+            while( it!=it_last )
                {
                 fmt::print("\n{}├{}", indent, it->first);
                 it->second.print(indent+"│ ");
@@ -279,13 +279,13 @@ class Node final
 //{
 //    // root┐
 //    //     ├a┐
-//    //     │  ├b┐
-//    //     │  │  └c
-//    //     │  └d
+//    //     │ ├b┐
+//    //     │ │ └c
+//    //     │ └d
 //    //     ├e┐
-//    //     │  ├f┐
-//    //     │  │  └g
-//    //     │  └h
+//    //     │ ├f┐
+//    //     │ │ └g
+//    //     │ └h
 //    //     └i
 //    json::Node root;
 //    json::Node& a = root.ensure_child("a");
