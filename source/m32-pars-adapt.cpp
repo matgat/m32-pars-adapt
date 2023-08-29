@@ -130,14 +130,7 @@ class Arguments final
                            {
                             throw std::invalid_argument( fmt::format("Machine type was already set to {}",i_job.mach().string()) );
                            }
-                        if( arg=="?" || arg=="ask" || arg=="choose" )
-                           {
-                            i_job.set_machine_type( macotec::MachineType::ask_user(i_job.mach().family()) );
-                           }
-                        else
-                           {
-                            i_job.set_machine_type(arg);
-                           }
+                         i_job.set_machine_type(arg);
                         status = STS::SEE_ARG;
                         break;
 
@@ -345,8 +338,9 @@ struct updated_file_t { fs::path path; bool same_mach; };
     // [Machine type]
     // Ensure to have all required machine data
     if( args.job().mach().is_incomplete() )
-       {// Ask missing data to user
-        args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+       {
+        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+        throw std::runtime_error( fmt::format("Machine data incomplete: {}", args.job().mach().string()) );
        }
 
     if( args.job().mach() )
@@ -447,8 +441,9 @@ struct updated_file_t { fs::path path; bool same_mach; };
 
     // Ensure to have all required data
     if( args.job().mach().is_incomplete() )
-       {// Ask missing data to user
-        args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+       {
+        //args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
+        throw std::runtime_error( fmt::format("Machine data incomplete: {}", args.job().mach().string()) );
        }
 
     // [Parameters DB]
@@ -601,19 +596,6 @@ int main( const int argc, const char* const argv[] )
            {// Adapting a par2kax.txt file given overlays database and machine type
             fs::path adapted_file_path = adapt_parax(args, issues);
             handle_adapted_file(std::move(adapted_file_path), args);
-           }
-
-        //====================================================================
-        else if( args.job().mach() && !args.job().target_file() && !args.job().db_file() )
-           {// Ensure to select a machine and copy the full name to clipboard
-            if( args.job().mach().is_incomplete() )
-               {
-                args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
-               }
-            const auto mach_fullname = args.job().mach().string();
-            fmt::print("\n{}\n", mach_fullname);
-            sys::Clipboard clipboard;
-            clipboard.set( mach_fullname );
            }
 
         else
