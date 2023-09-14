@@ -44,84 +44,84 @@ class MachineFamily final
         scut,  // StarCut   ⎫
         msfr,  // MasterFR  ⎬ Float families
         msfrv, // MasterFRV ⎭
-        s,   // ActiveE/F  ⎫
-        frs, // AcriveFRS  │
-        w,   // ActiveW    ⎬ Strato families
-        wr,  // AcriveWR   │
-        hp,  // ActiveHP   ⎭
+        actf,  // ActiveF/E    ⎫
+        actfr, // ActiveFR/FRS │
+        actw,  // ActiveW      ⎬ Strato families
+        actwr, // AcriveWR     │
+        acthp, // ActiveHP     ⎭
         size
        };
 
     static constexpr std::array<std::string_view, to_underlying(family::size)>
     mach_ids =
        {
-        ""sv,    // family::undefined
-        "STC"sv, // family::starcut
-        "FR"sv,  // family::msfr
-        "FRV"sv, // family::msfrv
-        "S"sv,   // family::s
-        "FRS"sv, // family::frs
-        "W"sv,   // family::w
-        "WR"sv,  // family::wr
-        "HP"sv   // family::hp
+        ""sv, // family::undefined
+        "STC"sv,   // family::scut  ⎫
+        "MSFR"sv,  // family::msfr  ⎬ Float families
+        "MSFRV"sv, // family::msfrv ⎭
+        "F"sv,  // family::actf  ⎫
+        "FR"sv, // family::actfr │
+        "W"sv,  // family::actw  ⎬ Strato families
+        "WR"sv, // family::actwr │
+        "HP"sv  // family::acthp ⎭
        };
 
     static constexpr std::array<std::string_view, to_underlying(family::size)>
     mach_names =
        {
         ""sv,          // family::undefined
-        "StarCut"sv,   // family::starcut
-        "MasterFR"sv,  // family::msfr
-        "MasterFRV"sv, // family::msfrv
-        "ActiveF"sv,   // family::s
-        "ActiveFRS"sv, // family::frs
-        "ActiveW"sv,   // family::w
-        "ActiveWR"sv,  // family::wr
-        "ActiveHP"sv   // family::hp
+        "StarCut"sv,   // family::starcut ⎫
+        "MasterFR"sv,  // family::msfr    ⎬ Float families
+        "MasterFRV"sv, // family::msfrv   ⎭
+        "ActiveF"sv,   // family::actf  ⎫
+        "ActiveFR"sv,  // family::actfr │
+        "ActiveW"sv,   // family::actw  ⎬ Strato families
+        "ActiveWR"sv,  // family::actwr │
+        "ActiveHP"sv   // family::acthp ⎭
        };
 
     family i_family = family::undefined;
 
  public:
     //-----------------------------------------------------------------------
-    void assign(const std::string_view s)
+    void assign(const std::string_view sv)
        {
-        if( s.ends_with("hp") )
+        if( sv.ends_with("hp") )
            {
-            i_family = family::hp;
+            i_family = family::acthp;
            }
-        else if( s.ends_with("wr") )
+        else if( sv.ends_with("wr") )
            {
-            i_family = family::wr;
+            i_family = family::actwr;
            }
-        else if( s.ends_with("w") )
+        else if( sv.ends_with("w") )
            {
-            i_family = family::w;
+            i_family = family::actw;
            }
-        else if( s.ends_with("frs") )
+        else if( sv.ends_with("frs") || (sv.ends_with("fr") && !sv.contains('m')) )
            {
-            i_family = family::frs;
+            i_family = family::actfr;
            }
-        else if( (s.contains("active") && (s.ends_with('f') || s.ends_with('e'))) ||
-                 (s.contains("strato") && s.ends_with('s')) )
+        else if( (sv.contains("active") && (sv.ends_with('f') || sv.ends_with('e'))) ||
+                 (sv.contains("strato") && sv.ends_with('s')) )
            {
-            i_family = family::s;
+            i_family = family::actf;
            }
-        else if( s.ends_with("frv") )
+        else if( sv.ends_with("frv") )
            {
             i_family = family::msfrv;
            }
-        else if( s.ends_with("fr") )
+        else if( sv.ends_with("fr") && sv.contains('m') )
            {
             i_family = family::msfr;
            }
-        else if( s.contains("starcut") || s.contains("stc") )
+        else if( sv.contains("starcut") || sv.contains("stc") )
            {
             i_family = family::scut;
            }
         else
            {
-            throw std::runtime_error( fmt::format("Unrecognized machine: {}", s) );
+            throw std::runtime_error( fmt::format("Unrecognized machine: {}", sv) );
            }
        }
 
@@ -129,16 +129,16 @@ class MachineFamily final
 
     [[nodiscard]] constexpr bool is_defined() const noexcept { return i_family!=family::undefined; }
 
-    [[nodiscard]] constexpr bool is_float() const noexcept { return i_family>family::undefined && i_family<family::s; }
-    [[nodiscard]] constexpr bool is_strato() const noexcept { return i_family>=family::s; }
-    [[nodiscard]] constexpr bool is_strato_s() const noexcept { return i_family==family::s; }
-    [[nodiscard]] constexpr bool is_strato_frs() const noexcept { return i_family==family::frs; }
+    [[nodiscard]] constexpr bool is_float() const noexcept { return i_family>family::undefined && i_family<family::actf; }
+    [[nodiscard]] constexpr bool is_strato() const noexcept { return i_family>=family::actf; }
+    [[nodiscard]] constexpr bool is_activef() const noexcept { return i_family==family::actf; }
+    [[nodiscard]] constexpr bool is_activefr() const noexcept { return i_family==family::actfr; }
 
-    constexpr void set_as_strato_hp()  noexcept { i_family = family::hp; }
-    constexpr void set_as_strato_wr()  noexcept { i_family = family::wr; }
-    constexpr void set_as_strato_w()   noexcept { i_family = family::w; }
-    constexpr void set_as_strato_frs() noexcept { i_family = family::frs; }
-    constexpr void set_as_strato_s()   noexcept { i_family = family::s; }
+    constexpr void set_as_strato_hp()  noexcept { i_family = family::acthp; }
+    constexpr void set_as_strato_wr()  noexcept { i_family = family::actwr; }
+    constexpr void set_as_strato_w()   noexcept { i_family = family::actw; }
+    constexpr void set_as_strato_frs() noexcept { i_family = family::actfr; }
+    constexpr void set_as_strato_s()   noexcept { i_family = family::actf; }
     constexpr void set_as_float_frv()  noexcept { i_family = family::msfrv; }
     constexpr void set_as_float_fr()   noexcept { i_family = family::msfr; }
     constexpr void set_as_float_scut() noexcept { i_family = family::scut; }
@@ -190,21 +190,21 @@ class CutBridgeDim final
             return std::fabs(dim-other_dim) < 0.2;
            };
 
-        if( mach_family.is_strato_s() )
-           {// Macchine piccole
+        if( mach_family.is_activef() )
+           {
                  if( matches(3.7) ) i_dimcat = cutbridgedim::c37;
             else if( matches(4.6) ) i_dimcat = cutbridgedim::c46;
             else throw std::runtime_error( fmt::format("Unrecognized {} cut bridge size: {}", mach_family.name(), dim) );
            }
-        else if( mach_family.is_strato_frs() )
-           {// Macchine FRS
+        else if( mach_family.is_activefr() )
+           {
                  if( matches(4.0) ) i_dimcat = cutbridgedim::c40;
             else if( matches(4.9) ) i_dimcat = cutbridgedim::c49;
             else if( matches(6.0) ) i_dimcat = cutbridgedim::c60;
             else throw std::runtime_error( fmt::format("Unrecognized {} cut bridge size: {}", mach_family.name(), dim) );
            }
         else
-           {// Tutte le altre
+           {
                  if( matches(4.0) ) i_dimcat = cutbridgedim::c40;
             else if( matches(4.9) ) i_dimcat = cutbridgedim::c49;
             else if( matches(6.0) ) i_dimcat = cutbridgedim::c60;

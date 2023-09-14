@@ -95,15 +95,16 @@ _________________________________________________________________________
 ### Content
 First level keys are the machine type:
 
-| *id*  | *Machine*  | *Type*    |
-|-------|------------|-----------|
-| `STC` |  StarCut   |  *Float*  |
-| `FR`  |  MasterFR  |  *Float*  |
-| `FRV` |  MasterFRV |  *Float*  |
-| `S`   |  ActiveE/F |  *Strato* |
-| `W`   |  ActiveW   |  *Strato* |
-| `WR`  |  ActiveWR  |  *Strato* |
-| `HP`  |  ActiveHP  |  *Strato* |
+| *id*  | *Machine*     | *Type*   |
+|-------|---------------|----------|
+| `STC` |  StarCut      | *Float*  |
+| `FR`  |  MasterFR     | *Float*  |
+| `FRV` |  MasterFRV    | *Float*  |
+| `F`   |  ActiveE/F    | *Strato* |
+| `FR`  |  ActiveFR/FRS | *Strato* |
+| `W`   |  ActiveW      | *Strato* |
+| `WR`  |  ActiveWR     | *Strato* |
+| `HP`  |  ActiveHP     | *Strato* |
 
 
 Recognized second level keys are:
@@ -123,8 +124,8 @@ Recognized  dimensions:
 	S: cut-bridge : 3.7, 4.6
 	S: algn-span  : 3.2
 
-	W,WR,HP: cut-bridge : 4.0, 4.9, 6.0
-	W,WR,HP: algn-span  : 3.2, 4.6
+	W,WR,HP,FR: cut-bridge : 4.0, 4.9, 6.0
+	W,WR,HP,FR: algn-span  : 3.2, 4.6
 
 
 _________________________________________________________________________
