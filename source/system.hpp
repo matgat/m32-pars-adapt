@@ -246,7 +246,7 @@ void execute(const char* const exe, Args&&... args) noexcept
   #elif defined(POSIX)
     if( const auto pid=fork(); pid==0 ) // pid_t
        {
-        struct loc
+        struct loc final
            {// Extract char pointer for posix api exec*
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }
@@ -280,7 +280,7 @@ template<std::convertible_to<std::string> ...Args>
     const auto pid_child = fork(); // pid_t
     if( pid_child==0 )
        {// Fork successful, inside child process
-        struct loc
+        struct loc final
            {// Extract char pointer for posix api exec*
             static const char* c_str(const char* const s) noexcept { return s; }
             static const char* c_str(const std::string& s) noexcept { return s.c_str(); }

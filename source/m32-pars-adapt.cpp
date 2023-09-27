@@ -21,6 +21,8 @@
 
 using namespace std::literals; // "..."sv
 
+constexpr std::string_view machname_field = "vaMachName"sv;
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -269,8 +271,8 @@ class Arguments final
 [[nodiscard]] bool refer_to_same_machine(const udt::File& udt1, const udt::File& udt2) noexcept
 {
     try{
-        if( const auto vaMachName1 = udt1.get_field("vaMachName") )
-        if( const auto vaMachName2 = udt2.get_field("vaMachName") )
+        if( const auto vaMachName1 = udt1.get_field(machname_field) )
+        if( const auto vaMachName2 = udt2.get_field(machname_field) )
            {
             const auto mac1 = macotec::MachineType::recognize_machine( str::unquoted(vaMachName1->value()) );
             const auto mac2 = macotec::MachineType::recognize_machine( str::unquoted(vaMachName2->value()) );
@@ -287,7 +289,7 @@ class Arguments final
 
 
 //---------------------------------------------------------------------------
-struct updated_file_t { fs::path path; bool same_mach; };
+struct updated_file_t final { fs::path path; bool same_mach; };
 [[nodiscard]] updated_file_t update_udt(const Arguments& args, std::vector<std::string>& issues)
 {
     // [Machine type]
@@ -337,7 +339,11 @@ struct updated_file_t { fs::path path; bool same_mach; };
 
     // [Machine type]
     // Ensure to have all required machine data
-    if( args.job().mach().is_incomplete() )
+    if( !args.job().mach() )
+       {// Machine type not explicitly specified
+        throw std::invalid_argument("Machine not specified");
+       }
+    else if( args.job().mach().is_incomplete() )
        {
         //args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
         throw std::runtime_error( fmt::format("Machine data incomplete: {}", args.job().mach().string()) );
@@ -345,7 +351,7 @@ struct updated_file_t { fs::path path; bool same_mach; };
 
     if( args.job().mach() )
        {// Now that I have the machine data
-        if( const auto vaMachName = udt_file.get_field("vaMachName") )
+        if( const auto vaMachName = udt_file.get_field(machname_field) )
            {
             // Better check that the target file has already superimposed options
             macotec::MachineType udt_mach_type;
@@ -370,7 +376,7 @@ struct updated_file_t { fs::path path; bool same_mach; };
        }
     else
        {// Machine type not yet known, extract from udt file (not so useful)
-        if( const auto vaMachName = udt_file.get_field("vaMachName") )
+        if( const auto vaMachName = udt_file.get_field(machname_field) )
            {
             args.mutable_job().set_machine_type( str::unquoted(vaMachName->value()) );
            }
@@ -434,13 +440,12 @@ struct updated_file_t { fs::path path; bool same_mach; };
     parax::File parax_file(args.job().target_file().path(), issues);
 
     // [Machine type]
+    // Ensure to have all required data
     if( !args.job().mach() )
        {// Machine type not explicitly specified
         throw std::invalid_argument("Machine not specified");
        }
-
-    // Ensure to have all required data
-    if( args.job().mach().is_incomplete() )
+    else if( args.job().mach().is_incomplete() )
        {
         //args.mutable_job().set_machine_type( macotec::MachineType::ask_user(args.job().mach().family()) );
         throw std::runtime_error( fmt::format("Machine data incomplete: {}", args.job().mach().string()) );

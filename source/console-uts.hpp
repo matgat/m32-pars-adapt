@@ -169,7 +169,7 @@ void println(const std::string& msg) noexcept
 #include <fmt/core.h> // fmt::*
 #include <fmt/color.h> // fmt::color::*
 /////////////////////////////////////////////////////////////////////////////
-class test_console_uts
+class test_console_uts final
 {
  public:
     void expect(const bool cond, const std::string_view msg)

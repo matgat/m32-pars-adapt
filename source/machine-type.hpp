@@ -362,7 +362,7 @@ class MachineType final
     MachineOptions i_options;
 
  public:
-    void assign(const std::string_view s) { *this = recognize_machine(s); }
+    void assign(const std::string_view sv) { *this = recognize_machine(sv); }
 
     [[nodiscard]] operator bool() const noexcept { return i_family.is_defined(); }
     [[nodiscard]] bool is_incomplete() const noexcept
