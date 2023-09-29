@@ -11,15 +11,6 @@
 //#include <charconv> // std::from_chars
 
 
-  //#if !defined(__cpp_lib_to_underlying)
-  //  template<typename E> [[nodiscard]] constexpr auto to_underlying(const E e) noexcept
-  //     {
-  //      return static_cast<std::underlying_type_t<E>>(e);
-  //     }
-  //#else
-  //  using std::to_underlying;
-  //#endif
-
 
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 namespace sipro
@@ -40,7 +31,7 @@ class Register final
         size
        };
 
-    static constexpr std::array<std::string_view, to_underlying(type::size)>
+    static constexpr std::array<std::string_view, std::to_underlying(type::size)>
     reg_iec_types =
        {
         ""sv,      // none
@@ -51,7 +42,7 @@ class Register final
         "STRING"sv // va
        };
 
-    static constexpr std::array<char, to_underlying(type::size)>
+    static constexpr std::array<char, std::to_underlying(type::size)>
     plc_var_type =
        {
         '\0', // none
@@ -62,7 +53,7 @@ class Register final
         'B'   // va
        };
 
-    static constexpr std::array<std::uint16_t, to_underlying(type::size)>
+    static constexpr std::array<std::uint16_t, std::to_underlying(type::size)>
     plc_var_address =
        {
         0,   // none
@@ -73,7 +64,7 @@ class Register final
         700  // va
        };
 
-    //static constexpr std::array<std::string_view, to_underlying(type::size)>
+    //static constexpr std::array<std::string_view, std::to_underlying(type::size)>
     //plc_mem_map =
     //   {
     //    ""sv,      // none
@@ -121,10 +112,10 @@ class Register final
 
     [[nodiscard]] constexpr std::uint16_t get_va_length() const noexcept { return 80; }
 
-    [[nodiscard]] constexpr std::string_view iec_type() const noexcept { return reg_iec_types[to_underlying(i_type)]; }
+    [[nodiscard]] constexpr std::string_view iec_type() const noexcept { return reg_iec_types[std::to_underlying(i_type)]; }
     [[nodiscard]] constexpr char iec_address_type() const noexcept { return 'M'; }
-    [[nodiscard]] constexpr char iec_address_vartype() const noexcept { return plc_var_type[to_underlying(i_type)]; }
-    [[nodiscard]] constexpr std::uint16_t iec_address_index() const noexcept { return plc_var_address[to_underlying(i_type)]; }
+    [[nodiscard]] constexpr char iec_address_vartype() const noexcept { return plc_var_type[std::to_underlying(i_type)]; }
+    [[nodiscard]] constexpr std::uint16_t iec_address_index() const noexcept { return plc_var_address[std::to_underlying(i_type)]; }
 
  private:
     std::uint16_t i_index = 0;

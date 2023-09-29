@@ -118,7 +118,7 @@ class BasicParser
     //    else issues.push_back( fmt::format("{} (line {}, offset {})", fmt::format(fmt::runtime(msg), args...), line, i) );
     //   }
     // Need to pass a compile-time string literal. A technique:
-    //template<std::size_t N> struct fixed_string_t
+    //template<std::size_t N> struct fixed_string_t final
     //{
     //    char str[N];
     //    constexpr fixed_string_t(const char (&str_)[N]) noexcept { std::ranges::copy(str_, str); }
@@ -164,31 +164,6 @@ class BasicParser
        {
         while( i<siz && is_blank(buf[i]) ) ++i;
        }
-
-    //-----------------------------------------------------------------------
-    // Tell if skipped space chars except new line
-    //[[nodiscard]] bool eat_blanks() noexcept
-    //   {
-    //    assert(i<siz);
-    //    if( is_blank(buf[i]) )
-    //       {
-    //        do{ ++i; } while( i<siz && is_blank(buf[i]) );
-    //        return true;
-    //       }
-    //    return false;
-    //   }
-
-    //-----------------------------------------------------------------------
-    // Get blank chars
-    //[[nodiscard]] std::string_view eat_blanks() noexcept
-    //   {
-    //    // Intercept the edge case already at buffer end:
-    //    if(i>i_last) return std::string_view(buf+i_last, 0);
-    //
-    //    const std::size_t i_start = i;
-    //    while( i<siz && is_blank(buf[i]) ) ++i;
-    //    return std::string_view(buf+i_start, i-i_start);
-    //   }
 
     //-----------------------------------------------------------------------
     // Skip any space, including new line
@@ -279,6 +254,19 @@ class BasicParser
     //   }
 
 
+    //-----------------------------------------------------------------------
+    [[nodiscard]] bool eat(const char ch) noexcept
+       {
+        assert(i<siz);
+        if( buf[i]==ch )
+           {
+            ++i; // Skip ch
+            return true;
+           }
+        return false;
+       }
+       
+       
     //-----------------------------------------------------------------------
     [[nodiscard]] bool eat(const std::string_view s) noexcept
        {

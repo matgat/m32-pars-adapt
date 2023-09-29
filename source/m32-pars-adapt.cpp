@@ -109,7 +109,7 @@ class JobUnit final
 class Arguments final
 {
  public:
-    Arguments(const int argc, const char* const argv[]) // const std::span args
+    Arguments(const int argc, const char* const argv[])
        {
         try{
             enum class STS
@@ -121,7 +121,6 @@ class Arguments final
                 GET_OUTFILENAM
                } status = STS::SEE_ARG;
 
-            //for( const auto arg : args | std::views::transform([](const char* const a){ return std::string_view(a);}) )
             for( int i=1; i<argc; ++i )
                {
                 std::string_view arg{ argv[i] };
@@ -573,7 +572,7 @@ void handle_updated_file(updated_file_t&& updated_file, const Arguments& args)
 int main( const int argc, const char* const argv[] )
 {
     try{
-        Arguments args(argc, argv); // std::span(argv, argc)
+        Arguments args(argc, argv);
         std::vector<std::string> issues;
 
         if( args.verbose() )

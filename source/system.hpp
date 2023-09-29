@@ -455,17 +455,10 @@ class file_write final
         return *this;
        }
 
-    const file_write& operator<<(const std::string_view s) const noexcept
+    const file_write& operator<<(const std::string_view sv) const noexcept
        {
         assert(m_handle!=nullptr);
-        std::fwrite(s.data(), sizeof(std::string_view::value_type), s.length(), m_handle);
-        return *this;
-       }
-
-    const file_write& operator<<(const std::string& s) const noexcept
-       {
-        assert(m_handle!=nullptr);
-        std::fwrite(s.data(), sizeof(std::string::value_type), s.length(), m_handle);
+        std::fwrite(sv.data(), sizeof(std::string_view::value_type), sv.length(), m_handle);
         return *this;
        }
 
