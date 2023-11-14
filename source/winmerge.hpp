@@ -85,7 +85,7 @@ void create_project(const std::string& prj_file, const std::string_view pth1, co
 
 //---------------------------------------------------------------------------
 // Launch WnMerge on a temporary project file
-void compare_using_project(const std::string& pth1, const std::string& pth2, const std::string& pth3 ="")
+void compare_using_project(const std::string_view pth1, const std::string_view pth2, const std::string_view pth3 ="")
 {
     const std::string prj_file( "~Compare.WinMerge" );
     create_project(prj_file, pth1, pth2, pth3);
