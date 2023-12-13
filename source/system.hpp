@@ -1,4 +1,4 @@
-#ifndef GUARD_system_hpp
+﻿#ifndef GUARD_system_hpp
 #define GUARD_system_hpp
 //  ---------------------------------------------
 //  System utilities
@@ -11,7 +11,7 @@
 #include <cstdlib> // std::getenv
 #include <filesystem> // std::filesystem
 namespace fs = std::filesystem;
-#include <regex> // std::regex*
+//#include <regex> // std::regex*
 #include <fmt/core.h> // fmt::format
 
 #include "os-detect.hpp" // MS_WINDOWS, POSIX
@@ -22,7 +22,7 @@ namespace fs = std::filesystem;
 
   #include <Windows.h>
   //#include <unistd.h> // _stat
-  #include <shellapi.h> // FindExecutableA
+  #include <shellapi.h> // ShellExecuteExA, FindExecutableA
   #include <shlwapi.h> // AssocQueryString
 #elif defined(POSIX)
   #include <cstdio> // std::fopen, ...
@@ -72,17 +72,17 @@ void sleep_ms( const int ms )
 
 
 //---------------------------------------------------------------------------
-[[nodiscard]] std::string expand_env_variables( std::string s )
-{
-    static const std::regex env_re{R"--(\$\{([\w_]+)\}|%([\w_]+)%)--"};
-    std::smatch match;
-    while( std::regex_search(s, match, env_re) )
-       {
-        const std::string capture = match[1].matched ? match[1].str() : match[2].str();
-        s.replace(match[0].first, match[0].second, std::getenv(capture.c_str()));
-       }
-    return s;
-}
+//[[nodiscard]] std::string expand_env_variables( std::string s )
+//{
+//    static const std::regex env_re{R"--(\$\{([\w_]+)\}|%([\w_]+)%)--"};
+//    std::smatch match;
+//    while( std::regex_search(s, match, env_re) )
+//       {
+//        const std::string capture = match[1].matched ? match[1].str() : match[2].str();
+//        s.replace(match[0].first, match[0].second, std::getenv(capture.c_str()));
+//       }
+//    return s;
+//}
 
 
 #if defined(MS_WINDOWS)
@@ -150,7 +150,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL;
     ShExecInfo.nShow = SW_SHOW;
     ShExecInfo.hInstApp = NULL;
-    ::ShellExecuteEx(&ShExecInfo);
+    ::ShellExecuteExA(&ShExecInfo);
 }
 
 //---------------------------------------------------------------------------
@@ -159,7 +159,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     const bool show = true;
     const bool wait = true;
 
-    SHELLEXECUTEINFO ShExecInfo = {0};
+    SHELLEXECUTEINFOA ShExecInfo = {0};
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
     ShExecInfo.fMask = (wait ? SEE_MASK_NOCLOSEPROCESS : 0) // SEE_MASK_DEFAULT
                        // | SEE_MASK_FLAG_NO_UI // Do not show error dialog in case of exe not found
@@ -173,7 +173,7 @@ void shell_execute(const char* const pth, const char* const args =nullptr) noexc
     ShExecInfo.lpDirectory = NULL; // base_dir.empty() ? NULL : base_dir.c_str();
     ShExecInfo.nShow = show ? SW_SHOW : SW_HIDE;
     ShExecInfo.hInstApp = NULL;
-    if( !::ShellExecuteEx(&ShExecInfo) )
+    if( !::ShellExecuteExA(&ShExecInfo) )
        {
         throw std::runtime_error( fmt::format("Cannot run {}: {}", pth, sys::get_lasterr_msg()) );
        }
@@ -493,10 +493,9 @@ class file_write final
 //  #endif
 
 
-
 //---------------------------------------------------------------------------
-// ex. const auto removed_count = remove_all_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
-//[[maybe_unused]] std::size_t remove_all_inside(const std::filesystem::path& dir, std::regex&& reg)
+// ex. const auto removed_count = remove_files_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
+//[[maybe_unused]] std::size_t remove_files_inside(const std::filesystem::path& dir, std::regex&& reg)
 //{
 //    std::size_t removed_items_count { 0 };
 //
@@ -507,38 +506,14 @@ class file_write final
 //
 //    for( auto& elem : fs::directory_iterator(dir) )
 //       {
-//        if( std::regex_match(elem.path().filename().string(), reg) )
+//        if( elem.is_regular_file() && std::regex_match(elem.path().filename().string(), reg) )
 //           {
-//            removed_items_count += fs::remove_all(elem.path());
+//            removed_items_count += fs::remove(elem.path());
 //           }
 //       }
 //
 //    return removed_items_count;
 //}
-
-
-
-//---------------------------------------------------------------------------
-// ex. const auto removed_count = remove_files_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
-[[maybe_unused]] std::size_t remove_files_inside(const std::filesystem::path& dir, std::regex&& reg)
-{
-    std::size_t removed_items_count { 0 };
-
-    if( !fs::is_directory(dir) )
-       {
-        throw std::invalid_argument("Not a directory: " + dir.string());
-       }
-
-    for( auto& elem : fs::directory_iterator(dir) )
-       {
-        if( elem.is_regular_file() && std::regex_match(elem.path().filename().string(), reg) )
-           {
-            removed_items_count += fs::remove(elem.path());
-           }
-       }
-
-    return removed_items_count;
-}
 
 
 //---------------------------------------------------------------------------

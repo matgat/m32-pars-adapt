@@ -14,23 +14,27 @@ so needs the installation of
 as prerequisite.
 
 To print usage info:
-```
+
+```bat
 > m32-pars-adapt --help
 ```
 
 To valorize a `MachSettings.udt` given a machine type:
-```
+
+```bat
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
 > m32-pars-adapt --tgt MachSettings.udt --db configs\machsettings-overlays.txt --machine StratoWR-4.9/4.6
 ```
 
 To update an old `MachSettings.udt` to a new one:
-```
+
+```bat
 > m32-pars-adapt --tgt new\MachSettings.udt --db old\MachSettings.udt
 ```
 
 To valorize a Sipro parameter file:
-```
+
+```bat
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\param
 > m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --machine StratoHP-6.0/4.6-(buf-rot,fast)
 ```
@@ -52,10 +56,12 @@ C++ runtime [`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe
 The utility [WinMerge](https://winmerge.org) is invoked whenever a manual
 comparison of the files is needed.
 The program will try the following paths:
+
 ```
 "C:\Macotec\Apps\WinMerge\WinMergeU.exe"
 "%PROGRAMFILES%\WinMerge\WinMergeU.exe"
 ```
+
 And as fallback the association with the extension `.WinMerge`
 
 
@@ -132,6 +138,7 @@ _________________________________________________________________________
 ### Structure for MachSettings.udt
 Here is the expected database structure used to adapt
 a `MachSettings.udt` file:
+
 ```
 ┐
 ├mach┐
@@ -150,6 +157,7 @@ a `MachSettings.udt` file:
 ```
 
 Example:
+
 ```js
 WR,HP :
    {
@@ -199,6 +207,7 @@ _________________________________________________________________________
 ### Structure for par2kax.txt
 Here is the expected database structure used to adapt
 a `par2kax.txt` file:
+
 ```
 ┐
 ├mach┐
@@ -235,6 +244,7 @@ a `par2kax.txt` file:
 ```
 
 Example:
+
 ```js
 W,WR,HP :
    {
@@ -273,22 +283,40 @@ HP :
 
 _________________________________________________________________________
 ## Build
-```
+On linux:
+
+```sh
 # pacman -S fmt
 $ git clone https://github.com/matgat/m32-pars-adapt.git
 $ cd m32-pars-adapt
-$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+$ make linux/makefile
 ```
 
-On Windows, use the latest Microsoft Visual Studio Community.
-From the command line, something like:
+or directly:
+
+```sh
+$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
 ```
+
+On Windows use the latest Microsoft Visual Studio Community.
+From the command line, something like:
+
+```bat
 > msbuild .msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
 ```
+
 This project depends on `{fmt}` library, use `vcpkg` to install it:
-```
+
+```bat
 > git clone https://github.com/Microsoft/vcpkg.git
 > .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
 > .\vcpkg\vcpkg integrate install
 > .\vcpkg\vcpkg install fmt:x64-windows
+```
+
+in case you already have `vcpkg`:
+
+```bat
+> .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
+> .\vcpkg\vcpkg upgrade --no-dry-run 
 ```

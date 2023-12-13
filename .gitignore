@@ -3,7 +3,10 @@
 **/tmp
 
 # [c++]
+*.gch
+*.pch
 *.o
+*.a
 *.obj
 *.exe
 

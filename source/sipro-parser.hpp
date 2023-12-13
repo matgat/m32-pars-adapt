@@ -1,4 +1,4 @@
-#ifndef GUARD_sipro_parser_hpp
+﻿#ifndef GUARD_sipro_parser_hpp
 #define GUARD_sipro_parser_hpp
 //  ---------------------------------------------
 //  Parser of Sipro m32 text file format adopted

@@ -12,10 +12,9 @@ set src_pth_w=%UserProfile%\Macotec\Machines\m32-Strato\sde
 set src_pth_f=%UserProfile%\Macotec\Machines\m32-Strato\families\ActiveF
 set udtdir_w=%src_pth_w%\userdata
 set udtdir_f=%src_pth_f%\userdata
-set pardir_w=%src_pth_w%\param
-set pardir_f=%src_pth_f%\param
-set exe="..\.msvc\x64-Debug\m32-pars-adapt.exe"
-::set exe="m32-pars-adapt.exe"
+
+::set exe="..\.msvc\x64-Debug\m32-pars-adapt.exe"
+set exe="m32-pars-adapt.exe"
 echo %exe%
 
 
@@ -57,7 +56,8 @@ goto select_test
 
 :menu4
 rem Test parax adaptation (W)
-set mach=ActHP-4.9/4.6;no-buf;combo
+set mach=ActWR-6.0/4.6;lowe;combo
+set pardir_w=%src_pth_w%\param
 %exe% -v -tgt "%pardir_w%\%parax_name%" -db "%pardir_w%\%parax_db%" -m "%mach%"
 echo ---- ret=%errorlevel% ----
 goto select_test
@@ -66,6 +66,7 @@ goto select_test
 :menu5
 rem Test parax adaptation (F)
 set mach=ActiveF-3.7-buf
+set pardir_f=%src_pth_f%\param
 %exe% -v -tgt "%pardir_f%\%parax_name%" -db "%pardir_f%\%parax_db%" -m "%mach%"
 echo ---- ret=%errorlevel% ----
 goto select_test

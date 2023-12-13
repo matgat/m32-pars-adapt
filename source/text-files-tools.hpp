@@ -1,4 +1,4 @@
-#ifndef GUARD_text_files_tools_hpp
+﻿#ifndef GUARD_text_files_tools_hpp
 #define GUARD_text_files_tools_hpp
 //  ---------------------------------------------
 //  Launch external program winmerge
@@ -17,7 +17,7 @@ namespace sys //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void edit_text_file(const std::string& pth, [[maybe_unused]] const std::size_t line, [[maybe_unused]] const std::size_t offset) noexcept
 {
   #ifdef MS_WINDOWS
-    const std::string exe_pth = find_executable_by_file(pth);
+    const std::string exe_pth = sys::find_executable_by_file(pth);
     //if( exe_pth.contains("scite") ) args = fmt::format("-open:\"{}\" goto:{},{}",pth,line,col);
     sys::shell_execute(exe_pth.c_str(), fmt::format("-nosession -p{} \"{}\"", offset, pth).c_str()); // npp
   #else

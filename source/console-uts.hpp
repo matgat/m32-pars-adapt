@@ -1,4 +1,4 @@
-#ifndef GUARD_console_uts_hpp
+﻿#ifndef GUARD_console_uts_hpp
 #define GUARD_console_uts_hpp
 //  ---------------------------------------------
 //  Utilities for console I/O

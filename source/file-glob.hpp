@@ -1,4 +1,4 @@
-#ifndef GUARD_file_glob_hpp
+﻿#ifndef GUARD_file_glob_hpp
 #define GUARD_file_glob_hpp
 //  ---------------------------------------------
 //  Expands a glob in filesystem

@@ -1,4 +1,4 @@
-#ifndef GUARD_machine_type_hpp
+﻿#ifndef GUARD_machine_type_hpp
 #define GUARD_machine_type_hpp
 //  ---------------------------------------------
 //  Machine type descriptor

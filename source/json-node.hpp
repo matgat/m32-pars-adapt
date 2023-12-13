@@ -1,4 +1,4 @@
-#ifndef GUARD_json_node_hpp
+﻿#ifndef GUARD_json_node_hpp
 #define GUARD_json_node_hpp
 //  ---------------------------------------------
 //  json node descriptor

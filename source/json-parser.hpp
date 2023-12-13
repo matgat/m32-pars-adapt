@@ -1,4 +1,4 @@
-#ifndef GUARD_json_parser_hpp
+﻿#ifndef GUARD_json_parser_hpp
 #define GUARD_json_parser_hpp
 //  ---------------------------------------------
 //  Parses my special json format adopted for

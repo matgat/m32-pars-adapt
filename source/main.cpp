@@ -1,4 +1,4 @@
-//  ---------------------------------------------
+﻿//  ---------------------------------------------
 //  Utility to handle the parametrization of
 //  m32 based machines
 //  ---------------------------------------------
@@ -9,7 +9,6 @@
 #include <fmt/core.h> // fmt::*
 
 #include "system.hpp" // sys::*, fs::*
-#include "clipboard.hpp" // sys::Clipboard
 #include "string-utilities.hpp" // str::tolower, str::unquoted
 #include "text-files-tools.hpp" // sys::edit_text_file, sys::compare_files_wait
 
@@ -222,7 +221,7 @@ class Arguments final
 
     static void print_usage() noexcept
        {
-        fmt::print( "\nUsage (ver. " __DATE__ "):\n"
+        fmt::print( "\nUsage:\n"
                     "   m32-pars-adapt --tgt path/to/MachSettings.udt --db path/to/msetts_pars.txt --mach ActiveW-4.9/4.6-(no-buf,opp)\n"
                     "       --db <path> (Parameters database json file)\n"
                     "       --help/-h (Just print help info and abort)\n"
@@ -577,8 +576,8 @@ int main( const int argc, const char* const argv[] )
 
         if( args.verbose() )
            {
-            fmt::print( "---- m32-pars-adapt (ver. " __DATE__ ") ----\n" );
-            fmt::print( "Running in: {}\n", fs::current_path().string() );
+            fmt::print( "---- m32-pars-adapt (ver. " __DATE__ ") ----\n"
+                        "Running in: {}\n", fs::current_path().string() );
            }
 
         //====================================================================

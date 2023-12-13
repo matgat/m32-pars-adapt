@@ -1,4 +1,4 @@
-#ifndef GUARD_clipboard_hpp
+﻿#ifndef GUARD_clipboard_hpp
 #define GUARD_clipboard_hpp
 //  ---------------------------------------------
 //  Clipboard manipulation

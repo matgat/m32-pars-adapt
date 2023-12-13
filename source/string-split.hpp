@@ -1,4 +1,4 @@
-#ifndef GUARD_string_split_hpp
+﻿#ifndef GUARD_string_split_hpp
 #define GUARD_string_split_hpp
 //  ---------------------------------------------
 //  Get comma separated elements in a string

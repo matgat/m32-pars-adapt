@@ -1,4 +1,4 @@
-#ifndef GUARD_sipro_register_hpp
+﻿#ifndef GUARD_sipro_register_hpp
 #define GUARD_sipro_register_hpp
 //  ---------------------------------------------
 //  Sipro register descriptor

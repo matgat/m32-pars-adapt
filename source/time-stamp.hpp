@@ -1,4 +1,4 @@
-#ifndef GUARD_time_stamp_hpp
+﻿#ifndef GUARD_time_stamp_hpp
 #define GUARD_time_stamp_hpp
 //  ---------------------------------------------
 //  Facilities related to time and timestamps

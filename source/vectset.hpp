@@ -1,4 +1,4 @@
-#ifndef GUARD_vectset_hpp
+﻿#ifndef GUARD_vectset_hpp
 #define GUARD_vectset_hpp
 //  ---------------------------------------------
 //  A set implemented with vector

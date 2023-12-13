@@ -1,4 +1,4 @@
-#ifndef GUARD_parax_file_hpp
+﻿#ifndef GUARD_parax_file_hpp
 #define GUARD_parax_file_hpp
 //  ---------------------------------------------
 //  Sipro par2kax.txt file descriptor

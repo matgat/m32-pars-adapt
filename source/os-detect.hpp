@@ -1,4 +1,4 @@
-#ifndef GUARD_os_detect_hpp
+﻿#ifndef GUARD_os_detect_hpp
 #define GUARD_os_detect_hpp
 //  ---------------------------------------------
 //  Set some unified preprocessor macros

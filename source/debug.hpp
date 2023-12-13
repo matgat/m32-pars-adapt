@@ -1,4 +1,4 @@
-#ifndef GUARD_debug_hpp
+﻿#ifndef GUARD_debug_hpp
 #define GUARD_debug_hpp
 //  ---------------------------------------------
 //  Debug facilities

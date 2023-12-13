@@ -1,4 +1,4 @@
-#ifndef GUARD_string_utilities_hpp
+﻿#ifndef GUARD_string_utilities_hpp
 #define GUARD_string_utilities_hpp
 //  ---------------------------------------------
 //  String utilities

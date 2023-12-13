@@ -1,4 +1,4 @@
-#ifndef GUARD_udt_file_hpp
+﻿#ifndef GUARD_udt_file_hpp
 #define GUARD_udt_file_hpp
 //  ---------------------------------------------
 //  Sipro udt file descriptor

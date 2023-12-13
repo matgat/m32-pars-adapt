@@ -1,4 +1,4 @@
-#ifndef GUARD_string_similarity_hpp
+﻿#ifndef GUARD_string_similarity_hpp
 #define GUARD_string_similarity_hpp
 //  ---------------------------------------------
 //  String utilities

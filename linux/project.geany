@@ -29,7 +29,7 @@ long_line_column=72
 
 [files]
 current_page=2
-FILE_NAME_0=1067;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fm32-pars-adapt.cpp;0;4
+FILE_NAME_0=1067;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fmain.cpp;0;4
 FILE_NAME_1=7368;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fjson-node.hpp;0;4
 FILE_NAME_2=15211;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fsystem.hpp;0;4
 
@@ -47,10 +47,10 @@ C++FT_00_LB=_Compile
 C++FT_00_CM=clang++ -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -c "%f"
 C++FT_00_WD=%d
 C++FT_01_LB=_Build
-C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
 C++FT_01_WD=%p
 C++FT_02_LB=Build with gcc
-C++FT_02_CM=g++ -fanalyzer -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/m32-pars-adapt.cpp"
+C++FT_02_CM=g++ -fanalyzer -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
 C++FT_02_WD=%p
 filetypes=C++;
 NF_00_LB=_Make

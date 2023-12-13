@@ -1,4 +1,4 @@
-#ifndef GUARD_extract_mach_db_hpp
+﻿#ifndef GUARD_extract_mach_db_hpp
 #define GUARD_extract_mach_db_hpp
 //  ---------------------------------------------
 //  Assuming a certain DB structure, extract

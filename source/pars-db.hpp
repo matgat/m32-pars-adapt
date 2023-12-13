@@ -1,4 +1,4 @@
-#ifndef GUARD_pars_db_hpp
+﻿#ifndef GUARD_pars_db_hpp
 #define GUARD_pars_db_hpp
 //  ---------------------------------------------
 //  Parameters database details
