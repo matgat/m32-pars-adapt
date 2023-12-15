@@ -5,7 +5,7 @@ auto_continue_multiline=true
 
 [file_prefs]
 final_new_line=false
-ensure_convert_new_lines=false
+ensure_convert_new_lines=true
 strip_trailing_spaces=true
 replace_tabs=true
 
@@ -37,34 +37,37 @@ FILE_NAME_2=15211;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsour
 last_dir=/home/mat/dev/m32-pars-adapt/source
 
 [build-menu]
-EX_00_LB=Run
-EX_00_CM=./m32-pars-adapt -v -m ActiveHP
-EX_00_WD=%p/linux/build
-EX_01_LB=Test
-EX_01_CM=time ./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-ovl.txt --mach StratoHP-4.9/3.2
-EX_01_WD=%p/linux/build
-C++FT_00_LB=_Compile
-C++FT_00_CM=clang++ -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -c "%f"
-C++FT_00_WD=%d
-C++FT_01_LB=_Build
-C++FT_01_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
-C++FT_01_WD=%p
-C++FT_02_LB=Build with gcc
-C++FT_02_CM=g++ -fanalyzer -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
-C++FT_02_WD=%p
 filetypes=C++;
 NF_00_LB=_Make
 NF_00_CM=make
 NF_00_WD=%p/linux
-NF_01_LB=Make Custom _Target...
-NF_01_CM=make
-NF_01_WD=%p/linux
-NF_02_LB=git status
-NF_02_CM=git status
+NF_01_LB=git status
+NF_01_CM=git status 
+NF_01_WD=%p
+NF_02_LB=git pull
+NF_02_CM=git pull
 NF_02_WD=%p
-NF_03_LB=git pull
-NF_03_CM=git pull
-NF_03_WD=%p
+EX_00_LB=Run tests
+EX_00_CM=time ./m32-pars-adapt -v -tgt ../../test/machsettings.udt -db ../../test/machsettings-ovl.txt --mach StratoHP-4.9/3.2
+EX_00_WD=%p/linux/build
+EX_01_LB=Run
+EX_01_CM=./m32-pars-adapt -v -m ActiveHP
+EX_01_WD=%p/linux/build
+C++FT_00_LB=_Compile
+C++FT_00_CM=g++ -fanalyzer -std=c++2b -fsyntax-only -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -c "%f"
+C++FT_00_WD=%d
+C++FT_01_LB=_Lint
+C++FT_01_CM=cppcheck --language=c++ --enable=warning,style --inline-suppr --suppress=passedByValue --template=gcc "%f"
+C++FT_01_WD=%d
+C++FT_02_LB=clang-tidy
+C++FT_02_CM=clang-tidy --header-filter=\\.hpp$ "%f" -- -std=c++2b
+C++FT_02_WD=%d
+C++FT_03_LB=_Build
+C++FT_03_CM=g++ -fanalyzer -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
+C++FT_03_WD=%p
+C++FT_04_LB=Build with clang
+C++FT_04_CM=clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
+C++FT_04_WD=%p
 
 [prjorg]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
