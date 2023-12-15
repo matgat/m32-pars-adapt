@@ -302,7 +302,7 @@ On Windows use the latest Microsoft Visual Studio Community.
 From the command line, something like:
 
 ```bat
-> msbuild .msvc/m32-pars-adapt.vcxproj -t:m32-pars-adapt -p:Configuration=Release
+> msbuild .msvc/m32-pars-adapt.vcxproj -t:Rebuild -p:Configuration=Release -p:Platform=x64
 ```
 
 This project depends on `{fmt}` library, use `vcpkg` to install it:
