@@ -114,11 +114,10 @@ namespace str //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //---------------------------------------------------------------------------
-template<std::convertible_to<std::string_view>... Args>
+template<std::same_as<std::string_view>... Args>
 [[nodiscard]] constexpr std::string concat(Args&&... args, const char delim)
 {
     //const auto args_array = std::array<std::common_type_t<std::decay_t<Args>...>, sizeof...(Args)>{{ std::forward<Args>(args)... }};
-    //return fmt::format("{}", fmt::join(args_array,delim));
     std::string s;
     const std::size_t totsiz = sizeof...(args) + (std::size(args) + ...);
     s.reserve(totsiz);

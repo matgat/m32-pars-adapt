@@ -16,7 +16,7 @@ std::string find_exe() // Must be a null terminated string for winapi
     std::string exe_pth = "C:\\Macotec\\Apps\\WinMerge\\WinMergeU.exe";
     if( !fs::exists(exe_pth) )
        {
-        //exe_pth = sys::expand_env_variables("%PROGRAMFILES%\\WinMerge\\WinMergeU.exe");
+        //exe_pth = sys::expand_env_variables("%ProgramFiles%\\WinMerge\\WinMergeU.exe");
         exe_pth = "C:\\Program Files\\WinMerge\\WinMergeU.exe";
         if( !fs::exists(exe_pth) )
            {

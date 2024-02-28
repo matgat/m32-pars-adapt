@@ -55,36 +55,6 @@ void sleep_ms( const int ms )
 }
 
 
-//---------------------------------------------------------------------------
-//std::string expand_env_variables( const std::string& s )
-//{
-//    const std::string::size_type i_start = s.find("${");
-//    if( i_start==std::string::npos ) return s;
-//    std::string_view pre( s.data(), i_start );
-//    i_start += 2; // Skip "$("
-//    const std::string::size_type i_end = s.find('}', i_start);
-//    if( i_end==std::string::npos ) return s;
-//    std::string_view post = ( s.data()+i_end+1, s.length()-(i_end+1) );
-//    std::string_view variable( s.data()+i_start, i_end-i_start );
-//    std::string value { std::getenv(variable.c_str()) };
-//    return expand_env_variables( fmt::format("{}{}{}",pre,value,post) );
-//}
-
-
-//---------------------------------------------------------------------------
-//[[nodiscard]] std::string expand_env_variables( std::string s )
-//{
-//    static const std::regex env_re{R"--(\$\{([\w_]+)\}|%([\w_]+)%)--"};
-//    std::smatch match;
-//    while( std::regex_search(s, match, env_re) )
-//       {
-//        const std::string capture = match[1].matched ? match[1].str() : match[2].str();
-//        s.replace(match[0].first, match[0].second, std::getenv(capture.c_str()));
-//       }
-//    return s;
-//}
-
-
 #if defined(MS_WINDOWS)
 //---------------------------------------------------------------------------
 // Format system error message
@@ -481,41 +451,6 @@ class file_write final
 };
 
 
-
-//---------------------------------------------------------------------------
-//void delete_file(const std::string& pth) noexcept
-//{
-//    //std::filesystem::remove(pth);
-//  #if defined(MS_WINDOWS)
-//    ::DeleteFile( pth.c_str() );
-//  #elif defined(POSIX)
-//    unlink( pth.c_str() );
-//  #endif
-
-
-//---------------------------------------------------------------------------
-// ex. const auto removed_count = remove_files_inside(fs::temp_directory_path(), std::regex{R"-(^.*\.(tmp)$)-"});
-//[[maybe_unused]] std::size_t remove_files_inside(const std::filesystem::path& dir, std::regex&& reg)
-//{
-//    std::size_t removed_items_count { 0 };
-//
-//    if( !fs::is_directory(dir) )
-//       {
-//        throw std::invalid_argument("Not a directory: " + dir.string());
-//       }
-//
-//    for( auto& elem : fs::directory_iterator(dir) )
-//       {
-//        if( elem.is_regular_file() && std::regex_match(elem.path().filename().string(), reg) )
-//           {
-//            removed_items_count += fs::remove(elem.path());
-//           }
-//       }
-//
-//    return removed_items_count;
-//}
-
-
 //---------------------------------------------------------------------------
 [[maybe_unused]] fs::path backup_file_same_dir(const fs::path src_pth)
 {
@@ -556,38 +491,6 @@ class file_write final
            fs::weakly_canonical(fs::absolute(pth2));
   #endif
 }
-
-
-//---------------------------------------------------------------------------
-// Append string to existing file using c++ streams
-//void append_to_file(const std::string_view path, const std::string_view txt)
-//{
-//    std::ofstream os;
-//    //os.exceptions(os.exceptions() | std::ios::failbit); // Some gcc has a bug bug that raises a useless 'ios_base::failure'
-//    os.open(path, std::ios::out | std::ios::app);
-//    if(os.fail()) throw std::ios_base::failure(std::strerror(errno));
-//    os.exceptions(os.exceptions() | std::ios::failbit | std::ifstream::badbit);
-//    os << txt;
-//}
-
-
-
-//---------------------------------------------------------------------------
-// Buffer the content of a file using c++ streams
-//[[nodiscard]] std::string read(const std::string_view path)
-//{
-//    std::ifstream is(path, std::ios::in | std::ios::binary);
-//        // Read file size
-//        is.seekg(0, std::ios::end);
-//        const std::size_t buf_siz = is.tellg();
-//        is.seekg(0, std::ios::beg);
-//    std::string buf;
-//    buf.reserve(buf_siz+1);
-//    is.read(buf.data(), buf_siz);
-//    buf.set_length(buf_siz);
-//    buf[buf_siz] = '\0';
-//    return buf;
-//}
 
 
 }//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
