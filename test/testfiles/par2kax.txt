@@ -1,0 +1,2154 @@
+[StartAxes]
+  #Version 1.0.6.11602
+  #CanAdd StdAx
+  #CanAdd CopAx
+  #CanAdd StepAx
+  #CanAdd HydrAx
+  #CanAdd InverterAx
+  #CanAdd MechatrAx
+  #CanAdd EthercatAx
+  #CanAdd OnOffAx
+
+  [StartNote]
+    Parametri Assi
+  [EndNote]
+
+
+  [StartEthercatAx]
+    [StartNote]
+      Riscontri (Xr, AX_XR)
+      Trasmissione meccanica (vecchia): 20.327952464 mm/rev
+      Trasmissione meccanica (denti inclinati): 20.220620225 mm/rev
+      Trasmissione meccanica (W): 20.592647059 mm/rev
+      Trasmissione meccanica (WR): (Z22 / Z34) * 1/4 * Z30 (5mm) = 24.2647 mm/rev
+      _  Vmax = 3000 rpm => 60:70 m/min
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 1
+    Name = "Xr"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 24.2647
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -60
+    MaxPos = 4060
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 364
+    QuoHome = 500
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 98
+    VelMan = 50
+    VelZero = 20
+    VelRilascioMicro = 5
+    VelHome = 20
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 20
+    PercSogliaVel = 5
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 66
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 50
+    VelPPd = 50
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.05
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.5
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Stacco (Xs, AX_XS)
+      Trasmissione meccanica 1: 1/60 40pi = 2.094395102 mm/rev
+      _  Vmax = 3000 rpm => 6.28 m/min = 104.72 mm/s
+      Trasmissione meccanica 2: 1/86.28 40pi = 1.45646391 mm/rev
+      _  Vmax = 3000 rpm => 4.37 m/min = 72.8232 mm/s
+      Trasmissione meccanica 3: pi/2 = 1.5708 mm/rev
+      _  Vmax = 3000 rpm => 4.712 m/min = 78.54 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 2
+    Name = "Xs"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.4
+    TimeDec = 0.3
+    MmRif = 2.094395102
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -95
+    MaxPos = 70
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = -87.5
+    QuoHome = -92
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 50
+    VelZero = 10
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 336
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 30
+    VelPPd = 30
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.25
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 1
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Carrello superiore (Ysup, AX_YSUP)
+      Trasmissione meccanica: 22/80 * 200 mm/rev = 55 mm/rev
+      _  Vmax = 3000 rpm => 165 m/min = 2750 mm/s
+      Trasmissione meccanica HP: 1/4 * 320 mm/rev = 80 mm/rev
+      _  Vmax = 3000 rpm => 240 m/min = 4000 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 3
+    Name = "Ysup"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.43
+    TimeDec = 0.3
+    MmRif = 55
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -300
+    MaxPos = 5186
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 5110
+    QuoHome = 5183
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 1
+    VelHome = 10
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 297
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 50
+    VelPPd = 25
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.2
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.5
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.2
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Carrello inferiore (Yinf, AX_YINF)
+      Trasmissione meccanica: 22/80 * 200 mm/rev = 55 mm/rev
+      _  Vmax = 3000 rpm => 165 m/min = 2750 mm/s
+      Trasmissione meccanica HP: 1/4 * 320 mm/rev = 80 mm/rev
+      _  Vmax = 3000 rpm => 240 m/min = 4000 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 4
+    Name = "Yinf"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.43
+    TimeDec = 0.3
+    MmRif = 55
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -300
+    MaxPos = 5186
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 5110
+    QuoHome = 5183
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 1
+    VelHome = 10
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 345
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 50
+    VelPPd = 25
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.2
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.5
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartStdAx]
+    [StartNote]
+      Orientazione utensili superiori (Zsup, AX_ZSUP)
+      Trasmissione meccanica: 1/3 ossia 120 deg/rev
+      _  Vmax = 3000 rpm => 6000 deg/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 5
+    Name = "Zsup"
+    AxEnabled = 1
+    Simula = 1
+    UseTwoVelRif = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.2
+    TimeDec = 0.2
+    MmRif = 120
+    ImpRif = 1048576
+    GearRatioNum = 1
+    GearRatioDen = 1
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    PidType = "StdPid"
+    DeadTime = 0
+    AnOutNum = 1
+    EncNum = 1
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 1
+    VelHome = 20
+    VelMaxLimit = 0
+    DelayBeforeInversion = 0.01
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 1
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 20
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 5
+    MaxErrInsDelayMs = 500
+    TimeAccJog = 1
+    TimeDecJog = 0.15
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndStdAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Orientazione utensili inferiori (Zinf, AX_ZINF)
+      Trasmissione meccanica: 1/3 ossia 120 deg/rev
+      _  Vmax = 3000 rpm => 6000 deg/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 6
+    Name = "Zinf"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.2
+    TimeDec = 0.2
+    MmRif = 120
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 1
+    VelHome = 20
+    DelayBeforeInversion = 0.01
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 1
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 20
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 5
+    MaxErrInsDelayMs = 500
+    TimeAccJog = 1
+    TimeDecJog = 0.15
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Orientazione Pinza (Zg, AX_ZG)
+      Trasmissione meccanica: 360/50 = 7.2 deg/rev
+      _  Vmax = 3000 rpm => 21600 deg/min = 360 deg/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 7
+    Name = "Zg"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.4
+    TimeDec = 0.5
+    MmRif = 7.2
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = -92.5
+    QuoHome = -90
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 80
+    VelZero = 10
+    VelRilascioMicro = 1
+    VelHome = 50
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 305
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.05
+    DelayFermo = 0.1
+    ErrIns = 90
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.3
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.5
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Rotazione ventosa polmone (Zb, AX_ZB)
+      Trasmissione meccanica: 1/100 = 3.6 deg/rev
+      _  Vmax = 3000 rpm => 10800 deg/min = 180 deg/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 8
+    Name = "Zb"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1.5
+    TimeDec = 1.5
+    MmRif = 3.6
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 80
+    VelZero = 10
+    VelRilascioMicro = 1
+    VelHome = 50
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.05
+    DelayFermo = 0.1
+    ErrIns = 10
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.5
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Carrello stampante (Yprn, AX_YPRN)
+      Trasmissione meccanica: 200 mm/rev
+      _  Vmax = 2400 rpm => 480 m/min => 8000 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (1800/60) rev/s * 1048576 pls/rev = 31457280 pls/s
+    [EndNote]
+
+    AxId = 9
+    Name = "Yprn"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 31457280
+    VelRifInd = 0
+    EngineRPM = 1800
+    TimeAcc = 1
+    TimeDec = 1
+    MmRif = 200
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -300
+    MaxPos = 4500
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 50
+    VelZero = 2
+    VelRilascioMicro = 1
+    VelHome = 10
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 404
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 50
+    VelPPd = 50
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.2
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.2
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie carico (Ca, AX_CA)
+      Trasmissione meccanica: 1/20 * 360 mm/rev = 18 mm/rev
+      _  Vmax = 3000 rpm => 54 m/min = 900 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 10
+    Name = "Ca"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 18
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 2
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie polmone (Cb, AX_CB)
+      Trasmissione meccanica: 1/20 * 360 mm/rev = 18 mm/rev
+      _  Vmax = 3000 rpm => 54 m/min = 900 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 11
+    Name = "Cb"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 18
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie stacco (Cs, AX_CS)
+      Trasmissione meccanica: 1/20 * 360 mm/rev = 18 mm/rev
+      _  Vmax = 3000 rpm => 54 m/min = 900 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 12
+    Name = "Cs"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 18
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 20
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie/Rulli su riscontri (Cr, AX_CR)
+      Trasmissione meccanica rulli: 1/20 * 125n = 19.634954085 mm/rev
+      _  Vmax = 3000 rpm => 58.904862255 m/min = 981.747704247 mm/s
+      Trasmissione meccanica cinghie: 1/10 * Z20 * 10 mm/rev = 20 mm/rev
+      _  Vmax = 3000 rpm => 40 m/min = 666.666 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 13
+    Name = "Cr"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 20
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie zona fine linea (Co, AX_CO)
+      Trasmissione meccanica: 1/10 * Z20 * 10 mm/rev = 20 mm/rev
+      _  Vmax = 3000 rpm => 60 m/min = 1000 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+
+    [EndNote]
+
+    AxId = 14
+    Name = "Co"
+    AxEnabled = 1
+    Simula = 0
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 20
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie tavolo supporto carico (Ca2, AX_CA2)
+      Insegue Ca
+    [EndNote]
+
+    AxId = 15
+    Name = "Ca2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 18
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie/Rulli gemelle su riscontri (Cr2, AX_CR2)
+      Insegue Cr
+    [EndNote]
+
+    AxId = 18
+    Name = "Cr2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 20
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 0
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Cinghie gemelle fine linea (Co2, AX_CO2)
+      Insegue Co
+
+    [EndNote]
+
+    AxId = 19
+    Name = "Co2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 1
+    TimeDec = 0.7
+    MmRif = 20
+    ImpRif = 1048576
+    InvDir = 1
+    InvEnc = 1
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 50
+    VelZero = 5
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 20
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 1
+    VelPPaJog = 80
+    VelPPdJog = 80
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 0
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Premilastra motorizzato lato riscontro (Pr, AX_PR)
+      Trasmissione meccanica: 1/5 5mm/rev = 1 mm/rev
+      _  Vmax = 3000 rpm => 3 m/min = 50 mm/s
+      _  Fn: 5.39 Nm * 2pi / 1mm/rev = 33866.369 N
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 20
+    Name = "Pr"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 1
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 1
+    MaxPos = 93
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 84
+    QuoHome = 45
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 110
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 80
+    VelZero = 15
+    VelRilascioMicro = 2
+    VelHome = 30
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 2
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 53
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.5
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 5
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Premilastra motorizzato lato riscontro (Pr2, AX_PR2)
+      In asse elettrico con Pr
+    [EndNote]
+
+    AxId = 22
+    Name = "Pr2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 1
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 1
+    MaxPos = 93
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 84
+    QuoHome = 45
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 110
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 80
+    VelZero = 15
+    VelRilascioMicro = 2
+    VelHome = 30
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 54
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.25
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 20
+    GantryFlags = 0
+    GantryVelAlignPerc = 1
+    GantryMaxDiffAlignMm = 20
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Premilastra motorizzato lato stacco (Ps, AX_PS)
+      Trasmissione meccanica: 1/5 5mm/rev = 1 mm/rev
+      _  Vmax = 3000 rpm => 3 m/min = 50 mm/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 21
+    Name = "Ps"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 1
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 93
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 84
+    QuoHome = 45
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 110
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 80
+    VelZero = 15
+    VelRilascioMicro = 2
+    VelHome = 30
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 2
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 55
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.5
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 5
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Premilastra motorizzato lato stacco (Ps2, AX_PS2)
+      In asse elettrico con Ps
+    [EndNote]
+
+    AxId = 23
+    Name = "Ps2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 1
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 93
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 84
+    QuoHome = 45
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 110
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 80
+    VelZero = 15
+    VelRilascioMicro = 2
+    VelHome = 30
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 15
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 56
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.25
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 20
+    GantryFlags = 0
+    GantryVelAlignPerc = 1
+    GantryMaxDiffAlignMm = 20
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Mandrino rotazione mola LowE (Sle, AX_SLE)
+      Trasmissione meccanica: 1/1 ossia 360 deg/rev
+      _  Vmax = 3000 rpm => 1080 Kdeg/min = 18000 deg/s
+      Risoluzione motore: 2^20=1048576 pls/rev
+      Vmot = (3000/60) rev/s * 1048576 pls/rev = 52428800 pls/s
+    [EndNote]
+
+    AxId = 24
+    Name = "Sle"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.5
+    MmRif = 360
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = 0
+    MaxPos = 0
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0
+    QuoZero = 0
+    QuoHome = 0
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 100
+    VelMan = 100
+    VelZero = 10
+    VelRilascioMicro = 2
+    VelHome = 50
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 100
+    PercSogliaVel = 10
+    OvdType = 0
+    ZeroDir = 3
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 0
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 10
+    VelPPd = 10
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 90
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.05
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 0.3
+    TimeDecJog = 0.5
+    VelPPaJog = 10
+    VelPPdJog = 10
+    TimeDecStop = 0.1
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 0
+    GantryMaxDiffAlignMm = 0
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Riscontri2 (Xr2, AX_XR2)
+      In asse elettrico con Xr
+    [EndNote]
+
+    AxId = 25
+    Name = "Xr2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 20.582
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -60
+    MaxPos = 4065
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = 364
+    QuoHome = 500
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 98
+    VelMan = 50
+    VelZero = 20
+    VelRilascioMicro = 5
+    VelHome = 20
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 20
+    PercSogliaVel = 5
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 523
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 50
+    VelPPd = 50
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.1
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.5
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0
+    VelPPdStop = 0
+    FlgQuickStop = 0
+    GantryInQuo = 0.1
+    GantryErrIns = 10
+    GantryFlags = 0
+    GantryVelAlignPerc = 1
+    GantryMaxDiffAlignMm = 500
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+
+  [StartEthercatAx]
+    [StartNote]
+      Stacco2 (Xs2, AX_XS2)
+      In asse elettrico con Xs
+    [EndNote]
+
+    AxId = 26
+    Name = "Xs2"
+    AxEnabled = 0
+    Simula = 1
+    VelRif = 52428800
+    VelRifInd = 0
+    EngineRPM = 3000
+    TimeAcc = 0.3
+    TimeDec = 0.3
+    MmRif = 2.094395102
+    ImpRif = 1048576
+    InvDir = 0
+    InvEnc = 0
+    RecGioco = 0
+    DeadTime = 0
+    MinPos = -95
+    MaxPos = 70
+    EnabSwFcEmerg = 0
+    MargineFcMm = 0.5
+    QuoZero = -87.5
+    QuoHome = -92
+    UseZeroQuoHome = 1
+    MaxDistMicroMm = 0
+    MaxDistMarkerMm = 0
+    VelMax = 95
+    VelMan = 50
+    VelZero = 10
+    VelRilascioMicro = 2
+    VelHome = 10
+    DelayBeforeInversion = 0.1
+    DelayMarkToStop = 0.1
+    DelayToQuoHome = 0.1
+    DelayAfterSet = 0
+    VelNotZero = 10
+    PercSogliaVel = 10
+    OvdType = 1
+    ZeroDir = 14
+    ZeroDirParam = 0
+    InPushState = 0
+    InZero = 286
+    InMin = 0
+    InMax = 0
+    MaxFcDebounceMs = 0
+    FlgFcDisab = 0
+    FlgFcNA = 0
+    VelShape = 2
+    VelPPa = 60
+    VelPPd = 60
+    AccSpig = 0
+    AccCirc = 0
+    KaccG1 = 0
+    BandaPos = 0.25
+    DelayInPos = 0.02
+    ToutNotInQuote = 0
+    BandaFermo = 0.1
+    DelayFermo = 0.1
+    ErrIns = 0
+    MaxErrInsDelayMs = 0
+    TimeAccJog = 1
+    TimeDecJog = 0.35
+    VelPPaJog = 20
+    VelPPdJog = 20
+    TimeDecStop = 0.25
+    VelPPdStop = 15
+    FlgQuickStop = 2
+    GantryInQuo = 0.1
+    GantryErrIns = 1
+    GantryFlags = 0
+    GantryVelAlignPerc = 1
+    GantryMaxDiffAlignMm = 5
+    ModuloMm = 0
+    RestoreBkpQuote = 0
+    FlgAxModulo = 0
+    FlgAxMandrino = 0
+    FlgAxDiametrale = 0
+    FlgAxLongitudinale = 0
+    FlgAxRotativo = 0
+    NumAxMoveInfo = 0
+  [EndEthercatAx]
+[EndAxes]

@@ -1,17 +1,29 @@
 ## [m32-pars-adapt](https://github.com/matgat/m32-pars-adapt.git)
+[![linux-build](https://github.com/matgat/m32-pars-adapt/actions/workflows/linux-build.yml/badge.svg)](https://github.com/matgat/m32-pars-adapt/actions/workflows/linux-build.yml)
+[![ms-build](https://github.com/matgat/m32-pars-adapt/actions/workflows/ms-build.yml/badge.svg)](https://github.com/matgat/m32-pars-adapt/actions/workflows/ms-build.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-A tool to help the proper parametrization of m32 based machines,
-using a json-like database that collects the proper parameters for the
-various machine types.
+A tool to help the parametrization of m32 based machines.
+The main functions are:
 
+* Update an old `MachSettings.udt` file using a newer one as template
+* Adapt a `MachSettings.udt` or `par2kax.txt` to a given machine using a parameters database
+
+_________________________________________________________________________
+## Requirements
+
+On windows:
+* C++ runtime [`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+* Manual comparisons invoke [WinMerge](https://winmerge.org)
+* Parsing errors invoke [Notepad++](https://notepad-plus-plus.org)
+
+On linux:
+* Manual comparisons invoke [Meld](https://meldmerge.org)
+* Parsing errors invoke [mousepad](https://docs.xfce.org/apps/mousepad/start)
 
 
 _________________________________________________________________________
 ## Usage
-Windows binary is dynamically linked to Microsoft c++ runtime,
-so needs the installation of
-[`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-as prerequisite.
 
 To print usage info:
 
@@ -19,65 +31,137 @@ To print usage info:
 > m32-pars-adapt --help
 ```
 
-To valorize a `MachSettings.udt` given a machine type:
-
-```bat
-> cd %UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
-> m32-pars-adapt --tgt MachSettings.udt --db configs\machsettings-overlays.txt --machine StratoWR-4.9/4.6
-```
-
-To update an old `MachSettings.udt` to a new one:
+To update an old `MachSettings.udt` transferring its values to a newer one:
 
 ```bat
 > m32-pars-adapt --tgt new\MachSettings.udt --db old\MachSettings.udt
 ```
 
-To valorize a Sipro parameter file:
+To adapt a `MachSettings.udt` for a certain machine:
+
+```bat
+> cd %UserProfile%\Macotec\Machines\m32-Strato\sde\userdata
+> m32-pars-adapt --tgt MachSettings.udt --db configs\machsettings-overlays.txt --mach WR-4.9/4.6
+```
+
+To adapt a Sipro axes parameter file for a certain machine:
 
 ```bat
 > cd %UserProfile%\Macotec\Machines\m32-Strato\sde\param
-> m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --machine StratoHP-6.0/4.6-(buf-rot,fast)
+> m32-pars-adapt --tgt par2kax.txt --db par2kax-overlays.txt --mach HP-6.0/4.6-(lowe,fast)
 ```
 
 Normally no file will be overwritten: the program will create a temporary
 file that will be automatically deleted after a manual merge.
 
-When the option `--quiet` is used, the manual merge will be skipped:
-if an output file name is specified with `--out`,
-there won't be any actions after its creation, otherwise
-the file to be modified will be backupped in the same directory and
-then silently overwritten.
+> [!NOTE]
+> With the option `--quiet` the manual merge will be skipped, and if
+> no output file was specified with `--out` the adapted file will
+> replace the original after a backup copy in the same directory
 
+### Exit values
 
-_________________________________________________________________________
-## Requirements
-C++ runtime [`VC_redist.x64.exe`](https://aka.ms/vs/17/release/vc_redist.x64.exe).
+| Return value | Meaning                                |
+|--------------|----------------------------------------|
+|      0       | Operation successful                   |
+|      1       | Operation completed but with issues    |
+|      2       | Operation aborted due to a fatal error |
 
-The utility [WinMerge](https://winmerge.org) is invoked whenever a manual
-comparison of the files is needed.
-The program will try the following paths:
-
-```
-"C:\Macotec\Apps\WinMerge\WinMergeU.exe"
-"%PROGRAMFILES%\WinMerge\WinMergeU.exe"
-```
-
-And as fallback the association with the extension `.WinMerge`
 
 
 _________________________________________________________________________
-## Parameters database
+## Updating a `udt` file
+A `udt` file is a series of fields like these:
+
+    var_name = value # comment 'var_label'
+
+This program eases the operation to update an old file to a newer
+one recognizing the fields and transferring the old values to the
+newer file, that acts as a template.
+
+> [!NOTE]
+> Unfortunately this operation cannot be fully automatic and almost
+> always needs a manual check of the generated file: it's not trivial
+> to deal with possible fields semantic changes.
+
+
+
+_________________________________________________________________________
+## Adapting a file
+Given a proper database of value overlays (more below), it's possible
+to automate the adaptation of both `udt` and `par2kax.txt` files
+according to a machine type.
+
+
+_________________________________________________________________________
+### Machine types
+It's possible to specify a machine type through the `--mach` command
+argument or the predefined field `vaMachName` in `udt` file.
+A machine type is identified by a string like:
+
+    <name>-<sizes>-(option1,option2,...)
+
+From the `<name>` part is inferred the machine family.
+The recognized ones are:
+
+| *id*  | *Machine*     | *Type*   |
+|-------|---------------|----------|
+| `STC` |  StarCut      | *Float*  |
+|`MSFR` |  MasterFR     | *Float*  |
+|`MSFRV`|  MasterFRV    | *Float*  |
+| `F`   |  ActiveE/F    | *Strato* |
+| `FR`  |  ActiveFR/FRS | *Strato* |
+| `W`   |  ActiveW      | *Strato* |
+| `WR`  |  ActiveWR     | *Strato* |
+| `HP`  |  ActiveHP     | *Strato* |
+
+For *Strato* machines two sizes must be specified:
+
+    <name>-<cut-bridge>/<algn-span>-(option1,option2,...)
+
+For example:
+
+    ActiveFRS-4.0/3.2
+
+The recognized values:
+
+	F: cut-bridge : 3.7, 4.6
+	F: algn-span  : 3.2
+
+	W,WR,HP,FR: cut-bridge : 4.0, 4.9, 6.0
+	W,WR,HP,FR: algn-span  : 3.2, 4.6
+
+> [!WARNING]
+> An unrecognized value will cause an error.
+
+Finally, a list of arbitrary comma separated options can be specified.
+
+> [!TIP]
+> Typical options for *Strato* machines are
+> `opp`, `lowe`, `rot`, `buf`, `no-buf`
+> but new arbitrary strings can be added.
+
+Some valid machine strings:
+
+    ActiveWR-4.9/4.6
+    actF-3.7/3.2-(buf,opp)
+    StarCut-9.0-(lowe)
+    MsFR
+
+
+
+_________________________________________________________________________
+### Parameters database
 The parameters database consists of a text file containing
 an extended/simplified json-like syntax.
 
 _________________________________________________________________________
-### Syntax
+#### Syntax
 * Key names can be unquoted (double quotes necessary in case of spaces or other special chars)
 * New line acts as a key-value separator (in that case other separators like comma are optional)
 * Supported multiple (comma separated) keys
 * Equal sign is tolerated for plain `key=value` assignments
 * Supported double slash line comments (`//`) as shown in the example below
-* Block comments (`/*...*/`) are *deliberately* not supported
 
 ```js
 "key1", key2 :
@@ -98,44 +182,25 @@ _________________________________________________________________________
 ```
 
 _________________________________________________________________________
-### Content
-First level keys are the machine type:
+#### Content
+First level keys are the machine families (`W`, `WR`, ...)
+the recognized second level keys are:
 
-| *id*  | *Machine*     | *Type*   |
-|-------|---------------|----------|
-| `STC` |  StarCut      | *Float*  |
-| `FR`  |  MasterFR     | *Float*  |
-| `FRV` |  MasterFRV    | *Float*  |
-| `F`   |  ActiveE/F    | *Strato* |
-| `FR`  |  ActiveFR/FRS | *Strato* |
-| `W`   |  ActiveW      | *Strato* |
-| `WR`  |  ActiveWR     | *Strato* |
-| `HP`  |  ActiveHP     | *Strato* |
+	`common`, `cut-bridge`, `algn-span`, `+<option-name>`
 
+> [!IMPORTANT]
+> Second level keys whose name is prefixed with `+`
+> represent special groups denoting *options*.
+> The values inside these groups are applied last,
+> overwriting possible existing fields with the same name.
+> Adapting a `udt` file that has already superimposed
+> options can lead to incoherences, so the program will
+> try to detect this case through the value of `vaMachName`.
 
-Recognized second level keys are:
-
-	"common", "cut-bridge", "algn-span", "+<option-name>"
-
-Second level keys whose name is prefixed with `+`
-represent special groups denoting *options*.
-The values inside these groups are applied last,
-overwriting possible existing fields with the same name.
-Warning: Adapting a `MachSettings.utd` that has
-superimposed options can lead to incoherences,
-so in this case the program will rise an error.
-
-Recognized  dimensions:
-
-	S: cut-bridge : 3.7, 4.6
-	S: algn-span  : 3.2
-
-	W,WR,HP,FR: cut-bridge : 4.0, 4.9, 6.0
-	W,WR,HP,FR: algn-span  : 3.2, 4.6
 
 
 _________________________________________________________________________
-### Structure for MachSettings.udt
+#### DB structure for MachSettings.udt
 Here is the expected database structure used to adapt
 a `MachSettings.udt` file:
 
@@ -158,7 +223,7 @@ a `MachSettings.udt` file:
 
 Example:
 
-```js
+```
 WR,HP :
    {
     "common" :
@@ -204,7 +269,7 @@ HP :
 
 
 _________________________________________________________________________
-### Structure for par2kax.txt
+#### DB structure for par2kax.txt
 Here is the expected database structure used to adapt
 a `par2kax.txt` file:
 
@@ -245,7 +310,7 @@ a `par2kax.txt` file:
 
 Example:
 
-```js
+```
 W,WR,HP :
    {
     "cut-bridge" :
@@ -283,40 +348,78 @@ HP :
 
 _________________________________________________________________________
 ## Build
-On linux:
+You need a `c++23` compliant toolchain.
+Check the operations in the python script:
 
 ```sh
-# pacman -S fmt
 $ git clone https://github.com/matgat/m32-pars-adapt.git
 $ cd m32-pars-adapt
-$ make linux/makefile
+$ python build/build.py
 ```
 
-or directly:
+To run tests:
 
 ```sh
-$ clang++ -std=c++2b -funsigned-char -Wall -Wextra -Wpedantic -Wconversion -O3 -lfmt -o "linux/build/m32-pars-adapt" "source/main.cpp"
+$ python test/run-all-tests.py
 ```
 
-On Windows use the latest Microsoft Visual Studio Community.
-From the command line, something like:
+
+### linux
+Launch `make` directly:
+
+```sh
+$ cd build
+$ make
+```
+
+To run unit tests:
+
+```sh
+$ make test
+```
+
+> [!TIP]
+> If building a version that needs `{fmt}`,
+> install the dependency beforehand with
+> your package manager:
+>
+> ```sh
+> $ sudo pacman -S fmt
+> ```
+>
+> or
+>
+> ```sh
+> $ sudo apt install -y libfmt-dev
+> ```
+
+
+### Windows
+
+On Windows you need Microsoft Visual Studio 2022 (Community Edition).
+Once you have `msbuild` visible in path, you can launch the build from the command line:
 
 ```bat
-> msbuild .msvc/m32-pars-adapt.vcxproj -t:Rebuild -p:Configuration=Release -p:Platform=x64
+> msbuild build/m32-pars-adapt.vcxproj -t:Rebuild -p:Configuration=Release -p:Platform=x64
 ```
 
-This project depends on `{fmt}` library, use `vcpkg` to install it:
-
-```bat
-> git clone https://github.com/Microsoft/vcpkg.git
-> .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
-> .\vcpkg\vcpkg integrate install
-> .\vcpkg\vcpkg install fmt:x64-windows
-```
-
-in case you already have `vcpkg`:
-
-```bat
-> .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
-> .\vcpkg\vcpkg upgrade --no-dry-run 
-```
+> [!TIP]
+> If building a version that needs `{fmt}`
+> install the dependency beforehand with `vcpkg`:
+>
+> ```bat
+> > git clone https://github.com/Microsoft/vcpkg.git
+> > cd .\vcpkg
+> > .\bootstrap-vcpkg.bat -disableMetrics
+> > .\vcpkg integrate install
+> > .\vcpkg install fmt:x64-windows
+> ```
+>
+> To just update the `vcpkg` libraries:
+>
+> ```bat
+> > cd .\vcpkg
+> > git pull
+> > .\bootstrap-vcpkg.bat -disableMetrics
+> > .\vcpkg upgrade --no-dry-run
+> ```

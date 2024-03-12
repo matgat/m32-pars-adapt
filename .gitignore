@@ -2,6 +2,10 @@
 *.log
 **/tmp
 
+# [python]
+__pycache__
+*.pyc
+
 # [c++]
 *.gch
 *.pch
@@ -10,31 +14,10 @@
 *.obj
 *.exe
 
-# [qtcreator]
-*.pro.user
-*.stash
-debug/
-release/
-Makefile
-Makefile.Debug
-Makefile.Release
-
 # [msvc]
-.vs/
-*.exe.recipe
-*.iobj
-*.tlog
-*.ipch
-*.idb
+.vs
 *.pdb
 *.ilk
-*.suo
-*.VC.db
-*.db-*
-*.opendb
-*.filters
-*.user
 
 # [specific]
-linux/build
-test/
+build/bin

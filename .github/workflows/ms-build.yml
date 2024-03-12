@@ -1,0 +1,44 @@
+name: ms-build
+
+on:
+  workflow_dispatch
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    env:
+      BUILD_CONFIGURATION: Release
+      TEST_BUILD_CONFIGURATION: Release
+      BUILD_PLATFORM: x64
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    #- name: Install dependencies
+    #  run: |
+    #    git clone https://github.com/microsoft/vcpkg.git
+    #    .\\vcpkg\\bootstrap-vcpkg.bat
+    #    .\\vcpkg\vcpkg integrate install
+    #    .\\vcpkg\vcpkg install fmt:x64-windows
+
+    - name: Build-App
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild build/${{github.event.repository.name}}.vcxproj -t:rebuild -p:Configuration=${{env.BUILD_CONFIGURATION}} -p:Platform=${{env.BUILD_PLATFORM}}
+
+    - name: Build-Unit-Tests
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild build/${{github.event.repository.name}}-test.vcxproj -t:rebuild -p:Configuration=${{env.TEST_BUILD_CONFIGURATION}} -p:Platform=${{env.BUILD_PLATFORM}}
+
+    - name: Run-Unit-Tests
+      working-directory: build/bin/win-${{env.BUILD_PLATFORM}}-${{env.TEST_BUILD_CONFIGURATION}}
+      run: |
+        dir .
+        ./${{github.event.repository.name}}-test.exe

@@ -1,0 +1,713 @@
+//-----------------------------------------------------------------
+HP :
+   {
+    "common" :
+       {// ActiveHP
+        vnMach_Type: 11
+        vbGrLe_FwdDir: 0
+        vqGrLe_Weight: -150
+        vqGrLe_CylFr: 10
+        vqTscore_SpdMax: 200000
+        vqBlade_SpdMax: 160000
+        vqClamps_PushMax: 33866
+        vnScu_Type: 2
+        vqCarrSup_DYroomM: -130
+        vqCarrSup_DYroomP: 280
+        vqECarrSup_Length: 395
+        vqRsup_DY: 220
+        vqBladeSup_DY: 151
+        vqGrLe_DY: 430
+        vqCarrInf_DYroomM: -120
+        vqCarrInf_DYroomP: 290
+        vqECarrInf_Length: 190
+        vqRinf_DY: 235
+        vqBladeInf_DY: 170
+        vqGrabber_DY: 402
+        vqTsup2_DY: 85
+        vqTinf2_DY: 85
+        vqGrLe2_DY: 595
+        vqRsup2_DY: -100
+        vqRinf2_DY: -100
+        vqCarr_CutAreaYbtm: -280
+        vqCarrInf_XroomM: -70
+        vqHoldPadsAlgn_X: 151
+        vqHoldPadsDtch_Dx: -50
+        vqDtchBelts_Dx: -80
+        vqClampDtch_DxM: -153
+        vqDXph_DtchLast: -242
+        vqYph_DtchLast: 315
+        vqClamps_Kslip: 60
+        vqClamps_WearPress: 250
+        vqTscore_Latency: 11
+        vqBladeSup_CylFr: 10
+        vqBrkBar_RiseTime: 0.5
+        vqBrkBar_OpenTime: 0.02
+        vqLamp_PreAlmostDone: 1
+        vbEdgeDet_OnTheFly: 1
+        vqEdgeDet_SweepSpd: 100000
+        vqProbe1_DY: 269.6
+        vqProbe3_DY: -38.6
+        vqCarr_HideMargin: 0
+        vqYsup_MaxForce: 2200
+        vqYinf_MaxForce: 2200
+        vqYsup_Friction: 350
+        vqYinf_Friction: 350
+        vqYsup_Viscosity: 2
+        vqYinf_Viscosity: 2
+       }
+   }
+
+
+
+//-----------------------------------------------------------------
+W,WR :
+   {
+    "common" :
+       {// ActiveW/WR
+        vnMach_Type: 10
+        vqClamps_PushMax: 18000
+        vnScu_Type: 1
+        vqCarrSup_DYroomM: -50
+        vqCarrSup_DYroomP: 380
+        vqECarrSup_Length: 0
+        vqRsup_DY: 130
+        vqBladeSup_DY: 65
+        vqGrLe_DY: 280
+        vqCarrInf_DYroomM: -75
+        vqCarrInf_DYroomP: 320
+        vqECarrInf_Length: 0
+        vqRinf_DY: 85
+        vqBladeInf_DY: 130
+        vqGrabber_DY: 231.5
+        vqTsup2_DY: 0
+        vqTinf2_DY: 0
+        vqGrLe2_DY: 0
+        vqRsup2_DY: 0
+        vqRinf2_DY: 0
+        vbGrLe_FwdDir: 1
+        vqGrLe_Weight: 5
+        vqGrLe_CylFr: 3
+        vqCarr_CutAreaYbtm: -30
+        vqCarrInf_XroomM: -89
+        vqHoldPadsAlgn_X: 190
+        vqHoldPadsDtch_Dx: -75
+        vqDtchBelts_Dx: -55
+        vqClampDtch_DxM: -105
+        vqDXph_DtchLast: -18
+        vqYph_DtchLast: 240
+        vqClamps_Kslip: 10
+        vqClamps_WearPress: 400
+        vqTscore_Latency: 13
+        vqBlade_StartDisp_2mm: 2
+        vqBlade_StartDisp_12mm: 4.5
+        vqBladeSup_CylFr: 0
+        vqBrkBar_RiseTime: 1.2
+        vqBrkBar_OpenTime: 0.1
+        vqLamp_PreAlmostDone: 5
+        vbEdgeDet_OnTheFly: 0
+        vqEdgeDet_SweepSpd: 150000
+        vqProbe1_DY: -45
+        vqProbe3_DY: -53
+        vqCarr_HideMargin: 50
+        vqYsup_MaxForce: 1500
+        vqYinf_MaxForce: 1500
+        vqYsup_Friction: 160
+        vqYinf_Friction: 235
+        vqYsup_Viscosity: 1
+        vqYinf_Viscosity: 1
+       }
+   }
+
+
+
+//-----------------------------------------------------------------
+WR,HP :
+   {
+    "common" :
+       {// ActiveWR/HP
+        vqGrab_MinRotTail: 350
+        vqProbe1_DX: 0.1
+        vqProbe3_DX: -0.5
+        vqRbrk_DblPressLim: 5.7
+        vqBelts_DragSpd: 45000
+        vnBelts_DragAcc: 100
+        vbVent_IndepOutZone: 1
+        vbBeltsAlgn_HaveFcDown: 1
+        vbHoldPads_Indep: 1
+        vnTiltOut_Type: 2
+        vbTiltOut_UseGrabOil: 0
+        vbTiltOut_StopIfGrab: 0
+        vqTiltOut_OffDelay: 0
+        vqTiltOut_OnDelay: 0
+        vqTiltOut_CmdDelay: 0
+        vqTiltOut_BumpDelay: 1
+        vqTiltOut_Speed: 9
+        vqTiltOut_AnearLow: 32
+        vqTiltOut_AnearHigh: 45
+        vqYph_OutZoneEnd: 170
+        vqRotNoBlk_MassMax: 200
+        vqGrab_RotVmax: 50000
+        vqGrab_SlipTorque: 50
+        vnGrab_YAccelMax: 30
+        vnGrab_RotMaxAccel: 30
+        vnGrab_SlantAccel: 8
+        vbOutZone_PedalToFree: 1
+        vqAlgn_DragVentOffDx: 100
+        vqAlgn_MinUpMargin: 30
+        vqAlgn_MinDelta: 35
+        vqAlgn_AddDelta: 45
+        vqAlgn_MeetSpd: 3000
+        vqAlgn_PushSpd: 2000
+       }
+
+    "cut-bridge" :
+       {
+        "4.0" :
+           {// ActiveWR/HP
+            vqYmax: 4030
+            vqY_AlgnTableTop: 4110
+            vqCarr_CutAreaYtop: 4200
+            vqDump_MaxY: 3300
+            vqRotProc_DiagMax: 4400
+            vqRotAlgn_HeightMax: 3500
+            vqBufRot_WidthMax: 3500
+            vqBufRot_HeightMax: 3500
+            vqBufRot_MassMax: 500
+            vqX_AlgnBandC: 230
+            vqY_AlgnBandB: 850
+            vqY_AlgnBandM: 2250
+            vbVent_JoinedAlgnCT: 1
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 4070
+            vqY_CollTopDtch: 4075
+            vqLamp2_Hlim: 2000
+            vqClamps_Pup: 7000
+            vqClamps_Y_TopCyl: 3000
+            vnClamps_NumCyl: 2
+            vqClampAlgn_Weight: 500
+            vqClampDtch_Weight: 500
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 600
+            vqXs_Inertia: 8000
+            vnDtchBelts_N: 6
+            vnBeltsAlgn_N: 7
+            vqBeltsAlgn_DY0_1: 96
+            vqBeltsAlgn_DY1_2: 289
+            vqBeltsAlgn_DY2_3: 350
+            vqBeltsAlgn_DY3_4: 550
+            vqBeltsAlgn_DY4_5: 607
+            vqBeltsAlgn_DY5_6: 792
+            vqBeltsAlgn_DY6_7: 956
+            vqBeltsAlgn_DY7_8: 0
+            vnTiltOutArms_N: 5
+            vqTiltOutArms_DY0_1: 283
+            vqTiltOutArms_DY1_2: 291
+            vqTiltOutArms_DY2_3: 610
+            vqTiltOutArms_DY3_4: 1199
+            vqTiltOutArms_DY4_5: 1365
+            vqTiltOutArms_DY5_6: 0
+            vqTiltOutArms_DY6_7: 0
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 6
+            vqAlgnBlks_DY0_1: 182
+            vqAlgnBlks_DY1_2: 284.5
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 549.5
+            vqAlgnBlks_DY4_5: 609
+            vqAlgnBlks_DY5_6: 791.5
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+
+        "4.9" :
+           {// ActiveWR/HP
+            vqYmax: 4920
+            vqY_AlgnTableTop: 5010
+            vqCarr_CutAreaYtop: 5100
+            vqDump_MaxY: 3900
+            vqRotProc_DiagMax: 5400
+            vqRotAlgn_HeightMax: 4500
+            vqBufRot_WidthMax: 4500
+            vqBufRot_HeightMax: 3500
+            vqBufRot_MassMax: 500
+            vqX_AlgnBandC: 230
+            vqY_AlgnBandB: 850
+            vqY_AlgnBandM: 2250
+            vbVent_JoinedAlgnCT: 1
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 4970
+            vqY_CollTopDtch: 4970
+            vqLamp2_Hlim: 2400
+            vqClamps_Pup: 10000
+            vqClamps_Y_TopCyl: 3500
+            vnClamps_NumCyl: 3
+            vqClampAlgn_Weight: 500
+            vqClampDtch_Weight: 500
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 1000
+            vqXs_Inertia: 9000
+            vnDtchBelts_N: 7
+            vnBeltsAlgn_N: 7
+            vqBeltsAlgn_DY0_1: 96
+            vqBeltsAlgn_DY1_2: 289
+            vqBeltsAlgn_DY2_3: 350
+            vqBeltsAlgn_DY3_4: 550
+            vqBeltsAlgn_DY4_5: 607
+            vqBeltsAlgn_DY5_6: 792
+            vqBeltsAlgn_DY6_7: 956
+            vqBeltsAlgn_DY7_8: 0
+            vnTiltOutArms_N: 5
+            vqTiltOutArms_DY0_1: 283
+            vqTiltOutArms_DY1_2: 291
+            vqTiltOutArms_DY2_3: 610
+            vqTiltOutArms_DY3_4: 1199
+            vqTiltOutArms_DY4_5: 1365
+            vqTiltOutArms_DY5_6: 0
+            vqTiltOutArms_DY6_7: 0
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 6
+            vqAlgnBlks_DY0_1: 182
+            vqAlgnBlks_DY1_2: 284.5
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 549.5
+            vqAlgnBlks_DY4_5: 609
+            vqAlgnBlks_DY5_6: 791.5
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+
+        "6.0" :
+           {// ActiveWR/HP
+            vqYmax: 6100
+            vqY_AlgnTableTop: 6320
+            vqCarr_CutAreaYtop: 6300
+            vqDump_MaxY: 5500
+            vqRotProc_DiagMax: 6500
+            vqRotAlgn_HeightMax: 5500
+            vqBufRot_WidthMax: 6000
+            vqBufRot_HeightMax: 4500
+            vqBufRot_MassMax: 810
+            vqX_AlgnBandC: 240
+            vqY_AlgnBandB: 2080
+            vqY_AlgnBandM: 4380
+            vbVent_JoinedAlgnCT: 0
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 6180
+            vqY_CollTopDtch: 6180
+            vqLamp2_Hlim: 3000
+            vqClamps_Pup: 10000
+            vqClamps_Y_TopCyl: 3500
+            vnClamps_NumCyl: 3
+            vqClampAlgn_Weight: 600
+            vqClampDtch_Weight: 600
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 1100
+            vqXs_Inertia: 9000
+            vnDtchBelts_N: 8
+            vnBeltsAlgn_N: 8
+            vqBeltsAlgn_DY0_1: 96
+            vqBeltsAlgn_DY1_2: 289
+            vqBeltsAlgn_DY2_3: 350
+            vqBeltsAlgn_DY3_4: 550
+            vqBeltsAlgn_DY4_5: 607
+            vqBeltsAlgn_DY5_6: 892
+            vqBeltsAlgn_DY6_7: 610
+            vqBeltsAlgn_DY7_8: 830
+            vnTiltOutArms_N: 7
+            vqTiltOutArms_DY0_1: 283
+            vqTiltOutArms_DY1_2: 291
+            vqTiltOutArms_DY2_3: 610
+            vqTiltOutArms_DY3_4: 910
+            vqTiltOutArms_DY4_5: 910
+            vqTiltOutArms_DY5_6: 1190
+            vqTiltOutArms_DY6_7: 1250
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 8
+            vqAlgnBlks_DY0_1: 182
+            vqAlgnBlks_DY1_2: 284.5
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 549.5
+            vqAlgnBlks_DY4_5: 609
+            vqAlgnBlks_DY5_6: 791.5
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+       }
+
+    "algn-span" :
+       {
+        "3.2" :
+           {// ActiveWR/HP
+            vqX_AlgnBeltsBegin: 350
+            vqX_AlgnBeltsEnd: 2700
+            vqX_OutZoneBegin: 2000
+            vqX_OutZoneEnd: 3590
+            vqTiltOut_Xo: 3610
+            vqX_AlgnTableEnd: 3780
+            vqX_OutTableEnd: 3780
+            vqXph_OutZoneNearEnd: 2845
+            vqXph_OutZoneEnd: 3520
+            vqX_AlgnForeP: 2700
+            vqRotAlgn_WidthMax: 3210
+           }
+
+        "4.6" :
+           {// ActiveWR/HP
+            vqX_AlgnBeltsBegin: 350
+            vqX_AlgnBeltsEnd: 2700
+            vqX_OutZoneBegin: 2740
+            vqX_OutZoneEnd: 5110
+            vqTiltOut_Xo: 5115
+            vqX_AlgnTableEnd: 5280
+            vqX_OutTableEnd: 5280
+            vqXph_OutZoneNearEnd: 4150
+            vqXph_OutZoneEnd: 4825
+            vqX_AlgnForeP: 3950
+            vqRotAlgn_WidthMax: 4200 // 4500 se 6.0
+           }
+       }
+   }
+
+
+
+//-----------------------------------------------------------------
+W :
+   {
+    "common" :
+       {// ActiveW
+        vqGrab_MinRotTail: 500
+        vqProbe1_DX: 0
+        vqProbe3_DX: 0
+        vqRbrk_DblPressLim: 5.7
+        vqBelts_DragSpd: 30000
+        vnBelts_DragAcc: 25
+        vbVent_IndepOutZone: 0
+        vbBeltsAlgn_HaveFcDown: 0
+        vbHoldPads_Indep: 0
+        vnTiltOut_Type: 1
+        vbTiltOut_UseGrabOil: 1
+        vbTiltOut_StopIfGrab: 1
+        vqTiltOut_OffDelay: 1.5
+        vqTiltOut_OnDelay: 0.5
+        vqTiltOut_CmdDelay: 0.5
+        vqTiltOut_BumpDelay: 1
+        vqTiltOut_Speed: 9
+        vqTiltOut_AnearLow: 27
+        vqTiltOut_AnearHigh: 45
+        vqYph_OutZoneEnd: 270
+        vqRotNoBlk_MassMax: 500
+        vqGrab_RotVmax: 80000
+        vqGrab_SlipTorque: 200
+        vnGrab_YAccelMax: 50
+        vnGrab_RotMaxAccel: 80
+        vnGrab_SlantAccel: 15
+        vbOutZone_PedalToFree: 0
+        vqAlgn_DragVentOffDx: 150
+        vqAlgn_MinUpMargin: 10
+        vqAlgn_MinDelta: 20
+        vqAlgn_AddDelta: 25
+        vqAlgn_MeetSpd: 4500
+        vqAlgn_PushSpd: 3500
+       }
+
+    "cut-bridge" :
+       {
+        "4.0" :
+           {// ActiveW
+            vqYmax: 4030
+            vqY_AlgnTableTop: 4110
+            vqCarr_CutAreaYtop: 4200
+            vqDump_MaxY: 3300
+            vqRotProc_DiagMax: 4400
+            vqRotAlgn_HeightMax: 3500
+            vqBufRot_WidthMax: 3500
+            vqBufRot_HeightMax: 3500
+            vqBufRot_MassMax: 500
+            vqX_AlgnBandC: 230
+            vqY_AlgnBandB: 850
+            vqY_AlgnBandM: 2250
+            vbVent_JoinedAlgnCT: 1
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 4070
+            vqY_CollTopDtch: 4075
+            vqLamp2_Hlim: 2000
+            vqClamps_Pup: 7000
+            vqClamps_Y_TopCyl: 3000
+            vnClamps_NumCyl: 2
+            vqClampAlgn_Weight: 500
+            vqClampDtch_Weight: 500
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 600
+            vqXs_Inertia: 8000
+            vnDtchBelts_N: 6
+            vnBeltsAlgn_N: 8
+            vqBeltsAlgn_DY0_1: 75
+            vqBeltsAlgn_DY1_2: 228
+            vqBeltsAlgn_DY2_3: 275
+            vqBeltsAlgn_DY3_4: 427
+            vqBeltsAlgn_DY4_5: 484
+            vqBeltsAlgn_DY5_6: 731
+            vqBeltsAlgn_DY6_7: 659
+            vqBeltsAlgn_DY7_8: 588
+            vqBeltsAlgn_DY8_9: 0
+            vnTiltOutArms_N: 6
+            vqTiltOutArms_DY0_1: 75
+            vqTiltOutArms_DY1_2: 290
+            vqTiltOutArms_DY2_3: 310
+            vqTiltOutArms_DY3_4: 640
+            vqTiltOutArms_DY4_5: 1265
+            vqTiltOutArms_DY5_6: 1300
+            vqTiltOutArms_DY6_7: 1260
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 6
+            vqAlgnBlks_DY0_1: 178
+            vqAlgnBlks_DY1_2: 294
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 550
+            vqAlgnBlks_DY4_5: 610
+            vqAlgnBlks_DY5_6: 790
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+
+        "4.9" :
+           {// ActiveW
+            vqYmax: 4920
+            vqY_AlgnTableTop: 5010
+            vqCarr_CutAreaYtop: 5100
+            vqDump_MaxY: 3900
+            vqRotProc_DiagMax: 5400
+            vqRotAlgn_HeightMax: 4500
+            vqBufRot_WidthMax: 4500
+            vqBufRot_HeightMax: 3500
+            vqBufRot_MassMax: 500
+            vqX_AlgnBandC: 230
+            vqY_AlgnBandB: 850
+            vqY_AlgnBandM: 2250
+            vbVent_JoinedAlgnCT: 1
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 4970
+            vqY_CollTopDtch: 4970
+            vqLamp2_Hlim: 2400
+            vqClamps_Pup: 9000
+            vqClamps_Y_TopCyl: 3500
+            vnClamps_NumCyl: 3
+            vqClampAlgn_Weight: 500
+            vqClampDtch_Weight: 500
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 1000
+            vqXs_Inertia: 9000
+            vnDtchBelts_N: 7
+            vnBeltsAlgn_N: 8
+            vqBeltsAlgn_DY0_1: 75
+            vqBeltsAlgn_DY1_2: 228
+            vqBeltsAlgn_DY2_3: 275
+            vqBeltsAlgn_DY3_4: 427
+            vqBeltsAlgn_DY4_5: 484
+            vqBeltsAlgn_DY5_6: 731
+            vqBeltsAlgn_DY6_7: 659
+            vqBeltsAlgn_DY7_8: 588
+            vqBeltsAlgn_DY8_9: 0
+            vnTiltOutArms_N: 6
+            vqTiltOutArms_DY0_1: 75
+            vqTiltOutArms_DY1_2: 290
+            vqTiltOutArms_DY2_3: 310
+            vqTiltOutArms_DY3_4: 640
+            vqTiltOutArms_DY4_5: 1265
+            vqTiltOutArms_DY5_6: 1300
+            vqTiltOutArms_DY6_7: 1260
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 6
+            vqAlgnBlks_DY0_1: 178
+            vqAlgnBlks_DY1_2: 294
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 550
+            vqAlgnBlks_DY4_5: 610
+            vqAlgnBlks_DY5_6: 790
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+
+        "6.0" :
+           {// ActiveW
+            vqYmax: 6100
+            vqY_AlgnTableTop: 6320
+            vqCarr_CutAreaYtop: 6300
+            vqDump_MaxY: 5500
+            vqRotProc_DiagMax: 6500
+            vqRotAlgn_HeightMax: 5500
+            vqBufRot_WidthMax: 6000
+            vqBufRot_HeightMax: 4500
+            vqBufRot_MassMax: 810
+            vqX_AlgnBandC: 240
+            vqY_AlgnBandB: 2080
+            vqY_AlgnBandM: 4380
+            vbVent_JoinedAlgnCT: 0
+            vbVent_NoDtchMotor: 0
+            vqY_CollTopAlgn: 6180
+            vqY_CollTopDtch: 6180
+            vqLamp2_Hlim: 3000
+            vqClamps_Pup: 9000
+            vqClamps_Y_TopCyl: 3500
+            vnClamps_NumCyl: 3
+            vqClampAlgn_Weight: 600
+            vqClampDtch_Weight: 600
+            vqClampAlgn_CylFr: 150
+            vqClampDtch_CylFr: 150
+            vqXr_Inertia: 1100
+            vqXs_Inertia: 9000
+            vnDtchBelts_N: 8
+            vnBeltsAlgn_N: 8
+            vqBeltsAlgn_DY0_1: 75
+            vqBeltsAlgn_DY1_2: 228
+            vqBeltsAlgn_DY2_3: 275
+            vqBeltsAlgn_DY3_4: 427
+            vqBeltsAlgn_DY4_5: 484
+            vqBeltsAlgn_DY5_6: 731
+            vqBeltsAlgn_DY6_7: 659
+            vqBeltsAlgn_DY7_8: 588
+            vqBeltsAlgn_DY8_9: 0
+            vnTiltOutArms_N: 7
+            vqTiltOutArms_DY0_1: 75
+            vqTiltOutArms_DY1_2: 290
+            vqTiltOutArms_DY2_3: 310
+            vqTiltOutArms_DY3_4: 640
+            vqTiltOutArms_DY4_5: 1265
+            vqTiltOutArms_DY5_6: 1300
+            vqTiltOutArms_DY6_7: 1260
+            vqTiltOutArms_DY7_8: 0
+            vqTiltOutArms_DY8_9: 0
+            vnAlgnBlks_N: 8
+            vqAlgnBlks_DY0_1: 178
+            vqAlgnBlks_DY1_2: 294
+            vqAlgnBlks_DY2_3: 350
+            vqAlgnBlks_DY3_4: 550
+            vqAlgnBlks_DY4_5: 610
+            vqAlgnBlks_DY5_6: 790
+            vqAlgnBlks_DY6_7: 900
+            vqAlgnBlks_DY7_8: 610
+            vqAlgnBlks_DY8_9: 0
+           }
+       }
+
+    "algn-span" :
+       {
+        "3.2" :
+           {// ActiveW
+            vqX_AlgnBeltsBegin: 382
+            vqX_AlgnBeltsEnd: 383
+            vqX_OutZoneBegin: 2000
+            vqX_OutZoneEnd: 3590
+            vqTiltOut_Xo: 3610
+            vqX_AlgnTableEnd: 3780
+            vqX_OutTableEnd: 3780
+            vqXph_OutZoneNearEnd: 2845
+            vqXph_OutZoneEnd: 3520
+            vqX_AlgnForeP: 2700
+            vqRotAlgn_WidthMax: 3210
+           }
+
+        "4.6" :
+           {// ActiveW
+            vqX_AlgnBeltsBegin: 382
+            vqX_AlgnBeltsEnd: 383
+            vqX_OutZoneBegin: 3500
+            vqX_OutZoneEnd: 4890
+            vqTiltOut_Xo: 4910
+            vqX_AlgnTableEnd: 5090
+            vqX_OutTableEnd: 5090
+            vqXph_OutZoneNearEnd: 4150
+            vqXph_OutZoneEnd: 4825
+            vqX_AlgnForeP: 3950
+            vqRotAlgn_WidthMax: 4000 // 4500 se 6.0
+           }
+       }
+   }
+
+
+
+//-----------------------------------------------------------------
+W,WR,HP :
+   {
+    "+lowe" :
+       {// Con mola
+        vnGrLe_Type: 2
+       }
+
+    "+combo" :
+       {// Macchina combinata
+        vnComboFloat_Type: 1
+        vnFeed_Type: 0
+       }
+
+    "+loader" :
+       {// Caricatrice
+        vnLoader_Type: 1
+       }
+
+    "+no-buf" :
+       {// Senza polmone
+        vnBuf_Type: 0
+        vqFeed_Xend: -870
+        vqXph_FeedBegin: -8400
+        vqXph_FeedNearEnd: -2600
+        vqXph_FeedEnd: -1140
+        vqXph_FeedEnd2: -1140
+        vqXph_BufBegin: -1000
+        vqLdr_LoaderSheetX: -9500
+       }
+
+    "+shapecurv" :
+       {// Sagomato curvilineo
+        vnEnabledModes: 7
+        vnAlgnPincers_Type: 1
+       }
+
+    "+blade-inf" :
+       {// Con lametta inferiore per rifilo di testa
+        vqProd_DtchMinWidth: 30
+        vqProd_TrimWidth: 120
+       }
+
+    "+ciclo-65" :
+       {// Con doppio cilindro su barra per ciclo 65
+        vqBrkBar_MidShift_Dist: 30
+       }
+
+    "+ebrk" :
+       {// Tavolo di troncaggio a valle
+        vqX_OutTableEnd: 6780 // 3.2:6780, 4.6:8280
+        vbVent_IndepOutZone: 0
+        vnTiltOut_Type: 0
+        vnEbrk_Type: 1
+       }
+
+    "+fast" :
+       {// Velocizzazioni taglio (HP)
+        vqBlade_SpdMax: 160000
+        vbBlade_SliceKeepOn: 0
+        vqBlade_StartDisp_2mm: 1
+        vqBlade_StartDisp_12mm: 2
+        vqBrkBar_RiseTime: 0.5
+        vnCarr_FreeMovPerc: 100
+        vqCarr_HideMargin: 0
+        vbDtch_BladeSynch: 0
+        //vqDtch_PullDxStd: 1 // Mah, dubbia utilità
+        //vqDtch_MaxErrSep: 2 // Mah, dubbia utilità
+       }
+   }

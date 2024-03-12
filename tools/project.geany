@@ -1,0 +1,93 @@
+[editor]
+line_wrapping=false
+line_break_column=78
+auto_continue_multiline=true
+
+[file_prefs]
+final_new_line=false
+ensure_convert_new_lines=true
+strip_trailing_spaces=true
+replace_tabs=true
+
+[indentation]
+indent_width=4
+indent_type=0
+indent_hard_tab_width=4
+detect_indent=true
+detect_indent_width=false
+indent_mode=2
+
+[project]
+name=m32-pars-adapt
+base_path=/home/mat/dev/m32-pars-adapt
+description=A tool to help the parametrization of m32 based machines
+file_patterns=*.cpp;*.hpp;*.h;*.py;makefile;*.md;
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72
+
+[files]
+current_page=0
+FILE_NAME_0=1067;C++;0;EUTF-8;0;1;0;%2Fhome%2Fmat%2Fdev%2Fm32-pars-adapt%2Fsource%2Fmain.cpp;0;4
+
+[VTE]
+last_dir=/home/mat/dev/m32-pars-adapt/source
+
+[build-menu]
+filetypes=C++;
+NF_00_LB=_Make
+NF_00_CM=make
+NF_00_WD=%p/linux
+NF_01_LB=git status
+NF_01_CM=git status 
+NF_01_WD=%p
+NF_02_LB=diff
+NF_02_CM=meld %f
+NF_02_WD=
+NF_03_LB=git pull
+NF_03_CM=git pull
+NF_03_WD=%p
+EX_00_LB=Run all tests
+EX_00_CM=python run-all-tests.py
+EX_00_WD=%p/test
+EX_01_LB=Run system tests
+EX_01_CM=python run-system-tests.py
+EX_01_WD=%p/test
+EX_02_LB=Run manual tests
+EX_02_CM=python run-manual-tests.py
+EX_02_WD=%p/test
+EX_03_LB=Run
+EX_03_CM=../build/bin/m32-pars-adapt --help
+EX_03_WD=%p/test
+C++FT_00_LB=_Compile
+C++FT_00_CM=g++ -fanalyzer -std=c++2b -fno-rtti -I%p/source -I%p/source/common -fsyntax-only -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -c "%f"
+C++FT_00_WD=%d
+C++FT_01_LB=_Lint
+C++FT_01_CM=cppcheck --language=c++ --enable=warning,style --inline-suppr --suppress=passedByValue --template=gcc "%f"
+C++FT_01_WD=%d
+C++FT_02_LB=clang-tidy
+C++FT_02_CM=clang-tidy --header-filter=\\.hpp$ "%f" -- -std=c++2b -I%p/source -I%p/source/common
+C++FT_02_WD=%d
+C++FT_03_LB=_Build
+C++FT_03_CM=g++ -std=c++2b -fno-rtti -Isource/common -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "build/bin/m32-pars-adapt" "source/main.cpp"
+C++FT_03_WD=%p
+C++FT_04_LB=Build with clang
+C++FT_04_CM=clang++ -std=c++2b -fno-rtti -Isource/common -Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wfatal-errors -O3 -flto=auto -lfmt -o "build/bin/m32-pars-adapt" "source/main.cpp"
+C++FT_04_WD=%p
+
+[prjorg]
+source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;*.m;
+header_patterns=*.h;*.H;*.hpp;*.hxx;*.h++;*.hh;
+ignored_dirs_patterns=.*;
+ignored_file_patterns=*.o;*.obj;*.a;*.lib;*.so;*.dll;*.lo;*.la;*.class;*.jar;*.pyc;*.mo;*.gmo;
+generate_tag_prefs=0
+show_empty_dirs=true
+external_dirs=
+
+[code-format]
+clang-format-path=clang-format
+style=custom
+auto-format=false
+auto-format-trigger-chars=})];
+format-on-save=false

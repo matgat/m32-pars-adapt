@@ -1,0 +1,321 @@
+//---------------------------------------------------------------------------
+W,WR,HP :
+   {
+    "cut-bridge" :
+       {
+        "4.0" :
+           {// W,WR,HP
+            "Ysup", "Yinf" :
+               {
+                MaxPos = 4282
+               }
+           }
+
+        "4.9" :
+           {// W,WR,HP
+            "Ysup", "Yinf" :
+               {
+                MaxPos = 5186
+               }
+           }
+
+        "6.0" :
+           {// W,WR,HP
+            "Ysup", "Yinf" :
+               {
+                MaxPos = 6385
+                VelPPd = 50
+                TimeDecStop = 0.3
+               }
+
+            "Xr2", "Xs2" : // There's also: "Ca2", "Cr2", "Co2"
+               {
+                AxEnabled = 1
+                Simula = 0
+               }
+           }
+       }
+
+    "algn-span" :
+       {
+        "3.2" :
+           {// W,WR,HP
+            "Xr" :
+               {
+                MaxPos = 2765
+               }
+           }
+
+        "4.6" :
+           {// W,WR,HP
+            "Xr" :
+               {
+                MaxPos = 4060
+               }
+           }
+       }
+
+    "+opp" :
+       {// W,WR,HP opposte
+        "Ysup", "Yinf", "Xs" :
+           {
+            InvDir = 1
+            InvEnc = 1
+           }
+
+        "Cb" :
+           {
+            InvDir = 0
+            InvEnc = 0
+           }
+
+        "Sle" :
+           {
+            InvDir = 1
+            InvEnc = 1
+           }
+       }
+
+    "+buf-rot" :
+       {// W,WR,HP ventosa su polmone
+        "Zb" :
+           {
+            AxEnabled = 1
+            Simula = 0
+           }
+       }
+
+    "+no-buf" :
+       {// W,WR,HP ventosa senza polmone
+        "Cb" :
+           {
+            AxEnabled = 0
+            Simula = 1
+           }
+       }
+
+    "+enc-ext-cs-shaft" :
+       {// Encoder esterno su albero cinghie stacco
+        "Cs" :
+           {
+            MmRif = 360
+            ImpRif = 28800
+            EngineRPM = 150
+            VelRif = 72000
+           }
+       }
+
+    "+enc-ext-cs-w200" :
+       {// Encoder esterno su vetro (rotella sviluppo 200mm)
+        "Cs" :
+           {
+            MmRif = 200
+            ImpRif = 28800
+            EngineRPM = 1696.46
+            VelRif = 814301
+           }
+       }
+   }
+
+
+//---------------------------------------------------------------------------
+W,WR :
+   {
+    "common" :
+       {// W,WR
+        "Xs" :
+           {
+            MmRif = 2.094395102 // 1/60 40pi
+            VelMax = 90
+           }
+
+        "Ysup", "Yinf" :
+           {
+            MinPos = -300
+            MmRif = 55 // 22/80 * 200 mm/rev
+            ZeroDir = 15
+           }
+       }
+
+    "cut-bridge" :
+       {
+        "4.0" :
+           {// W,WR
+            "Ysup", "Yinf" :
+               {
+                QuoZero = 4207
+                QuoHome = 4277
+               }
+           }
+
+        "4.9" :
+           {// W,WR
+            "Ysup", "Yinf" :
+               {
+                QuoZero = 5110
+                QuoHome = 5183
+               }
+           }
+
+        "6.0" :
+           {// W,WR
+            "Ysup", "Yinf" :
+               {
+                QuoZero = 6335
+                QuoHome = 6380
+               }
+
+            "Xs" :
+               {// Rallentiamo un po' lo stacco gantry?
+                VelMax = 70
+                VelZero = 8
+                TimeAcc = 0.5
+                //TimeDec = 0.3
+                VelPPa = 50
+                //VelPPd = 30
+               }
+           }
+       }
+   }
+
+
+//---------------------------------------------------------------------------
+WR,HP :
+   {
+    "common" :
+       {// WR,HP
+        "Xr" :
+           {
+            MmRif = 24.2647
+           }
+
+        "Cr" :
+           {
+            MmRif = 20 // Cinghie
+            AxEnabled = 1
+            Simula = 0
+           }
+
+        "Co" :
+           {
+            AxEnabled = 1
+            Simula = 0
+           }
+       }
+}
+
+
+//---------------------------------------------------------------------------
+HP :
+   {
+    "common" :
+       {// HP
+        "Xs" :
+           {
+            MmRif = 1.45646391 // 1/86.28 40pi
+           }
+
+        "Ysup", "Yinf" :
+           {
+            MmRif = 80 // 1/4 * 320 mm/rev
+            MinPos = -583
+            QuoZero = -502
+            QuoHome = -580
+            ZeroDir = 14
+           }
+
+        "Yinf" :
+           {
+            TimeDecStop = 0.3
+           }
+
+        "Pr", "Pr2", "Ps", "Ps2" :
+           {
+            AxEnabled = 1
+            Simula = 0
+           }
+       }
+
+    "cut-bridge" :
+       {
+        "6.0" :
+           {// HP
+            "Xs" :
+               {// Rallentiamo un po' lo stacco gantry?
+                VelMax = 80
+                VelZero = 8
+               }
+           }
+       }
+   }
+
+
+//---------------------------------------------------------------------------
+W :
+   {
+    "common" :
+       {// W
+        "Xr" :
+           {
+            MmRif = 20.592647059
+           }
+
+        "Cr" :
+           {
+            MmRif = 19.635 // Rulli
+           }
+
+        "Co" :
+           {
+            AxEnabled = 0
+            Simula = 1
+           }
+       }
+   }
+
+
+//---------------------------------------------------------------------------
+// Ingressi di azzeramento
+W,WR :
+   {
+    "common" :
+       {
+        "Xr" : { InZero = 66 }
+        "Xr2": { InZero = 523 }
+        "Xs" : { InZero = 336 }
+        "Xs2": { InZero = 286 }
+        "Ysup": { InZero = 297 }
+        "Yinf": { InZero = 345 }
+        "Zg": { InZero = 305 }
+       }
+
+    "cut-bridge" :
+       {
+        "6.0" :
+           {
+            "Xs" : { InZero = 38 }
+            "Xs2": { InZero = 47 }
+            "Ysup": { InZero = 36 }
+            "Yinf": { InZero = 35 }
+            "Zg": { InZero = 16 }
+           }
+       }
+   }
+
+HP :
+   {
+    "common" :
+       {
+        "Xr" : { InZero = 157 }
+        "Xr2": { InZero = 201 }
+        "Xs" : { InZero = 58 }
+        "Xs2": { InZero = 67 }
+        "Ysup": { InZero = 52 }
+        "Yinf": { InZero = 51 }
+        "Zg": { InZero = 32 }
+        "Pr" : { InZero = 53 }
+        "Pr2": { InZero = 54 }
+        "Ps" : { InZero = 55 }
+        "Ps2": { InZero = 56 }
+       }
+   }

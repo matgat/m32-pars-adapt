@@ -1,0 +1,1078 @@
+[StartUdt]
+
+  [StartVars]
+    [StartNote]
+    Parametri macchina
+    m32-pars-adapt, 0 issues
+    [EndNote]
+
+    # [Release]
+    vq91 = 34.9 # Versione file (2024-03) 'vqMachSettingsVer'
+    va30 = "ActiveHP-6.0/4.6-(lowe)" # Nome macchina 'vaMachName'
+    va31 = "Base" # Note rilascio 'vaRelNotes'
+
+
+    # [Opzioni]
+    vn1500 = 11 # Tipologia macchina (0:Dummy 1:F 2:FR 10:W/WR 11:HP) 'vnMach_Type'
+    vq1500 = -0.001 # Funzionalità abilitate 'vqEnabledSettings'
+    vn1600 = 7 # Modalità lavorazione abilitate 'vnEnabledModes'
+    vn1601 = 28 # Ricette abilitate 'vnEnabledRecipes'
+    vq2500 = 206.000 # Minimum needed firmware version 'vqMinFwVer'
+
+
+    # [Limiti macchina: taglio]
+    vq1840 = 0 # [mm] Ordinata minima del bordo vetro (rotelle di riferimento) 'vqYmin'
+    vq1841 = 6100 # [mm] Ordinata massima del bordo vetro (limite del ponte di taglio) 'vqYmax'
+    vq2511 = 13 # [mm] Spessore singolo strato vetro massimo tagliabile 'vqCut_LayerThcknMax'
+    vq2512 = 5 # [mm] Spessore plastico massimo tagliabile 'vqCut_PvbThcknMax'
+    vq2513 = 100 # [mm] Altezza minima tagliabile 'vqCut_MinLength'
+    vq2514 = 20 # [mm] Rimanenza minima apribile automaticamente 'vqRemn_OpenMinWidth'
+    vq2515 = 20 # [mm] Rimanenza minima separabile automaticamente 'vqRemn_DtchMinWidth'
+    vq2516 = 100 # [mm] Soglia larghezza rimanenza per sequenza separazione rifilo 'vqRemn_TrimWidth'
+    vq2517 = 20 # [mm] Prodotto minimo apribile automaticamente 'vqProd_OpenMinWidth'
+    vq2518 = 120 # [mm] Prodotto minimo separabile automaticamente 'vqProd_DtchMinWidth'
+    vq2519 = 120 # [mm] Soglia larghezza prodotto per sequenza separazione rifilo di testa 'vqProd_TrimWidth'
+    # Sequenze taglio
+    vq2590 = 6 # [mm] Appoggio minimo per apertura standard barra+rotella 'vqOpenStd_MinLean'
+    vq2591 = 80 # [mm] Soglia larghezza rifilo per sequenza separazione velocizzata 'vqRemn_BigTrim'
+    # Taglio monolitico
+    vq2531 = 12 # [mm] Spessore vetro monolitico massimo tagliabile 'vqCut_FloatThcknMax'
+    vq2535 = 300 # [mm] Soglia larghezza prodotto/rimanenza per separaz vetro monolitico 'vqCut_FloatMinWidth'
+
+
+    # [Limiti macchina: movimentazione]
+    vq2550 = 25 # [mm] Spessore complessivo massimo movimentabile 'vqShift_MaxGlassThckn'
+    vq1680 = 21 # [mm] Spessore complessivo massimo agguantabile da pinza 'vqGrab_MaxGlassThckn'
+    vq1681 = 8 # [mm] Minimo spessore monolitico ruotabile automaticamente 'vqGrab_MinFloatThckn'
+    vq2551 = 350 # [mm] Larghezza minima vetro per trasferimento tra moduli 'vqShift_PassMinWidth'
+    vq2552 = 350 # [mm] Larghezza minima vetro per passaggio stacco-riscontri 'vqShift_CrossMinWidth'
+    vq2553 = 800 # [mm] Larghezza minima passabile a riscontri senza avvicinam stacco 'vqShift_GoodWidth'
+    vq2554 = 200 # [mm] Soglia larghezza rimanenza per accorgimenti sequenze prelievo 'vqShift_RemnGoodWidth'
+    # -Rotazioni zona taglio-
+    vq2560 = 150 # [mm] Massima sporgenza vetro fuori dal tavolo ammessa 'vqRot_MaxLeanOut'
+    vq2561 = 6500 # [mm] Massima diagonale ruotabile in zona taglio 'vqRotProc_DiagMax'
+    vq2562 = 4200 # [mm] Massima larghezza ruotabile lato riscontro 'vqRotAlgn_WidthMax'
+    vq2563 = 5500 # [mm] Massima altezza ruotabile lato riscontro 'vqRotAlgn_HeightMax'
+    vq2566 = 200 # [Kg] Soglia massa ruotabile senza piedino 'vqRotNoBlk_MassMax'
+    # -Rotazioni su polmone-
+    vq2570 = 6000 # [mm] Massima larghezza ruotabile sul polmone 'vqBufRot_WidthMax'
+    vq2571 = 4500 # [mm] Massima altezza ruotabile sul polmone 'vqBufRot_HeightMax'
+    vq2572 = 2000 # [mm] Minima larghezza ruotabile sul polmone 'vqBufRot_WidthMin'
+    vq2573 = 2150 # [mm] Minima altezza ruotabile sul polmone 'vqBufRot_HeightMin'
+    vq2574 = 810 # [Kg] Massima massa ruotabile sul polmone 'vqBufRot_MassMax'
+
+
+    # [Impostazioni generali/Comportamento]
+    vb1500 = 0 # Effettua test completo attuazioni all'azzeramento 'vbHomingFullTest'
+    vb1501 = 1 # Non fidarti del reset richieste, controlla fotocellule 'vbAck_CheckSensors'
+    vb1502 = 1 # Anticipa start automatico del passo successivo 'vbStep_EarlyStart'
+    vb1503 = 1 # Seleziona step successivo anche al fallimento di una rotazione 'vbStep_AlwaysNext'
+    vb1504 = 1 # Non attendere inserzione rimanenza 'vbStep_DoNotWaitRemnIns'
+    vb1505 = 1 # Ruota la lastra in arrivo lato riscontri 'vbStep_RotSheetOnAlgn'
+    vb1506 = 1 # Fai partire la sequenza riscontro alla chiamata lastra 'vbStep_StartAlgnOnCall'
+    vb1507 = 0 # Il pulsante stop+avanzamento ferma tutto 'vbNextStep_FullStop'
+    vb1508 = 0 # Prosegui col passo successivo solo dopo prelievo pezzo 'vbStep_WaitPieceTaken'
+    vq1505 = 15 # [mm] Margine massimo sui controlli caduta vetro 'vqFall_MaxMargin'
+    vq1884 = 50 # [mm] Ordinata ideale/tipica della lastra in arrivo dal carico 'vqYo_SheetFeed'
+    # -Prelievo rimanenza-
+    vq1734 = -400 # [mm] Posizione prelievo rimanenza lato stacco 'vqShift_RemnTakePos'
+
+
+    # [Limitazioni attuazioni]
+    vq1533 = 200000 # [mm/min] Velocità massima incisione 'vqTscore_SpdMax'
+    vq1560 = 135000 # [mm/min] Velocità massima rotelle apertura 'vqRbrk_SpdMax'
+    vq1570 = 160000 # [mm/min] Velocità massima taglio PVB 'vqBlade_SpdMax'
+    vq1602 = 100000 # [mm/min] Velocità massima mola basso emissivo 'vqGrLe_SpdMax'
+    vq2804 = 33866 # [N] Spinta massima ammessa dei premilastra pneumatici 'vqClamps_PushMax'
+    vq1534 = 240 # [N] Spinta massima testine di incisione 'vqTscore_PushMax'
+    vq1561 = 3200 # [N] Spinta massima rotelle di apertura 'vqRbrk_PushMax'
+    vq1571 = 120 # [N] Spinta massima lametta PVB 'vqBlade_PushMax'
+    vq1603 = 100 # [N] Spinta massima mola basso emissivo 'vqGrLe_PushMax'
+    vq1547 = 50 # [N] Spinta massima attuatore pastello marcatore 'vqMarker_PushMax'
+
+
+    # [Sicurezze]
+    vn1507 = 2 # Tipo centralina di sicurezza (0:none 1:Digital-IO 2:Sick-Ethercat) 'vnScu_Type'
+    vn1610 = 50 # [%] Parzializzazione velocità con sicurezze in preallarme 'vnSpdSafePerc'
+    vq1507 = 4.5 # [s] Tempo attesa riarmo sicurezze 'vqScu_RearmTime'
+    vq1508 = 1.5 # [s] Tempo tolleranza cadute pressione di linea 'vqAirPrsFallMaxTime'
+    vb1509 = 1 # Non liberare area preincisioni se fotocellula coperta 'vbScu_StrictOutzonePolicy'
+    vq1509 = 3 # [s] Ritardo per fare uscire l'operatore dalle zone protette 'vqScu_ReleaseDelay'
+
+
+    # [Offset Y utensili rispetto testine incisione]
+    # -Carrello superiore-
+    vq1850 = -130 # [mm] Ingombro Y (indietro) corpo carrello superiore 'vqCarrSup_DYroomM'
+    vq1851 = 280 # [mm] Ingombro Y (avanti) corpo carrello superiore 'vqCarrSup_DYroomP'
+    vq1852 = 395 # [mm] Dimensione traino superiore 'vqECarrSup_Length'
+    vq2620 = 220 # [mm] Offset Y rotella apertura superiore 'vqRsup_DY'
+    vq2621 = 151 # [mm] Offset Y lametta PVB 'vqBladeSup_DY'
+    vq2622 = 430 # [mm] Offset Y mola basso emissivo 'vqGrLe_DY'
+    # -Carrello inferiore-
+    vq1855 = -120 # [mm] Ingombro Y (indietro) corpo carrello inferiore 'vqCarrInf_DYroomM'
+    vq1856 = 290 # [mm] Ingombro Y (avanti) corpo carrello inferiore 'vqCarrInf_DYroomP'
+    vq1857 = 190 # [mm] Dimensione traino inferiore 'vqECarrInf_Length'
+    vq2625 = 235 # [mm] Offset Y rotella apertura inferiore 'vqRinf_DY'
+    vq2626 = 170 # [mm] Offset Y lametta PVB 'vqBladeInf_DY'
+    vq2627 = 402 # [mm] Offset Y centro girapezzi 'vqGrabber_DY'
+    # -Utensili aggiuntivi per sagomato-
+    vq2631 = 85 # [mm] Offset Y testina aggiuntiva superiore 'vqTsup2_DY'
+    vq2632 = 85 # [mm] Offset Y testina aggiuntiva inferiore 'vqTinf2_DY'
+    vq2633 = 595 # [mm] Offset Y mola basso emissivo aggiuntiva 'vqGrLe2_DY'
+    vq2636 = 0 # [mm] Offset X mola basso emissivo aggiuntiva 'vqGrLe2_DX'
+    vq2634 = -100 # [mm] Offset Y utensile apertura a percussione superiore 'vqRsup2_DY'
+    vq2635 = -100 # [mm] Offset Y utensile apertura a percussione inferiore 'vqRinf2_DY'
+
+
+    # [Misure critiche] !!Se qui sbagli distruggi la macchina!!
+    vq1848 = -280 # [mm] Ordinata inizio area non sicura carrelli 'vqCarr_CutAreaYbtm'
+    vq1849 = 6300 # [mm] Ordinata fine area non sicura carrelli 'vqCarr_CutAreaYtop'
+    vq2600 = -70 # [mm] Ingombro X (lato stacco) carrello inferiore 'vqCarrInf_XroomM'
+    vq2436 = -86 # [mm] Ingombro X (lato stacco) traino inferiore 'vqECarrInf_XroomM'
+    vq2601 = -37 # [mm] Ingombro X (lato stacco) carrello superiore 'vqCarrSup_XroomM'
+    vq2435 = -37 # [mm] Ingombro X (lato stacco) traino superiore 'vqECarrSup_XroomM'
+    vq2602 = -23 # [mm] Ingombro X (lato stacco) lampada 'vqLamp_XroomM'
+    vq2603 = -33 # [mm] Limite quota stacco con barra fuori 'vqX_BrkBarMax'
+    vq2605 = 92 # [mm] Ascissa inizio piano di appoggio/premilastra riscontri 'vqX_CutZoneP'
+    vq2606 = 230 # [mm] Ascissa fine premilastra riscontri 'vqX_ClampAlgnP'
+    vq2615 = 2740 # [mm] Ascissa inizio zona fine linea 'vqX_OutZoneBegin'
+    vq2616 = 5110 # [mm] Ascissa fine zona fine linea/consegna pezzi 'vqX_OutZoneEnd'
+    vq1780 = 5115 # [mm] Ascissa dei piedini automatici della ribaltina 'vqTiltOut_Xo'
+    vq2617 = 5280 # [mm] Ascissa legno fine modulo riscontri 'vqX_AlgnTableEnd'
+    vq2618 = 5280 # [mm] Ascissa legno fine tavolo a valle 'vqX_OutTableEnd'
+    vq2619 = 6320 # [mm] Ordinata legno alto modulo riscontri 'vqY_AlgnTableTop'
+
+
+    # [Altre misure]
+    vq1511 = 151 # [mm] Ascissa dei tamponi fermavetro (lato riscontro) 'vqHoldPadsAlgn_X'
+    vq2610 = 350 # [mm] Ascissa inizio rulli/cinghie modulo riscontri 'vqX_AlgnBeltsBegin'
+    vq2611 = 2700 # [mm] Ascissa fine rulli/cinghie modulo riscontri 'vqX_AlgnBeltsEnd'
+    vq2760 = -80 # [mm] Offset X delle cinghie rispetto bordo stacco 'vqDtchBelts_Dx'
+    vq1525 = -153 # [mm] Offset X bordo indietro del premilastra stacco 'vqClampDtch_DxM'
+    vq1863 = -833 # [mm] Ascissa inizio zona stacco 'vqDtch_Xbegin'
+    vq1882 = -3275 # [mm] Posizione bordo avanti del tavolo di carico 'vqFeed_Xend'
+    # -Posizione Y cinghie, riscontri, ribaltina-
+    vq2751 = 145 # [mm] Ordinata della mezzeria cinghia stacco 1 'vqDtchBelts_DY0_1'
+    vq2771 = 96 # [mm] Ordinata della mezzeria cinghia/rullo riscontro 1 'vqBeltsAlgn_DY0_1'
+    vq2731 = 182 # [mm] Ordinata del primo piedino di riscontro 'vqAlgnBlks_DY0_1'
+    vq2781 = 283 # [mm] Ordinata del braccio ribaltina 1 'vqTiltOutArms_DY0_1'
+    # -Coordinate per controllo collisioni rotazioni-
+    vq2580 = 245 # [mm] X punto collisione carpenteria in alto lato riscontri 'vqX_CollTopAlgn'
+    vq2581 = 6180 # [mm] Y punto collisione carpenteria in alto lato riscontri 'vqY_CollTopAlgn'
+    vq2582 = -210 # [mm] X punto collisione carpenteria in alto lato stacco 'vqX_CollTopDtch'
+    vq2583 = 6180 # [mm] Y punto collisione carpenteria in alto lato stacco 'vqY_CollTopDtch'
+    vq2584 = -5000 # [mm] X punto collisione corpo estraneo a monte 'vqX_CollTopFeed'
+    vq2585 = 3200 # [mm] Y punto collisione corpo estraneo a monte 'vqY_CollTopFeed'
+    # -Misure posizione fotocellule-
+    #    +---------------------+-------------++--+ +-------------+
+    #    |                     |             ||  |=| ___________ |
+    #    |FeedBegin     FeedEnd|      DtchBegin  DtchLast_______ |
+    #    |°    FeedNearEnd°   °|°BufBegin    |°  °=| ____°___°__°| OutZoneEnd
+    #    +---------------------+-------------+|--| +-------------+
+    vq1700 = 1 # [mm] Larghezza fotocellule per correzione lettura in rilascio 'vqDXph_Size'
+    vq1701 = -10575 # [mm] Ascissa fotocellula inizio carico 'vqXph_FeedBegin'
+    vq1703 = -4510 # [mm] Ascissa fotocellula prossimità fine carico 'vqXph_FeedNearEnd'
+    vq1704 = -3340 # [mm] Ascissa fotocellula fine carico 'vqXph_FeedEnd'
+    vq1705 = 385 # [mm] Ordinata fotocellula fine carico 'vqYph_FeedEnd'
+    vq1706 = -3340 # [mm] Ascissa fotocellula fine carico alta 'vqXph_FeedEnd2'
+    vq1707 = 2829 # [mm] Ordinata fotocellula fine carico alta 'vqYph_FeedEnd2'
+    vq1708 = -3215 # [mm] Ascissa fotocellula inizio polmone 'vqXph_BufBegin'
+    vq1710 = -653 # [mm] Offset fotocellula inizio stacco/esp rifili 'vqDXph_DtchBegin'
+    vq1711 = -242 # [mm] Offset ultima fotocellula su stacco 'vqDXph_DtchLast'
+    vq1712 = 315 # [mm] Ordinata ultima fotocellula su stacco 'vqYph_DtchLast'
+    vq1715 = 2640 # [mm] Ascissa fotocellula inizio zona fine linea 'vqXph_OutZoneBegin'
+    vq1716 = 4150 # [mm] Ascissa fotocellula prossimità fine zona fine linea 'vqXph_OutZoneNearEnd'
+    vq1717 = 4825 # [mm] Ascissa fotocellula fine zona fine linea 'vqXph_OutZoneEnd'
+    vq1718 = 170 # [mm] Ordinata fotocellula fine zona fine linea 'vqYph_OutZoneEnd'
+    # Vedi anche sotto le misure riscontri e cinghie 'vqAlgnBlks_DY0_1', 'vqDtchBelts_DY0_1'
+
+
+    # [Tamponi fermavetro]
+    vn1557 = 1 # Tipo tamponi ferma vetro (0:none 1:pneum) 'vnHoldPads_Type'
+    vb1530 = 1 # Tamponi fermavetro lato stacco/riscontro indipendenti 'vbHoldPads_Indep'
+    vq1510 = 2945 # [mm²] Area cilindri attuatore pneumatico tamponi fermavetro (6xø25=2945) 'vqHoldPads_CylArea'
+    vq1512 = -50 # [mm] Offset dei tamponi fermavetro (lato stacco, rispetto bordo) 'vqHoldPadsDtch_Dx'
+    vq1515 = 1 # [s] Tempo attesa discesa tamponi 'vqHoldPads_DwnTime'
+    vq1516 = 0.3 # [s] Tempo attesa salita tamponi 'vqHoldPads_UpTime'
+    vq1517 = 300 # [N] Spinta tamponi fermavetro per tenere il taglio 'vqHoldPads_Phold'
+    vq1518 = 600 # [N] Spinta tamponi fermavetro per scollare il rifilo 'vqHoldPads_Pclamp'
+
+
+    # [Premilastra]
+    vq1520 = 60 # Scivolosità vetro-gomma premilastra 'vqClamps_Kslip'
+    vq1521 = 250 # [N/m·mm] Massima pressione di schiacciamento vetro per non rovinare gomma 'vqClamps_WearPress'
+    # -attuazione pneumatica-
+    vq2800 = 0.4 # Rapporto di trasmissione meccanico cilindri premilastra 'vqClamps_MechRatio'
+    vq2801 = 5026 # [mm²] Area cilindri premilastra (ø63=3117,ø80=5026) 'vqClamps_CylArea'
+    vq2802 = 0.1 # [ms/N] Latenza attuatore pneumatico premilastra 'vqClamps_Latency'
+    vq2803 = 3500 # [mm] Ordinata limite uso secondo gruppo di cilindri 'vqClamps_Y_TopCyl'
+    vq2805 = 6000 # [N] Spinta impulso discesa premilastra 'vqClamps_PpulseDwn'
+    vq2806 = 10000 # [N] Spinta salita dolce premilastra 'vqClamps_Pup'
+    vq2807 = 0.9 # [s] Tempo impulso spinta discesa premilastra 'vqClamps_TpulseDwn'
+    vq2808 = 0 # [s] Tempo discesa senza spinta premilastra 'vqClamps_TfallDwn'
+    vq2809 = 0.9 # [s] Tempo spinta di salita premilastra 'vqClamps_Tup'
+    vq2810 = 0.7 # [s] Tempo per cui si considerano i premilastra quasi saliti 'vqClamps_TalmostUp'
+    vn1615 = 2 # Numero cilindri banda bassa (fissi) 'vnClamps_NumBcyl'
+    vn1616 = 3 # Numero cilindri totali (fissi+opzionali) 'vnClamps_NumCyl'
+    vq2811 = 800 # [N] Spinta premilastra per apertura con barra 3+3 'vqClamps_Pbrk_6mm'
+    vq2812 = 8000 # [N] Spinta premilastra per apertura con barra 10+10 'vqClamps_Pbrk_20mm'
+    vq2813 = 2000 # [N] Spinta premilastra per tenere il vetro durante il taglio 'vqClamps_Phold'
+    vq2814 = 4000 # [N] Spinta premilastra per spostare il vetro 'vqClamps_Pgrab'
+    vq2816 = 600 # [N] Peso premilastra lato riscontri 'vqClampAlgn_Weight'
+    vq2817 = 150 # [N] Forza resistente statica cilindri premilastra lato riscontri 'vqClampAlgn_CylFr'
+    vq2818 = 600 # [N] Peso premilastra lato stacco 'vqClampDtch_Weight'
+    vq2819 = 150 # [N] Forza resistente statica cilindri premilastra lato stacco 'vqClampDtch_CylFr'
+    # -attuazione motorizzata-
+    vb1535 = 1 # Stai in home quando non si taglia 'vbClamps_HomeRest'
+    vq2820 = 16 # [mm] Altezza posizione di riposo rispetto il vetro 'vqClamps_Hover'
+    vq2821 = 1 # [mm] Tolleranza posizione per deformabilità, planarità e spessore vetro 'vqClamps_Htol'
+    vq2822 = 0 # [mm] Distanza dal vetro per tenuta 'vqClamps_DHhold'
+    vq2823 = 1 # [mm] Distanza dal vetro per apertura con barra 'vqClamps_DHbrk'
+    vq2824 = 0 # [mm] Distanza dal vetro per apertura con barra vetro stretto 'vqClamps_DHbrk_more'
+    vq2825 = 350 # [mm] Soglia larghezza vetro stretto (vetro su gomma) 'vqClamps_Xrubber'
+    vq2826 = 45 # [mm] Altezza sicura per collisione carrsup/pinza alta 'vqClamps_Hsafe'
+    vq2830 = 0.2 # [s] Tempo stabilizzazione spinta premilastra 'vqClamps_SettleTime'
+    vq2831 = 0.1 # [Tn] Limite coppia minimo durante pressione su vetro 'vqPx_PressMinTrq'
+    vq2832 = 1 # [Tn] Limite coppia durante pressione su vetro 'vqPx_PressMaxTrq'
+    vq2833 = 3 # [Tn] Limite coppia erogabile dal motore secondario del premilastra 'vqPx_GantryMaxTrq'
+    vq2835 = 5 # [mm] Massimo scostamento ammesso tra i motori 'vqPx_GantryMaxErr'
+    vb1537 = 1 # L'asse elettrico insegue la posizione effettiva 'vbPx_GantryActPos'
+
+
+    # [Incisione]
+    vb1550 = 0 # Riferisci quota alta preincisione alla misura del bordo basso 'vbPrescoreRefBtmEdge'
+    vq1530 = 1 # [mm] Semilarghezza testine di incisione 'vqTscore_SemiWidth'
+    vq1531 = 314 # [mm²] Area cilindro attuatore pneumatico testine di incisione (ø20=314) 'vqTscore_CylArea'
+    vq1532 = 11 # [ms/N] Latenza attuatore pneumatico testine di incisione 'vqTscore_Latency'
+    vq1535 = 70 # [N] Forza di salita/ritenuta testine di incisione 'vqTscore_UpPush'
+    vq1536 = 250 # [N] Forza massima che il carrello può erogare durante incisione 'vqTscore_ScoreYforce'
+    # -Testina superiore-
+    vq1540 = 0 # [N] Peso attuazione testina superiore 'vqTsup_Weight'
+    vq1541 = 2 # [N] Forza resistente statica attuazione testina superiore 'vqTsup_CylFr'
+    # -Testina inferiore-
+    vq1542 = 0 # [N] Peso attuazione testina inferiore 'vqTinf_Weight'
+    vq1543 = 2 # [N] Forza resistente statica attuazione testina inferiore 'vqTinf_CylFr'
+
+
+    # [Rotelle di apertura]
+    vq1550 = 40 # [mm] Semilarghezza controrotelle di apertura 'vqRbrk_SemiWidth'
+    vq1551 = 1963 # [mm²] Area cilindro attuatore pneumatico rotelle di apertura (ø50=1963) 'vqRbrk_CylArea'
+    vq1552 = 1.1 # [ms/N] Latenza attuatore pneumatico rotelle di apertura 'vqRbrk_Latency'
+    vq1553 = 0 # [N] Soglia spinta per direzione preferita passate con controrotella (0:none <0:bck >0:fwd) 'vqRbrk_CrotPrefDirF'
+    vq1555 = 300 # [N] Forza di salita/ritenuta rotelle di apertura 'vqRbrk_UpPush'
+    vq1556 = 5.7 # [bar] Soglia pressione uso doppia camera 'vqRbrk_DblPressLim'
+    vq1557 = 0.9 # [s] Tempo scambio contro-rotella 'vqRbrk_SelTime'
+    vq1558 = 20 # [mm] Margine aggiuntivo da bordo vetro per bassi spessori 'vqRbrk_MaxAddMargin'
+    vq1559 = 500 # [N] Forza massima che il carrello può erogare durante apertura con rotelle 'vqRbrk_OpenYforce'
+    # -Rotella apertura superiore-
+    vq1566 = 5 # [N] Peso attuazione rotella superiore 'vqRsup_Weight'
+    vq1567 = 5 # [N] Forza resistente statica attuazione rotella superiore 'vqRsup_CylFr'
+    # -Rotella apertura inferiore-
+    vq1568 = 5 # [N] Peso attuazione rotella inferiore 'vqRinf_Weight'
+    vq1569 = 5 # [N] Forza resistente statica attuazione rotella inferiore 'vqRinf_CylFr'
+
+
+    # [Lamette PVB]
+    vb1570 = 1 # Non attendere salita lametta dopo taglio PVB 'vbBlade_NoWaitUp'
+    vb1571 = 0 # Forza taglio PVB sempre in avanti 'vbBlade_AlwaysFwd'
+    vq1572 = 50 # [N] Forza di salita/ritenuta lametta PVB 'vqBlade_UpPush'
+    vq1573 = 16 # [N/0.1mm] Forza del carrello durante taglio PVB per ogni decimo di plastico 'vqBlade_CutYforce'
+    vq1574 = -30.5 # [mm] X lametta per taglio rifilo lato stacco 'vqBlade_XtrimDtch'
+    vq1575 = 85 # [mm] X lametta per taglio rifilo lato riscontro 'vqBlade_XtrimAlgn'
+    vq1576 = 0 # [mm] Correzione offset Y lametta nel taglio rifilo 'vqBlade_DYtrim'
+    vq1577 = 0.5 # [s] Tempo spinta sfondamento plastico 'vqBlade_Tpush'
+    vq1578 = 30 # [N] Compensazione forza antagonista 'vqBlade_AddPush'
+    # Tasteggio
+    vb1580 = 0 # Non alzare lametta durante tasteggio 'vbBlade_SliceKeepOn'
+    vq1580 = 20 # [mm] Movimento affettatura durante tasteggio 'vqBlade_SliceDelta'
+    vq1581 = 2000 # [mm/min] Velocità affettatura durante tasteggio 'vqBlade_SliceSpeed'
+    vq1583 = 2 # [mm] Soglia scostamento stacco per inizio tasteggio -strato 2mm- 'vqBlade_StartDisp_2mm'
+    vq1584 = 4.5 # [mm] Soglia scostamento stacco per inizio tasteggio -strato 12mm- 'vqBlade_StartDisp_12mm'
+    vq1585 = 6.2 # Limite scostamento stacco per fallimento tasteggio (multiplo dello scostamento di inizio) 'vqBlade_AbortDispK'
+    # Taglio plastico
+    vq1586 = 300 # [mm] Massimo errore inseguimento ammesso durante taglio plastico 'vqBlade_MaxPosErr'
+    vq1587 = 5 # [mm] Errore inseguimento per rilevazione lametta inceppata 'vqBlade_StuckPosErr'
+    vq1588 = 200 # [N] Forza per disincastrare la lametta 'vqBlade_UnjamForce'
+    vq1589 = 0 # [mm] Ampiezza movimento per disincastrare la lametta 'vqBlade_UnjamMove'
+    # Lametta superiore
+    vq1590 = 200 # [mm²] Area cilindro attuatore pneumatico lametta superiore (ø20=314) 'vqBladeSup_CylArea'
+    vq1591 = 10 # [N] Forza resistente statica attuazione lametta superiore 'vqBladeSup_CylFr'
+    # Lametta inferiore
+    vq1595 = 200 # [mm²] Area cilindro attuatore pneumatico lametta inferiore (ø20=314) 'vqBladeInf_CylArea'
+    vq1596 = 0 # [N] Forza resistente statica attuazione lametta inferiore 'vqBladeInf_CylFr'
+    # Misura altezza
+    vn2740 = 9988 # [mV] Lettura sensore altezza lametta sup in posizione alta 'vnBladeSup_ReadHup'
+    vn2741 = 0 # [mV] Lettura sensore altezza lametta sup in posizione bassa 'vnBladeSup_ReadHdwn'
+    vq2890 = 15.4 # [mm] Altezza lametta sup in posizione alta (risp premilastra) 'vqBladeSup_Hup'
+    vq2891 = -21 # [mm] Altezza lametta sup in posizione bassa (risp premilastra) 'vqBladeSup_Hdwn'
+    vq2892 = 1 # [mm] Penetrazione minima per condizione plastico tagliato 'vqBladeSup_DHthrough'
+    vq2893 = 3 # [mm] Soglia dimensione rottura lametta 'vqBladeSup_DHbroken'
+    vq2895 = -0.2 # [mm] Altezza piano riferimento lametta 'vqBladeSup_Href'
+    vq2896 = -400 # [mm] Posizione Y piano riferimento lametta 'vqBladeSup_Yref'
+    vq2897 = 1 # [mm] Tolleranza altezza piano riferimento lametta 'vqBladeSup_Href_tol'
+
+    # [Mola basso emissivo]
+    vn1560 = 2 # Tipo mola asportazione basso emissivo (0:none 1:light 2:perif) 'vnGrLe_Type'
+    vb1600 = 0 # Direzione passata mola basso emissivo 'vbGrLe_FwdDir'
+    vq1600 = 10 # [mm] Semilarghezza utensile mola 'vqGrLe_SemiWidth'
+    vq1601 = 804 # [mm²] Area cilindro attuatore mola basso emissivo (ø32=804) 'vqGrLe_CylArea'
+    vq1606 = -150 # [N] Peso attuazione mola basso emissivo 'vqGrLe_Weight'
+    vq1607 = 10 # [N] Forza resistente statica attuazione mola basso emissivo 'vqGrLe_CylFr'
+    vq1608 = 45000 # [mm/min] Velocità tipica rimozione low-E 'vqGrLe_StdSpd'
+    vq1609 = 80 # [N] Spinta tipica per rimozione low-E 'vqGrLe_StdForce'
+    vn1622 = 100 # [rpm] Tolleranza sulla velocità rotazione mola 'vnGrLe_RpmTol'
+    # Misura altezza
+    vn1623 = 8000 # [mV] Lettura sensore altezza mola in posizione alta 'vnGrLe_ReadHup'
+    vn1624 = 2000 # [mV] Lettura sensore altezza mola in posizione bassa 'vnGrLe_ReadHdwn'
+    vq1610 = -10 # [mm] Altezza mola in posizione alta (nuova, risp premilastra) 'vqGrLe_Hup'
+    vq1611 = -40 # [mm] Altezza mola in posizione bassa (nuova, risp premilastra) 'vqGrLe_Hdwn'
+    vq1612 = 1 # [mm] Tolleranza sulla misura altezza mola 'vqGrLe_Htol'
+    vq1613 = 0 # [mm] Posizione di taratura misura altezza mola (non deve appoggiare!) 'vqGrLe_Ytune'
+    vq1614 = 0 # [mm] Massimo consumo mola ammesso 'vqGrLe_MaxWear'
+
+
+    # [Pastello marcatore]
+    vq1545 = 2 # [mm] Semilarghezza pastello marcatore 'vqMarker_SemiWidth'
+    vq1546 = 314 # [mm²] Area cilindro attuatore pneumatico pastello marcatore (ø20=314) 'vqMarker_CylArea'
+
+
+    # [Barra di troncaggio]
+    vq1615 = 0 # [mm] Corsa cilindro piccolo aggiuntivo (ciclo 65) 'vqBrkBar_MidShift_Dist'
+    vq1616 = 0.5 # [s] Tempo di salita barra 'vqBrkBar_RiseTime'
+    vq1617 = 0.5 # [s] Tempo minimo di apertura 'vqBrkBar_MinTime'
+    vq1618 = 0.02 # [s/mm] Tempo di apertura per ogni mm vetro 'vqBrkBar_OpenTime'
+
+
+    # [Lampada]
+    vb1630 = 1 # Controllo rigoroso dei sensori 'vbLamp_StrictChecks'
+    vq1630 = 3000 # [mm] Soglia altezza per accensione lampada aggiuntiva 'vqLamp2_Hlim'
+    vq1631 = 120 # [s] Massimo tempo di accensione con lampada fuori 'vqLamp_MaxTimeOut'
+    vq1632 = 7 # [s] Massimo tempo di accensione con lampada dentro 'vqLamp_MaxTimeIn'
+    vq1634 = 1.25 # Aumento preriscaldamento con rimanenza stretta 'vqLamp_KPreStripe'
+    vq1635 = -3 # [mm] Ingombro in altezza della lampada fuori 'vqLamp_ZroomP'
+    vq1636 = 1 # [s] Anticipo fine attesa preriscaldamento 'vqLamp_PreAlmostDone'
+    vq1637 = 30 # [s] Anticipo fine attesa riscaldamento (rifilo) 'vqLamp_PreAlmostDoneTrim'
+
+
+    # [Rilevazione vetro]
+    vb1640 = 1 # Abilita la ricerca al volo del vetro durante il taglio 'vbEdgeDet_OnTheFly'
+    vb1641 = 1 # In automatico usa la dimensione lastra per il target della ricerca al volo 'vbEdgeDet_AutoFlyUseDim'
+    vn1640 = 2 # Numero di tentativi della ricerca 'vnEdgeDet_MaxRetries'
+    vq1640 = 50 # [mm] Dimensioni filtro schegge 'vqEdgeDet_FiltSize'
+    vq1641 = 10 # [mm] Margine per rilevazione bordo vetro 'vqEdgeDet_Margin'
+    vq1642 = 6 # [mm] Massima discrepanza ammessa delle catture di un bordo 'vqEdgeDet_MaxErr'
+    vq1643 = 8.1 # [mm] Spessore complessivo utilizzato nella taratura ricerca 'vqAdjProbe_Thckn'
+    vq1645 = 100000 # [mm/min] Velocità spazzate durante la misurazione vetro 'vqEdgeDet_SweepSpd'
+    vq1646 = 2000 # [mm/min] Velocità acquisizione fine 'vqEdgeDet_AcqSpd'
+    vq1647 = 100000 # [mm/min] Velocità ricerca al volo 'vqEdgeDet_OnTheFlySpd'
+
+
+    # [Sonda primaria - fotocellula su carrello superiore]
+    vn1651 = 10 # [0.1ms] Latenza sonda primaria 'vnProbe1_Latency'
+    vq2641 = 0.1 # [mm] Offset X sonda primaria 'vqProbe1_DX'
+    vq2646 = 269.6 # [mm] Offset Y sonda primaria 'vqProbe1_DY'
+    vq2651 = 0 # [mm] Correzione bordo opposto sonda primaria 'vqProbe1_FixOpp'
+    vq2656 = 0 # [mm] Correzione entrata bassa sonda primaria 'vqProbe1_FixFwdIn'
+    vq2661 = 0 # [mm] Correzione uscita bassa sonda primaria 'vqProbe1_FixBckOut'
+    vq2666 = 0 # [mm] Correzione uscita alta sonda primaria 'vqProbe1_FixFwdOut'
+    vq2671 = 0 # [mm] Correzione entrata alta sonda primaria 'vqProbe1_FixBckIn'
+    vq2676 = 0 # [mm/mm] 0.025 Correzione spessore rilevazione sonda primaria 'vqProbe1_FixThckn'
+    vq2681 = 2 # [mm] Raggio spot sonda primaria 'vqProbe1_SpotRadius'
+
+
+    # [Sonda secondaria - fotocellula su carrello superiore aggiuntiva]
+    vn1652 = 10 # [0.1ms] Latenza sonda secondaria 'vnProbe2_Latency'
+    vq2642 = 0 # [mm] Offset X sonda secondaria (avanti) 'vqProbe2_DX'
+    vq2647 = 0 # [mm] Offset Y sonda secondaria (avanti) 'vqProbe2_DY'
+    vq2652 = 0 # [mm] Correzione bordo opposto sonda secondaria 'vqProbe2_FixOpp'
+    vq2657 = 0 # [mm] Correzione entrata bassa sonda secondaria 'vqProbe2_FixFwdIn'
+    vq2662 = 0 # [mm] Correzione uscita bassa sonda secondaria 'vqProbe2_FixBckOut'
+    vq2667 = 0 # [mm] Correzione uscita alta sonda secondaria 'vqProbe2_FixFwdOut'
+    vq2672 = 0 # [mm] Correzione entrata alta sonda secondaria 'vqProbe2_FixBckIn'
+    vq2677 = 0 # [mm/mm] Correzione spessore rilevazione sonda secondaria 'vqProbe2_FixThckn'
+    vq2682 = 1 # [mm] Raggio spot sonda secondaria 'vqProbe2_SpotRadius'
+
+
+    # [Terza sonda - fotocellula su carrello inferiore]
+    vn1653 = 10 # [0.1ms] Latenza sonda 3 'vnProbe3_Latency'
+    vq2643 = -0.5 # [mm] Offset X sonda inferiore 'vqProbe3_DX'
+    vq2648 = -38.6 # [mm] Offset Y sonda inferiore 'vqProbe3_DY'
+    vq2653 = 0 # [mm] Correzione bordo opposto terza sonda 'vqProbe3_FixOpp'
+    vq2658 = 0 # [mm] Correzione entrata bassa terza sonda 'vqProbe3_FixFwdIn'
+    vq2663 = 0 # [mm] Correzione uscita bassa terza sonda 'vqProbe3_FixBckOut'
+    vq2668 = 0 # [mm] Correzione uscita alta terza sonda 'vqProbe3_FixFwdOut'
+    vq2673 = 0 # [mm] Correzione entrata alta terza sonda 'vqProbe3_FixBckIn'
+    vq2678 = 0 # [mm/mm] Correzione spessore rilevazione terza sonda 'vqProbe3_FixThckn'
+    vq2683 = 1 # [mm] Raggio spot sonda inferiore 'vqProbe3_SpotRadius'
+
+
+    # [Rotazione lastre/Pinza girapezzi]
+    vn1569 = 2 # Tipo girapezzi (0:none 1:ventosa 2:pinza) 'vnGrabber_Type'
+    vb1660 = 1 # Mantieni la pressione sulla ganascia in apertura 'vbGrabber_KeepOpen'
+    vb1661 = 0 # Permetti apertura prima di azzerare 'vbGrabber_UnsafeForceUp'
+    vq1660 = 76 # [mm] Raggio del girapezzi 'vqGrabber_Radius'
+    vq1662 = 0.8 # [deg] Gioco meccanico della pinza verso angoli positivi 'vqGrabber_ZplayP'
+    vq1663 = 1.1 # [deg] Gioco meccanico della pinza verso angoli negativi 'vqGrabber_ZplayN'
+    vq1664 = 0 # [mm] Ascissa dell'asse di rotazione del girapezzi 'vqGrabber_DX'
+    vq1667 = 3.5 # [s] Tempo di agguantamento/chiusura ganasce minimo 'vqGrabber_Tgrab'
+    vq1668 = 6 # [s] Tempo massimo dei movimenti del girapezzi 'vqGrabber_Timeout'
+    vq1669 = 1.5 # [s] Tempo minimo garantito attesa movimenti pinza 'vqGrabber_MinWait'
+    vq1685 = 14 # [mm] Ordinata zona limite bassa per controllo collisioni con vetro in traslazione 'vqYminSafe'
+    # -Attuazione oleodinamica-
+    vq1690 = 3.5 # [s] Ritardo spegnimento attuazione 'vqGrabber_OffDelay'
+    vq1691 = 0.5 # [s] Ritardo apertura olio in torretta 'vqGrabber_OnDelay'
+    vq1692 = 0.5 # [s] Ritardo attivazione completa per comandi 'vqGrabber_CmdDelay'
+    # -Rotazioni-
+    vb1670 = 0 # Abilita la ricerca al volo durante agguantamento pinza 'vbGrab_OnTheFlySearch'
+    vb1671 = 1 # Non misurare la lastra in arrivo 'vbGrab_DontSearchInc'
+    vb1673 = 0 # Permetti aggancio piedino ritardato per svincolare il punto di presa 'vbRot_EnabDelayedHook'
+    vb1675 = 1 # Dopo rotazione centra lastra anche sui primi tre/quattro riscontri 'vbRot_CenterOnAlgn'
+    vb1676 = 1 # Ottimizza profili rotazione 'vbRot_OptimizeCams'
+    vq1695 = 0 # [mm] Altezza dopo rotazione oltre la quale il vetro non è portato in basso 'vqRot_NoYmoveHmin'
+    vq1670 = 10 # [mm] Margine di sicurezza su ingombro Y carrello inferiore per posizioni presa 'vqGrab_YroomSafeMrg'
+    vq1671 = 15 # [mm] Spazio aggiuntivo prevenzione collisioni con piedino riscontro sottostante 'vqGrab_YroomMSafeSpc'
+    vq1672 = 20 # [mm] Margine di sicurezza ingombro rotazioni 'vqGrab_RotMargin'
+    vq2589 = 15 # [mm] Tolleranza montaggio rotelle fisse di riferimento 'vqGreenBlcks_Ytol'
+    vq1674 = 350 # [mm] Margine minimo alto del punto di presa (coda dopo rotazione) 'vqGrab_MinRotTail'
+    vq1675 = 50000 # [mm/min] Massima velocità tangenziale lastra in rotazione 'vqGrab_RotVmax'
+    vq1676 = 2500 # [deg/min] Limite velocità di rotazione 'vqGrab_RotZSpdMax'
+    vq1677 = 5000 # [mm/min] Velocità traslazione Y con vetro agguantato 'vqGrab_YSpdMax'
+    vq1678 = 50 # [Nm] Coppia scivolamento ganasce agguantate al vetro 'vqGrab_SlipTorque'
+    vn1676 = 30 # [%] Limite accelerazione carrello nel riposizionamento Y 'vnGrab_YAccelMax'
+    vn1677 = 30 # [%] Limite accelerazione pinza per rotazione vetro 'vnGrab_RotMaxAccel'
+    vn1678 = 15 # [%] Accelerazione pinza per rotazione con piedino 'vnGrab_RotBlkAccel'
+    vn1679 = 8 # [%] Parzializzazione accelerazioni con vetro agguantato nel taglio fuori squadra 'vnGrab_SlantAccel'
+    vq1693 = 10 # [mm] Errore inseguimento ammesso del piedino durante rotazione 'vqRotBlk_MaxErr'
+    vq1694 = 0 # [deg] Sotto-rotazione con piedino per compensazione riposizionamento in basso 'vqRotBlk_DaComp'
+    # -Altro-
+    vq1696 = 0 # [mm] Y blocchi squadratura dopo rotazione con pinza pneumatica 'vqRot_YRefBlocks'
+    # -Ventosa-
+    vq1697 = 1605 # [mm] Quota di presa assoluta della ventosa 'vqVGrab_Ygrab'
+    vq1698 = 3 # [s] Tempo movimento rullo pre-rotazione 'vqRollPreRot_Time'
+    vq1699 = 21 # [deg] Angolo di pre-rotazione (rullo ActiveF) 'vqRollPreRot_Angle'
+
+
+    # [Trasporto vetro]
+    vb1730 = 1 # Applica correzione latenza fotocellule 'vbShift_PhLatencyFix'
+    vb1731 = 1 # Ignora intelligentemente le fotocellule nella chiamata 'vbShift_PhIgnorePrev'
+    vb1732 = 0 # Cerca di eseguire sempre il movimento manuale 'vbShift_ForceMan'
+    vb1733 = 0 # Usa cinghie zona fine linea nella chiamata lastra 'vbShift_UseBeltsOutZone'
+    vb1734 = 1 # Attendi disponibilità cinghie carico 'vbShift_WaitBeltsFeed'
+    vq1730 = 1 # [°] Massimo fuori squadra ammesso dopo traslazione 'vqShift_MaxTurn'
+    vq1733 = 16 # [mm] Soglia spessore per accensione cuscino aria e minori accelerazioni 'vqShift_HeavyThckn'
+    vn1733 = 80 # [%] Parzializzazione accelerazione traslazione lastre pesanti 'vnBelts_HeavyAcc'
+    vn1734 = 80 # [%] Parzializzazione movimenti troncaggio monolitico 'vnBelts_FloatPerc'
+    vq1735 = 15 # [mm] Sicurezza collisione con piedini di riscontro 'vqShift_HitMargin'
+    vq1736 = 10 # [mm] Tolleranza sui posizionamenti generici 'vqShift_MovePosTol'
+    vq1737 = 20 # [mm] Tolleranza sul posizionamento per riscontro 'vqShift_AlgnPosTol'
+    vq1738 = 20 # [mm] Tolleranza sul posizionamento per aggancio 'vqShift_DragPosTol'
+    vq1739 = -2500 # [mm] Default area da liberare all'inserzione 'vqShift_DefInsXfwd'
+    # [Cinghie]
+    vb1740 = 0 # Attendi aria pronta prima di muovere 'vbBelts_WaitStartPosCond'
+    vb1741 = 1 # Cinghie riscontri dotate di sensore su posizione bassa 'vbBeltsAlgn_HaveFcDown'
+    vn1731 = 20 # [%] Profilo curva S decelerazione cinghie assunto nelle stime 'vnBelts_VelPPd'
+    vq1740 = 1 # [s] Tempo minimo attesa salita cinghie 'vqBelts_OutTime'
+    vq1741 = 0.8 # [s] Tempo attesa discesa cinghie 'vqBelts_InTime'
+    vq1743 = 1 # [s] Tempo controllo cinghie gemelle 'vqBelts2_ToutCheck'
+    vq1745 = 15000 # [mm/min] Velocità traslazione per movimenti pericolosi 'vqBelts_SlowSpd'
+    vq1746 = 45000 # [mm/min] Velocità traslazione con lastra sui riscontri 'vqBelts_DragSpd'
+    vn1746 = 100 # [%] Parzializzazione accelerazione traslazione con lastra sui riscontri 'vnBelts_DragAcc'
+    vq1747 = 40000 # [mm/min] Velocità traslazione manuale 'vqBelts_ManSpd'
+    vq1748 = 45000 # [mm/min] Velocità traslazione avanti 'vqBelts_FwdSpd'
+    vq1749 = 40000 # [mm/min] Velocità traslazione indietro 'vqBelts_BckSpd'
+    vq1750 = 25000 # [mm/min] Velocità espulsione rimanenza 'vqBelts_DumpSpd'
+    vn1750 = 80 # [%] Parzializzazione accelerazione espulsione rimanenza 'vnBelts_DumpAcc'
+    vq1751 = 40000 # [mm/min] Velocità cinghie/caricatrice per carico lastra 'vqBelts_LoadSpd'
+    vq1752 = 35000 # [mm/min] Velocità cinghie/caricatrice per restituzione sfrido 'vqBelts_UnloadSpd'
+    vq1753 = 15000 # [mm/min] Velocità cinghie per ricerca/misura 'vqBelts_ProbeSpd'
+    vq1755 = 350 # [mm] Distanza lastre accodate sul carico 'vqBelts_StackDist'
+    vq1756 = 7 # [mm] Minima banda Y contatto gomma-vetro per trasportabilità 'vqBelts_MinGripDY'
+    vq1757 = 50 # [mm] Minimo contatto X cinghie-vetro per trasportabilità 'vqBelts_MinGripDX'
+    vn1757 = 2 # [%] Minima percentuale di contatto X cinghie-vetro sotto la quale rischio scivolamenti 'vnBelts_MinGripDXPerc'
+    # -Espulsione nel cassone-
+    vq1760 = 250 # [mm] Massima larghezza scaricabile nel cassone 'vqDump_MaxWidth'
+    vq1761 = 5500 # [mm] Altezza del cassone 'vqDump_MaxY'
+    vq1762 = 150 # [mm] Spostamento finale cinghie per espulsione nel cassone 'vqDump_AddMove'
+    vq1763 = 1700 # [mm] Altezza rimanenza con pericolo di intraversamento 'vqDump_TurnHeight'
+    vq1764 = 100 # [mm] Slittamento cinghie previsto minimo 'vqDump_MinSlip'
+    vq1765 = 80 # [mm] Larghezza rimanenza con pericolo di slittamento cinghie 'vqDump_SlipWidth'
+    vq1766 = 10 # [mm/mm] Slittamento previsto cinghie per ogni millimetro sotto 'vqDump_SlipCoeff'
+    # -Cinghie a monte-
+    vq2750 = 50 # [mm] Larghezza banda gommata cinghie a monte 'vqDtchBelts_Size'
+    vn1740 = 8 # Numero delle cinghie stacco 'vnDtchBelts_N'
+    vq2752 = 330 # [mm] Distanza tra cinghie stacco 1 e 2 'vqDtchBelts_DY1_2'
+    vq2753 = 350 # [mm] Distanza tra cinghie stacco 2 e 3 'vqDtchBelts_DY2_3'
+    vq2754 = 560 # [mm] Distanza tra cinghie stacco 3 e 4 'vqDtchBelts_DY3_4'
+    vq2755 = 785 # [mm] Distanza tra cinghie stacco 4 e 5 'vqDtchBelts_DY4_5'
+    vq2756 = 990 # [mm] Distanza tra cinghie stacco 5 e 6 'vqDtchBelts_DY5_6'
+    vq2757 = 1000 # [mm] Distanza tra cinghie stacco 6 e 7 'vqDtchBelts_DY6_7'
+    vq2758 = 1000 # [mm] Distanza tra cinghie stacco 7 e 8 'vqDtchBelts_DY7_8'
+    vq2759 = 0 # [mm] Distanza tra cinghie stacco 8 e 9 'vqDtchBelts_DY8_9'
+    # -Cinghie su riscontro-
+    vb1768 = 1 # Abilita controlli sicurezza aggiuntivi nella consegna con cinghie 'vbShiftAlgn_MoreChecks'
+    vq1767 = 250 # [mm] Minimo contatto X cinghie riscontro-vetro 'vqBeltsAlgn_MinGripDX'
+    vq1768 = 100 # [mm] Larghezza minima per trasferimento tra cinghie riscontro e fine linea 'vqShiftAlgn_PassMinWidth'
+    vq1769 = 55000 # [mm/min] Velocità consegna pezzo 'vqShiftAlgn_DeliverSpd'
+    vq2770 = 15 # [mm] Larghezza banda gommmata cinghie su riscontro 'vqBeltsAlgn_Size'
+    vn1741 = 8 # Numero delle cinghie/rulli riscontro 'vnBeltsAlgn_N'
+    vq2772 = 289 # [mm] Distanza tra cinghie/rulli riscontro 1 e 2 'vqBeltsAlgn_DY1_2'
+    vq2773 = 350 # [mm] Distanza tra cinghie/rulli riscontro 2 e 3 'vqBeltsAlgn_DY2_3'
+    vq2774 = 550 # [mm] Distanza tra cinghie/rulli riscontro 3 e 4 'vqBeltsAlgn_DY3_4'
+    vq2775 = 607 # [mm] Distanza tra cinghie/rulli riscontro 4 e 5 'vqBeltsAlgn_DY4_5'
+    vq2776 = 892 # [mm] Distanza tra cinghie/rulli riscontro 5 e 6 'vqBeltsAlgn_DY5_6'
+    vq2777 = 610 # [mm] Distanza tra cinghie/rulli riscontro 6 e 7 'vqBeltsAlgn_DY6_7'
+    vq2778 = 830 # [mm] Distanza tra cinghie/rulli riscontro 7 e 8 'vqBeltsAlgn_DY7_8'
+    vq2779 = 0 # [mm] Distanza tra cinghie/rulli riscontro 8 e 9 'vqBeltsAlgn_DY8_9'
+
+
+    # [Ventilatori]
+    vb1770 = 0 # Avvia i motori dei ventilatori appena possibile 'vbVent_AutoMotorsOn'
+    vb1771 = 0 # Zone aria riscontri banda alta e premilastra sono unite 'vbVent_JoinedAlgnCT'
+    vb1772 = 0 # La zona stacco usa il motore della zona premilastra riscontri 'vbVent_NoDtchMotor'
+    vb1773 = 1 # Zona aria fine linea indipendente 'vbVent_IndepOutZone'
+    vq1770 = 1.5 # [s] Attesa motore ventilatore a regime 'vqVent_RampTime'
+    vq1771 = 0.5 # [s] Attesa apertura/chiusura serranda 'vqVent_ShutTime'
+    vq1772 = 0.5 # [s] Latenza apertura/chiusura flusso aria 'vqVent_AirDelay'
+    vq1773 = 0.9 # [s] Tempo per comando pedaliere mantenuto 'vqVent_CmdHoldTime'
+    # -Zone ventilatori riscontri-
+    vq1830 = 240 # [mm] Ascissa fine zona cuscino aria riscontri taglio 'vqX_AlgnBandC'
+    vq1831 = 2080 # [mm] Ordinata fine zona cuscino aria riscontri banda bassa 'vqY_AlgnBandB'
+    vq1832 = 4380 # [mm] Ordinata fine zona cuscino aria riscontri banda mediana 'vqY_AlgnBandM'
+
+
+    # [Zona fine linea/Uscita pezzi]
+    vb1775 = 1 # Conferma pezzo prelevato solo con pedale 'vbOutZone_SafeConfirm'
+    vb1776 = 1 # Richiedi sempre pedale per liberare la zona 'vbOutZone_PedalToFree'
+    vb1777 = 0 # Libera la zona anche con ribaltina alta 'vbOutZone_FreeTiltOut'
+    vq1775 = 0 # [s] Ritardo effetto pedale zona fine linea 'vqOutZone_PedalDelay'
+
+
+    # [Ribaltina scarico pezzi]
+    vn1530 = 2 # Tipo ribaltina scarico pezzi (0:none 1:pneum 2:oleodyn) 'vnTiltOut_Type'
+    vb1780 = 0 # Centralina oledinamica condivisa con pinza 'vbTiltOut_UseGrabOil'
+    vb1781 = 0 # Escludi sempre se pinza chiusa 'vbTiltOut_StopIfGrab'
+    vq1781 = 1100 # [mm] Lunghezza delle braccia ribaltina 'vqTiltOut_ArmLength'
+    vq1782 = 40 # [mm] Larghezza braccia ribaltina 'vqTiltOut_ArmWidth'
+    vq1783 = 0 # [s] Ritardo spegnimento attuazione 'vqTiltOut_OffDelay'
+    vq1784 = 0 # [s] Ritardo apertura olio in torretta 'vqTiltOut_OnDelay'
+    vq1785 = 0 # [s] Ritardo attivazione completa 'vqTiltOut_CmdDelay'
+    vq1786 = 1 # [s] Ritardo per andare in battuta 'vqTiltOut_BumpDelay'
+    vq1787 = 50 # [deg] Soglia angolo per controllo fotocellule 'vqTiltOut_MidAngle'
+    vq1789 = 9 # [deg/s] Velocità di movimento 'vqTiltOut_Speed'
+    # -Gestione con inverter e inclinometro-
+    vn1782 = 1 # [rpm] Velocità minima pompa oleodinamica ribaltina scarico pezzi 'vnTiltOut_MinSpd'
+    vn1783 = 1200 # [rpm] Velocità massima pompa oleodinamica ribaltina scarico pezzi 'vnTiltOut_MaxSpd'
+    vn1784 = 2373 # [mV] Lettura inclinometro con ribaltina orizzontale 'vnTiltOut_AreadMin'
+    vn1785 = 4662 # [mV] Lettura inclinometro con ribaltina alta 'vnTiltOut_AreadMax'
+    vq2790 = 32 # [deg] Inclinazione rallentamento discesa ribaltina scarico pezzi 'vqTiltOut_AnearLow'
+    vq2791 = 45 # [deg] Inclinazione rallentamento salita ribaltina scarico pezzi 'vqTiltOut_AnearHigh'
+    vq2792 = 80 # [deg] Inclinazione massima ribaltina scarico pezzi 'vqTiltOut_AngleMax'
+    # -Misure posizione braccia ribaltina-
+    vn1780 = 7 # Numero delle braccia ribaltina !max=9! 'vnTiltOutArms_N'
+    vq2782 = 291 # [mm] Distanza tra braccio ribaltina 1 e 2 'vqTiltOutArms_DY1_2'
+    vq2783 = 610 # [mm] Distanza tra braccio ribaltina 2 e 3 'vqTiltOutArms_DY2_3'
+    vq2784 = 910 # [mm] Distanza tra braccio ribaltina 3 e 4 'vqTiltOutArms_DY3_4'
+    vq2785 = 910 # [mm] Distanza tra braccio ribaltina 4 e 5 'vqTiltOutArms_DY4_5'
+    vq2786 = 1190 # [mm] Distanza tra braccio ribaltina 5 e 6 'vqTiltOutArms_DY5_6'
+    vq2787 = 1250 # [mm] Distanza tra braccio ribaltina 6 e 7 'vqTiltOutArms_DY6_7'
+    vq2788 = 0 # [mm] Distanza tra braccio ribaltina 7 e 8 'vqTiltOutArms_DY7_8'
+    vq2789 = 0 # [mm] Distanza tra braccio ribaltina 8 e 9 'vqTiltOutArms_DY8_9'
+
+
+    # [Riscontri]
+    vn1515 = 3 # Tipo riscontri 'ID_ALGN' (0:none 1:fixed 2:first-indep 3:full-indep) 'vnAlgn_Type'
+    vb1801 = 0 # Sospendi movimento all'attivazione sicurezze 'vbAlgn_SuspendOnSafety'
+    vb1802 = 0 # Tendi a mantenere il motore abilitato 'vbAlgn_KeepXrEnabled'
+    vq1804 = 60000 # [mm/min] Velocità massima con piedini alti 'vqAlgn_BlocksUpSpdMax'
+    # -Allineamento vetro-
+    vb1810 = 0 # Applica sempre i controlli riscontrabilità 'vbAlgn_LimitAlways'
+    vb1812 = 0 # Attendi premilastra alti prima di andare verso il vetro 'vbAlgn_MeetWaitClamps'
+    vq1805 = 30 # [mm] Margine minimo garantito per salita piedini al riscontro 'vqAlgn_MinUpMargin'
+    vq1806 = 35 # [mm] Margine normale per salita piedini al riscontro 'vqAlgn_UpMargin'
+    vq1807 = 35 # [mm] Spostamento di riscontro minimo garantito 'vqAlgn_MinDelta'
+    vq1808 = 45 # [mm] Spostamento di riscontro aggiuntivo per lastre basse 'vqAlgn_AddDelta'
+    vq1809 = 150 # [mm] Soglia riscontro quasi terminato per inizio ricerca lastra 'vqAlgn_AlmostDelta'
+    vq1810 = 2000 # [N] Limite forza nella fase di incontro vetro 'vqAlgn_MeetForce'
+    vq1811 = 1 # [mm] Errore inseguimento per rilevazione incontro con vetro 'vqAlgn_MeetPosErr'
+    vb1813 = 0 # Abbassa la velocità riscontro verso la fine 'vbAlgn_SlowDownOnEnd'
+    vq1812 = 3000 # [mm/min] Velocità riscontro per incontrare il vetro 'vqAlgn_MeetSpd'
+    vq1813 = 2000 # [mm/min] Velocità riscontro durante fase di spinta 'vqAlgn_PushSpd'
+    vn1813 = 8 # [%] Parzializzazione accelerazione durante fase di spinta 'vnAlgn_PushAccel'
+    # -Pilotaggio aria durante allineamento-
+    vb1811 = 1 # Spegni cuscino aria all'incontro del vetro 'vbAlgn_VentOffOnImpact'
+    vq1835 = 1000 # [mm] Soglia larghezza riscontro senza aria 'vqAlgn_WidthNoAir'
+    vq1836 = 50 # [Kg] Soglia massa per partenza riscontro con ventilatori spenti 'vqAlgn_MassNoVents'
+    vq1837 = 16 # [mm] Spessore massimo per banda alta sempre spenta 'vqAlgn_ThcknTopAir'
+    vq1838 = 19 # [mm] Spessore massimo per zona stacco sempre spenta 'vqAlgn_ThcknDtchAir'
+    vq1839 = 100 # [mm] Anticipo spegnimento aria nel trascinamento avanti 'vqAlgn_DragVentOffDx'
+    # -Trascinamento vetro-
+    vb1815 = 1 # Abilita il trascinamento avanti 'vbAlgn_EnableDrag'
+    vb1816 = 0 # Nel trascinamento alza solo i piedini necessari 'vbAlgn_MinBlocksDrag'
+    vb1817 = 0 # Attendi asse Xr pronto all'inizio del trascinamento 'vbAlgn_DragWaitXr'
+    vb1818 = 0 # Dopo il trascinamento preposiziona verso quota più probabile 'vbAlgn_DragMoveToNext'
+    vn1815 = 30 # [%] Parzializzazione accelerazione durante trascinamento 'vnAlgn_DragAccel'
+    vq1814 = 300 # [N] Limite minimo forza nel trascinamento del vetro 'vqAlgn_DragMinForce'
+    vq1815 = 3000 # [N] Limite massimo forza nel trascinamento del vetro 'vqAlgn_DragMaxForce'
+    vq1816 = 50000 # [mm/min] Velocità trascinamento vetro 'vqAlgn_DragSpd'
+    vq1817 = 30 # [mm] Movimento minimo per cui vale la pena spostare il pezzo 'vqAlgn_DragMinDisp'
+    vq1818 = 0.1 # [mm] Margine di aggancio con piedini anteriori 'vqAlgn_DragForeMargin'
+    vq1819 = 30 # [mm] Margine di inizio spinta con piedini posteriori 'vqAlgn_DragRearMargin'
+    vq1820 = 50 # [mm] Margine di aggancio pre-rotazione 'vqAlgn_RotHookMargin'
+    # -Consegna pezzi-
+    vb1814 = 0 # Comincia subito a portare il pezzo al limite della zona occupata 'vbAlgnDlvr_BringEarly'
+    # -Lampada su riscontri-
+    vq1824 = 60 # [s] Massimo tempo di accensione lampada modulo riscontri 'vqAlgnLamp_MaxTime'
+    vq1825 = 2 # [s] Tempo attesa spegnimento lampada modulo riscontri 'vqAlgnLamp_OffTime'
+    vq1826 = 5 # [s] Tempo raffreddamento lampada modulo riscontri 'vqAlgnLamp_CoolTime'
+    # -Chele presa vetro per sagomato-
+    vn1558 = 0 # Tipo chele presa vetro su riscontro (0:none 1:pneum) 'vnAlgnPincers_Type'
+    vq2840 = 28 # [mm] Chele riscontri: Spessore complessivo massimo agguantabile 'vqAlgnPincers_MaxGlassThckn'
+    vq2841 = 1 # [s] Chele riscontri: Attesa movimenti appoggi 'vqAlgnPincers_Tblocks'
+    vq2842 = 1 # [s] Chele riscontri: Attesa movimenti ganasce 'vqAlgnPincers_Tclamps'
+    vq2843 = 1 # [s] Chele riscontri: Attesa agguantamento ganasce 'vqAlgnPincers_Tgrab'
+    vq2844 = 4 # [s] Chele riscontri: Tempo massimo dei movimenti 'vqAlgnPincers_Timeout'
+    vq2845 = 494 # [mm] Chele riscontri: Offset rispetto riferimento riscontri 'vqAlgnPincers_Dx'
+    vq2846 = 42 # [mm] Chele riscontri: Lunghezza ganasce 'vqAlgnPincers_Length'
+    # -Piedini di riscontro-
+    vb1805 = 1 # Abortisci salita piedini se leggono i sensori vetro 'vbAlgn_NoGlassOnUp'
+    vb1806 = 1 # Sposta sempre i piedini prima del reset indipendentemente dai sensori 'vbAlgn_MoveOnReset'
+    vb1807 = 0 # Mantieni l'uscita di set delle bistabili 'vbAlgnBlks_KeepSet'
+    vb1808 = 0 # Rinfresca il reset delle bistabili 'vbAlgnBlks_RefreshRst'
+    vq2700 = 15 # [mm] Raggio dei piedini di riscontro 'vqAlgnBlks_R'
+    vq2701 = 10 # [mm] Raggio del primo piedino di riscontro (aiuto rotazione) 'vqAlgnBlkRot_R'
+    vq2702 = 680 # [mm] Distanza tra piedini anteriori e posteriori 'vqAlgnBlk_RearDist'
+    vq2703 = 55 # [mm] Distanza del punto di appoggio opposto dei piedini anteriori 'vqAlgnBlk_ForeOppDist'
+    vq2704 = 153 # [mm] Distanza del punto di appoggio opposto dei piedini posteriori 'vqAlgnBlk_RearOppDist'
+    vq2705 = 20 # [mm] Sporgenza sensore da piedini di riscontro 'vqAlgnBlk_ForeSpur'
+    vq2706 = 5 # [mm] Scostamento Y del piedino di aiuto rotazione 'vqAlgnBlkRot_Dy'
+    vq2707 = 45 # [mm] Altezza piedini su rispetto il piano (per collisione con premilastra) 'vqAlgnBlks_H'
+    vq2710 = 490 # [mm] Quota minima per cui è possibile alzare i piedini posteriori 'vqX_AlgnRearM'
+    vq2712 = -100 # [mm] Quota minima per cui è possibile abbassare i piedini anteriori 'vqX_AlgnForeM'
+    vq2713 = 3950 # [mm] Quota massima per cui è possibile alzare i piedini anteriori 'vqX_AlgnForeP'
+    vq2715 = 10 # [mm] Spostamento prima di abbassare i piedini 'vqAlgn_DxReset'
+    vq2716 = 1 # [s] Attesa garantita bistabile piedini di riscontro 'vqAlgnBlk_UpDownDelay'
+    vq2717 = 20 # [mm] Margine per uso piedini di riscontro 'vqAlgnBlk_YMargin'
+    vq2718 = 0 # [mm] Offset indicatore riscontri 'vqAlgn_IndOffset'
+    vq2719 = 300 # [mm] Soglia posizione minima per controllo piedini sotto il vetro 'vqAlgn_XminCheckOnUp'
+    # -Misure posizione piedini di riscontro-
+    vn1830 = 8 # Numero dei piedini di riscontro !max=9! 'vnAlgnBlks_N'
+    vn1831 = 2 # Indice piedino su cui è montato il sensore vetro su banda bassa 'vnAlgnBlk_Bsense'
+    vn1832 = 6 # Indice piedino su cui è montato il sensore vetro su banda alta 'vnAlgnBlk_Tsense'
+    vn1833 = 1 # Indice piedino per ausilio rotazioni lato riscontro 'vnAlgnBlk_AuxRot'
+    vq2732 = 284.5 # [mm] Distanza tra piedino di riscontro 1 e 2 'vqAlgnBlks_DY1_2'
+    vq2733 = 350 # [mm] Distanza tra piedino di riscontro 2 e 3 'vqAlgnBlks_DY2_3'
+    vq2734 = 549.5 # [mm] Distanza tra piedino di riscontro 3 e 4 'vqAlgnBlks_DY3_4'
+    vq2735 = 609 # [mm] Distanza tra piedino di riscontro 4 e 5 'vqAlgnBlks_DY4_5'
+    vq2736 = 791.5 # [mm] Distanza tra piedino di riscontro 5 e 6 'vqAlgnBlks_DY5_6'
+    vq2737 = 900 # [mm] Distanza tra piedino di riscontro 6 e 7 'vqAlgnBlks_DY6_7'
+    vq2738 = 610 # [mm] Distanza tra piedino di riscontro 7 e 8 'vqAlgnBlks_DY7_8'
+    vq2739 = 0 # [mm] Distanza tra piedino di riscontro 8 e 9 'vqAlgnBlks_DY8_9'
+
+
+    # [Carrelli/Ponte di taglio]
+    vb1840 = 0 # Parzializza accelerazione carrelli in base a velocità 'vbCarr_PartAcc'
+    vb1842 = 1 # Alza subito utensili in caso di errori del movimento 'vbCarr_ToolsOffOnErr'
+    vb1843 = 0 # Parcheggia automaticamente pinza in caso di rotazione fallita 'vbCarr_ParkOnRotErr'
+    vb1845 = 0 # Il comando parcheggio garantisce di liberare l'area taglio 'vbCarr_ParkFreesCutArea'
+    vb1846 = 0 # L'area taglio è libera solo se sensore di home attivo 'vbCarr_StrictHome'
+    vn1840 = 100 # [%] Parzializzazione vel/acc movimenti liberi carrelli 'vnCarr_FreeMovPerc'
+    vn1842 = 200 # [%] Decelerazione per ricerca bordo finale vetro 'vnCarr_ChgTgtDec'
+    vq1845 = 80000 # [mm/min] Velocità con pericolo collisioni (es. presa pinza) 'vqCarr_SafeSpd'
+    vq1846 = 100 # [mm/min] Soglia velocità carrello quasi fermo 'vqCarr_StillSpd'
+    vq1847 = 0 # [mm] Margine per schermatura da lampada 'vqCarr_HideMargin'
+
+
+    # [Traini passivi dei carrelli]
+    vb2430 = 0 # Non alzare allarmi in caso di traini non agganciati 'vbECarr_MuteAlarms'
+    vn2431 = 1 # Controlla sensori aggancio traini (0:no 1:aggancio 2:contatto 3:sempre) 'vnECarr_Fussyness'
+    vn2432 = 0 # Disabilita operazioni traini (0:nulla 1:sgancio 2:aggancio 3:tutto) 'vnECarr_Inhibit'
+    vq2430 = 40 # [mm] Margine avvicinamento posizione di aggancio/sgancio traini 'vqECarr_LockApproach'
+    vq2431 = 10000 # [mm/min] Velocità avvicinamento posizione di aggancio/sgancio traini 'vqECarr_LockApproachSpd'
+    vq2432 = 1.2 # [s] Tempo di aggancio/sgancio traini 'vqECarr_LockDelay'
+    vq2433 = 0 # [mm] Movimentino assestamento aggancio traino a carrello 'vqECarr_LockAdjustDy'
+    vn2430 = 50 # [%] Parzializzazione accelerazione carrelli con traini agganciati 'vnECarr_Acc'
+    # v. anche vqECarrSup_Length, vqECarrInf_Length, vqECarrSup_XroomM, vqECarrInf_XroomM
+
+
+    # [Stacco/Separazione]
+    vq1860 = 730 # [mm] Dimensione X modulo di stacco 'vqDtch_Width'
+    vq1862 = 10 # [mm] Minimo vetro pinzabile 'vqDtch_GrabMinWidth'
+    vq1864 = 5 # [mm] Sporgenza delle rotelline anteriori dello stacco 'vqDtch_FwdSpur'
+    vq1865 = 9999 # [N] Limite forza nei movimenti liberi dello stacco 'vqDtch_MoveForce'
+    vb1861 = 0 # Sincronizza i movimenti di trazione con tasteggio lametta 'vbDtch_BladeSynch'
+    # Stacco motorizzato
+    vb1865 = 1 # L'asse elettrico insegue la posizione effettiva 'vbXs_GantryActPos'
+    vn1865 = 15 # [%] Parzializzazione accelerazione durante trazione 'vnDtch_PullAcc'
+    vn1866 = 100 # [%] Parzializzazione accelerazione trascinamento vetro 'vnDtch_DragAcc'
+    vq1866 = 3000 # [mm/min] Velocità movimenti trascinamento vetro 'vqDtch_DragSpd'
+    vq1867 = 40 # [mm/min] Velocità tipica trazione plastico durante riscaldamento 'vqDtch_PullSpdStd'
+    vq1868 = 1000 # [mm/min] Velocità trazione plastico senza riscaldamento 'vqDtch_FastPullSpd'
+    vq1869 = 0 # [mm] Modificatore posizione stacco durante il taglio 'vqDtch_DxCut'
+    # Stacco pneumatico
+    vq1875 = 3117 # [mm²] Area cilindri stacco (ø63=3117) 'vqDtch_CylArea'
+    vn1875 = 10 # [0.1bar] Pressione movimenti liberi 'vnDtch_Pcyl_FreeMove'
+    vn1876 = 10 # [0.1bar] Pressione durante freno 'vnDtch_Pcyl_Braked'
+    # Separazione
+    vq2690 = 1000 # [N/m·0.1mm] Trazione tipica per metro e per ogni decimo di plastico 'vqDtch_HowMuchPull'
+    vq2691 = 1 # [mm] Incremento tipico spostamenti durante trazione 'vqDtch_PullDxStd'
+    vq2692 = 0.5 # [mm] Soglia reset errore di inseguimento stacco durante separazione 'vqDtch_MaxErrSep'
+    vq2693 = 15 # [mm] Ampiezza movimento necessario alla separazione (per quota di presa vetro) 'vqDtch_SepDx'
+    vq2694 = 30 # [mm] Ampiezza movimento per scollare rimanenza 'vqDtch_PvbStickDx'
+    vq2695 = 30 # [mm] Ampiezza movimento per finalizzare distacco rifilo 'vqDtch_TrimAwayDx'
+    vq2696 = 15 # [mm] Ampiezza movimento necessario alla separazione con sola trazione 'vqDtch_SepDx_TearPull'
+    vq2697 = 2 # [mm] Ampiezza movimenti snervamento 'vqDtch_TearPull_Dx'
+    vn1864 = 10 # Numero di movimenti snervamento avanti indietro 'vnDtch_TearPull_N'
+
+    # [Polmone]
+    vn1513 = 1 # Tipo modulo/zona polmone (0:non-presente 1:cinghie) 'vnBuf_Type'
+    vq1877 = 2400 # [mm] Dimensione X modulo polmone 'vqBuf_Width'
+
+
+    # [Carico/accumulo]
+    vn1512 = 1 # Tipo modulo carico/accumulo 'ID_FEED' (0:none 1:normal 2:tiltable) 'vnFeed_Type'
+    vq1880 = 7500 # [mm] Dimensione X modulo carico 'vqFeed_Width'
+    vq1883 = 3210 # [mm] Altezza tipica della lastra caricata 'vqH_SheetFeed'
+    # [Basculamento del modulo di carico]
+    vb1885 = 0 # Abilita comando di basculamento automatico 'vbFeedTilt_EnableAuto'
+    vb1886 = 1 # Impulso cuscino aria per abbassamento piedini di carico 'vbFeedTilt_AirPulse'
+    vb1887 = 1 # Permetti la ripresa del basculamento su 'vbFeedTilt_CanResumeUp'
+    vb1888 = 0 # Mantieni il set dei piedini di carico 'vbFeedTilt_KeepBlkSet'
+    vb1889 = 0 # Fai uscire i distanziatori quando su 'vbFeedTilt_PushersOnUp'
+    vn1885 = 1500 # [rpm] Velocità massima pompa oleodinamica basculamento -motore 4 poli- 'vnFeedTilt_MaxSpd'
+    vn1886 = 50 # [%] Velocità rallentata basculamento modulo carico 'vnFeedTilt_SlowSpd'
+    vn1887 = 2500 # Lettura inclinometro con modulo carico orizzontale 'vnFeedTilt_AreadMin'
+    vn1888 = 4800 # Lettura inclinometro con modulo carico ad angolo massimo 'vnFeedTilt_AreadMax'
+    vq1885 = 10 # [s] Ritardo spegnimento sistema 'vqFeedTilt_OffDelay'
+    vq1887 = 0.1 # [s] Attesa attivazione sistema (ritardo comandi) 'vqFeedTilt_CmdDelay'
+    vq1888 = 1.3 # [s] Ritardo per andare in battuta bassa 'vqFeedTilt_BumpDelay'
+    vq1890 = 12 # [deg] Inclinazione rallentamento discesa basculamento modulo carico 'vqFeedTilt_AnearLow'
+    vq1891 = 65 # [deg] Inclinazione rallentamento salita basculamento modulo carico 'vqFeedTilt_AnearHigh'
+    vq1892 = 80 # [deg] Inclinazione di carico basculamento modulo carico 'vqFeedTilt_AngleHigh'
+    vq1893 = 82 # [deg] Inclinazione massima basculamento modulo carico 'vqFeedTilt_AngleMax'
+    # [Trasportatori modulo carico]
+    vq1894 = 50.93 # [rev/m] Trasmissione trasportatori con inverter 'vqFeedInvBelts_RevPerM'
+    # [Sistema di stoccaggio del modulo carico]
+    # [Rotelle di squadratura del modulo carico]
+    vn1534 = 0 # Tipo di rotelle di squadratura modulo carico/accumulo (0:none 1:simple) 'vnFeedWheels_Type'
+    vq1895 = 2 # [s] Tempo squadratura con rotelle 'vqFeedWheels_Dwell'
+    vq1896 = 1 # [s] Tempo aria per lastre leggere 'vqFeedWheels_AirPulseL'
+    vq1897 = 2 # [s] Tempo aria per lastre pesanti 'vqFeedWheels_AirPulseH'
+
+
+    # [Sistema rotazione lastre su polmone (ventosa)]
+    vn1535 = 0 # Tipo sistema rotazione su polmone (0:none 1:cup) 'vnBufRot_Type'
+    vb1920 = 1 # Rotazione preferita all'estrazione (0:-90 1:+90) 'vbBufRot_ExtrP90'
+    vb1921 = 1 # Rotazione preferita della rimanenza (0:-90 1:+90) 'vbBufRot_RemnP90'
+    vb1922 = 0 # Prova ad invertire il senso di rotazione se collisioni 'vbBufRot_TryInv'
+    vq1920 = -2447 # [mm] Posizione X centro rotazione 'vqBufRot_Xc'
+    vq1921 = 1887 # [mm] Posizione Y centro rotazione 'vqBufRot_Yc'
+    vq1922 = 200 # [mm] Raggio ventosa rotazione su polmone 'vqBufRot_Radius'
+    vq1923 = 0 # [mm] Margine aggiuntivo bordo sotto dopo rotazione ventosa 'vqBufRot_Yfix'
+    vq1924 = 1 # [s] Tempo di attesa fine rotazione 'vqBufRot_WaitStop'
+    vq1925 = 1.1 # [s] Tempo di attesa salita 'vqBufRot_WaitUp'
+    vq1926 = 1 # [s] Tempo di attesa vuoto e rilascio vetro 'vqBufRot_WaitGrab'
+    vq1927 = 10 # [Nm] Coppia scivolamento 'vqBufRot_SlipTorque'
+    vn1927 = 90 # [%] Decelerazione massima 'vnBufRot_MaxDecel'
+    vq1928 = 1800 # [deg/min] Limite velocità di rotazione 'vqBufRot_RotZSpdMax'
+    vq1929 = 20000 # [mm/min] Massima velocità tangenziale lastra in rotazione 'vqBufRot_RotVmax'
+
+
+    # [Caricatrice]
+    vn1510 = 0 # Tipo caricatrice esterna 'ID_LOADER' (0:none 1:generic) 'vnLoader_Type'
+    vb1931 = 0 # Interfaccia I/O semplificata -no segnali in marcia- 'vbLdr_NoStatusSignals'
+    vb1932 = 1 # Controlla sempre consensi 'vbLdr_FussyCheck'
+    vb1934 = 0 # Alza piedini di carico alla restituzione sfrido 'vbLdr_BlksOnUnload'
+    vb1935 = 0 # Cerca sempre di caricare automaticamente lastra se pronta 'vbLdr_AlwaysAutoLoad'
+    vq1930 = -11920 # [mm] Posizione tipica bordo lastra sulla caricatrice 'vqLdr_LoaderSheetX'
+    vq1932 = 500 # [mm] Movimento aggiuntivo restituzione sfrido 'vqLdr_UnloadDx'
+    vq1933 = 1.5 # [s] Tolleranza controllo trasportatori in marcia 'vqLdr_CheckMove'
+    vq1934 = 1 # [s] Tempo rampa di stop trasportatori caricatrice 'vqLdr_StopTime'
+
+
+    # [Troncaggio esterno (a valle)]
+    vn1517 = 0 # Tipo modulo troncaggio esterno 'ID_EBRK' (0:none 1:generic) 'vnEbrk_Type'
+    # Vedi anche 'vqX_OutTableEnd'
+
+
+    # [Monolitico combinato (a monte)]
+    vn1518 = 0 # Tipo monolitico combinato (0:none 1:m32-float) 'vnComboFloat_Type'
+    vb1960 = 1 # Abilita lavorazione contemporanea 'vbComboFloat_Concurrent'
+    vb1961 = 1 # Segnali sicurezza combinata da comunicazione 'vbCombo_SafetyFromComm'
+    vq1960 = -3840 # [mm] Coordinata origine X del monolitico combinato 'vqComboFloat_Xo'
+    vq1961 = 0 # [mm] Coordinata origine Y del monolitico combinato 'vqComboFloat_Yo'
+    vq1963 = 4066 # [mm] Y collisione con spalla monolitico combinato 'vqComboFloat_Ymax'
+    vq1964 = 860 # [mm] Distanza dal rallentamento per stop carico lastra 'vqCombo_LoadStopDx'
+    vq1965 = 1 # [s] Timeout comunicazione con monolitico combinato 'vqComboFloat_Tout'
+
+
+    # [Tagli obliqui (sagome poligonali)]
+    vb2441 = 1 # Forza uso sonda superiore nella misura per tagli obliqui 'vbSlant_UseProbeSup'
+    vq2440 = 2.8 # [deg] Angolo correzione con piedino riscontri 'vqSlant_Bfix_PrefDa'
+    vq2441 = 200 # [mm] Leva piedino minima per correzione posiz taglio obliquo 'vqSlant_Bfix_MinArm'
+    vq2442 = 0.04 # [1/mdeg] Coeff attrito per modulazione coppia pinza durante correzione 'vqSlant_Bfix_Kfr'
+    vq2443 = 0.02 # [1/mdeg] Coeff attrito vetro-tavolo con aria per modulazione coppia pinza durante correzione 'vqSlant_Bfix_Kfr_air'
+    vq2445 = 15 # [deg] Angolo di incidenza minimo con bordo vetro per incisione 'vqSlant_Acut_ScoreMin'
+    vq2446 = 25 # [deg] Angolo di incidenza minimo con bordo vetro per apertura automatica 'vqSlant_Acut_OpenMin'
+    vq2447 = 40 # [mm] Margine aggiuntivo posizionamento lastra prima di correzione Y con piedino 'vqSlant_YfixMargin'
+
+
+    # [Sistema di etichettatura]
+    vn1568 = 0 # Tipo sistema di etichettatura (0:none 1:carrsup 2:feed-bridge 3:align) 'vnLabeler_Type'
+    vb1970 = 0 # Interagisci con stampante in modo rigoroso 'vbLblPrn_Strict'
+    vb1971 = 0 # Vuoto applicatore durante lo sfoglio etichetta 'vbLblAppl_AspOnPrint'
+    vq1970 = 1.8 # [s] Tempo minimo attesa stampa/sfoglio 'vqLblPrn_WaitPrint'
+    vq1972 = 0.2 # [s] Tempo minimo attesa movimento applicatore etichette 'vqLblAppl_WaitInOut'
+    vq1973 = 0.1 # [s] Ritardo tra off aspirazione e posa etichetta 'vqLblAppl_PutDelay'
+    # -Ponte etichettatore-
+    vq1975 = -11250 # [mm] Posizione ponte di stampa 'vqLblBrdg_Xo'
+    vq1976 = 200 # [mm] Offset Y posizionamento etichette 'vqLblBrdg_Yo'
+    vq1977 = 100000 # [mm/min] Velocità di movimento carrello stampante 'vqLblBrdg_CarrSpd'
+    vq1978 = 35000 # [mm/min] Velocità cinghie per etichettatura 'vqShftOp_BeltsSpd'
+    # -Etichettatura pezzi in uscita-
+    vq1980 = 650 # [mm] Posizione X applicazione etichette in uscita 'vqLblOut_Xo'
+    vq1981 = 300 # [mm] Posizione Y applicazione etichette in uscita 'vqLblOut_Yo'
+
+
+    # [Misura spessore effettivo vetro]
+    vb2410 = 0 # Non tollerare mancate misure spessore 'vbThcknSense_Fussy'
+    vn2411 = 1000 # [mV] Lettura sensore con spessore di taratura 'vnThcknSense_ReadTune'
+    vn2412 = 2000 # [mV] Lettura sensore senza vetro 'vnThcknSense_ReadZero'
+    vq2410 = 1 # [mm] Tolleranza sulla misura dello spessore 'vqThcknSense_Tol'
+    vq2411 = 20.4 # [mm] Spessore usato per la taratura 'vqThcknSense_ThcknTune'
+    vq2412 = 365 # [mm] Posizione X sensore misura spessore 'vqThcknSense_X'
+    vq2413 = 120 # [mm] Posizione Y sensore misura spessore 'vqThcknSense_Y'
+
+
+    # [Utensile intestatura plastico]
+    vn1586 = 0 # Tipo utensile intestatura plastico (0:none 1:carr-blade 2:load-blade) 'vnEdgeTrim_Type'
+    vq2420 = 300 # [mm] Offset Y utensile intestatura plastico 'vqEdgeTrim_DY'
+    vq2422 = 0 # [s] Tempo preparazione utensile intestatura plastico 'vqEdgeTrim_Tinit'
+    vq2423 = 1 # [s] Tempo accostamento utensile intestatura plastico 'vqEdgeTrim_Tapprch'
+    vq2425 = 20 # [mm/min] Velocità utensile intestatura plastico 'vqEdgeTrim_Spd'
+    vq2426 = 200 # [N] Limite forza utensile intestatura plastico 'vqEdgeTrim_Frc'
+
+
+    # [Macchine 6m/assi gantry]
+    vb2400 = 1 # Azzera i riscontri 2 separatamente 'vbXr2_DecoupledZero'
+    vq2400 = 3 # [Tn] Limite coppia erogabile riscontri 2 'vqXr2_GantryMaxTrq'
+    vq2401 = 3 # [Tn] Limite coppia erogabile stacco 2 'vqXs2_GantryMaxTrq'
+    vq2402 = 0.3 # [Tn] Limite coppia erogabile stacco 2 per azzeramento 'vqXs2_GantryMaxTrqZero'
+    vq2403 = 5 # [mm] Massimo scostamento ammesso dei motori stacco 'vqXs2_GantryMaxErr'
+
+
+    # [Sagomato curvilineo]
+    vn2450 = 1 # Indice asse X interpolato !par2kmac.txt! 'vnShape_AxXIdx'
+    vn2455 = 10 # [%] Parzializzazione accelerazione nel sagomato curvilineo 'vnShape_Acc'
+    vq2470 = 6 # [mm] Spessore gomme per separazione sagome 'vqDetach_ShimsThckn'
+    vq2471 = 10 # [Kg] Massa minima del vetro da sagomare 'vqShapeCurv_MinMass'
+    vq2472 = 10 # [Kg] Massa minima del vetro da aprire in sagomato 'vqShapeCurv_OpenMinMass'
+    vq2475 = 20000 # [mm/min] Velocità movimentazione sagome 'vqShapeBelts_MoveSpd'
+    vq2476 = 5000 # [mm/min] Velocità movimentazione sagome lenta 'vqShapeBelts_SlowSpd'
+    vq2477 = 3000 # [mm/min] Velocità movimentazione riscaldamento sagome 'vqShapeBelts_HeatSpd'
+    # [Utensili sagomato]
+    vq2450 = 3 # [mm] Semilarghezza testine di incisione aggiuntive 'vqTscore2_SemiWidth'
+    vq2452 = 2 # [mm] Eccentricità pivot testine incisione aggiuntive 'vqTscore2_PivotEcc'
+    vb2453 = 0 # Permetti riallineamento esterno testine pivottanti 'vbTscore2_ExtPivotMov'
+    vq2453 = 100 # [mm] Movimento minimo di riallineamento testine pivottanti 'vqTscore2_PivotMovMin'
+    vq2454 = 25 # [N] Spinta per riallineamento testine pivottanti 'vqTscore2_PivotPress'
+    vq2455 = 0 # [N] Peso attuazione testina aggiuntiva superiore 'vqTsup2_Weight'
+    vq2456 = 0 # [N] Forza resistente statica attuazione testina aggiuntiva superiore 'vqTsup2_CylFr'
+    vq2457 = 0 # [N] Peso attuazione testina aggiuntiva inferiore 'vqTinf2_Weight'
+    vq2458 = 0 # [N] Forza resistente statica attuazione testina aggiuntiva inferiore 'vqTinf2_CylFr'
+    vq2460 = 10 # [mm] Semilarghezza mola basso emissivo aggiuntiva 'vqGrLe2_SemiWidth'
+    vq2461 = 314 # [mm²] Area cilindro attuatore mola basso emissivo aggiuntiva 'vqGrLe2_CylArea'
+    vq2462 = 0 # [N] Forza resistente statica attuazione mola basso emissivo aggiuntiva 'vqGrLe2_CylFr'
+    vq2465 = 10 # [mm] Semilarghezza utensili apertura a percussione 'vqRbrk2_SemiWidth'
+    vq2466 = 490 # [mm²] Area cilindro attuatore pneumatico utensili apertura a percussione 'vqRbrk2_CylArea'
+
+
+    # [I/O]
+    vn1505 = 1 # Tipologia moduli I/O (0:Onboard 1:CANOpen 2:Ethercat) 'vnIo_Type'
+    vq1506 = 0.2 # [s] Filtro su off fotocellule (debouncing) 'vqPthc_OffFilter'
+
+
+    # [Proporzionali]
+    vq2012 = 9 # [bar] Fondoscala proporzionale 1 carrello inf 'vqPV1_Yinf_Pmax'
+    vq2013 = 9 # [bar] Fondoscala proporzionale 2 carrello inf (old:apertura) 'vqPV2_Yinf_Pmax'
+    vq2014 = 9 # [bar] Fondoscala proporzionale 1 carrello sup 'vqPV1_Ysup_Pmax'
+    vq2015 = 9 # [bar] Fondoscala proporzionale 2 carrello sup (mole,old:apertura) 'vqPV2_Ysup_Pmax'
+    vq2016 = 9 # [bar] Fondoscala proporzionale 3 carrello sup (old:lamette,tamponi) 'vqPV3_Ysup_Pmax'
+    vq2017 = 9 # [bar] Fondoscala proporzionale 1 modulo stacco (premilastra pneumatici) 'vqPV1_Dtch_Pmax'
+    vq2018 = 9 # [bar] Fondoscala proporzionale 2 modulo stacco (stacco pneumatico) 'vqPV2_Dtch_Pmax'
+
+
+    # [Assi]
+    vn1506 = 2 # Tipologia azionamenti assi principali (0:Analog 1:Mlink 2:Ethercat) 'vnDrives_Type'
+    vb2090 = 1 # Imposta finestra di inseguimento negli azionamenti e non nel CNC 'vbAx_MaxPosErrInDrive'
+    vq2090 = 1048.576 # [kpls/rev] Impulsi per giro degli azionamenti (2^20) 'vqAx_PlsPerRev'
+    vn2090 = 175 # [<=10 ? tick : 0.01 tick] Ritardo comunicazione quota assi nelle catture 'vnAx_BusLatency'
+    vb2092 = 1 # Resetta errore di inseguimento senza disabilitare l'asse 'vbAx_NoServoOffToRstErr'
+    vn2092 = 0 # Politiche riabilitazione asse fuori posizione (0:none 1:wait 2:reset 3:repos) 'vnAx_ServoOnPolicy'
+    vn2091 = 150 # [%] Ampiezza relativa finestra di asse in posizione rispetto parametro 'vnAx_InPosPerc'
+    vq2091 = 536870.912 # [kpls] Massima finestra errore inseguimento azionamenti (2^30-1=1073741.823) 'vqAx_MaxErrPls'
+    vb2093 = 1 # Non controllare asse fermo nella condizione di parcheggio 'vbAx_NoStillChkAtRest'
+    vb2094 = 0 # Alza emergenza se finecorsa intervenuti 'vbAx_EmgOnHwLims'
+    vb2095 = 1 # Leggi stato finecorsa da bus 'vbAx_ReadHwLims'
+    vq2092 = 0.2 # [s] Ritardo abilitazione drives dopo inserzione potenza 'vqAx_ServoOnDelay'
+    vq2095 = 10 # [mm] Tolleranza sul calcolo dello spazio di stop 'vqAx_StopSpaceTol'
+
+    vb2100 = 0 # Asse rotativo asse riscontri 'vbXr_IsRot'
+    vb2101 = 0 # Asse rotativo asse stacco 'vbXs_IsRot'
+    vb2102 = 0 # Asse rotativo asse carrello superiore 'vbYsup_IsRot'
+    vb2103 = 0 # Asse rotativo asse carrello inferiore 'vbYinf_IsRot'
+    vb2104 = 1 # Asse rotativo asse orientazione utensili superiori 'vbZsup_IsRot'
+    vb2105 = 1 # Asse rotativo asse orientazione utensili inferiori 'vbZinf_IsRot'
+    vb2106 = 1 # Asse rotativo asse orientazione pinza girapezzi 'vbZg_IsRot'
+    vb2107 = 1 # Asse rotativo asse rotazione ventosa polmone 'vbZb_IsRot'
+    #vb21__ = 0 # Asse rotativo asse piedino ausiliario rotazioni 'vbYb_IsRot'
+    vb2108 = 0 # Asse rotativo asse carrello stampante 'vbYprn_IsRot'
+    vb2109 = 0 # Asse rotativo asse cinghie carico 'vbCa_IsRot'
+    vb2110 = 0 # Asse rotativo asse cinghie polmone 'vbCb_IsRot'
+    vb2111 = 0 # Asse rotativo asse cinghie stacco 'vbCs_IsRot'
+    vb2112 = 0 # Asse rotativo asse cinghie/rulli riscontro 'vbCr_IsRot'
+    vb2113 = 0 # Asse rotativo asse cinghie uscita/scarico 'vbCo_IsRot'
+    #vb2114 = 0 # Asse rotativo asse cinghie gemelle carico 'vbCa2_IsRot'
+    vb2119 = 0 # Asse rotativo asse premilastra riscontro 'vbPr_IsRot'
+    vb2120 = 0 # Asse rotativo asse premilastra stacco 'vbPs_IsRot'
+
+    vq2100 = 1 # [mm] Finestra errore ammesso asse riscontri 'vqXr_StrictMaxPosErr'
+    vq2101 = 1 # [mm] Finestra errore ammesso asse stacco 'vqXs_StrictMaxPosErr'
+    vq2102 = 2.5 # [mm] Finestra errore ammesso asse carrello superiore 'vqYsup_StrictMaxPosErr'
+    vq2103 = 2.5 # [mm] Finestra errore ammesso asse carrello inferiore 'vqYinf_StrictMaxPosErr'
+    vq2104 = 1 # Finestra errore ammesso asse orientazione utensili superiori 'vqZsup_StrictMaxPosErr'
+    vq2105 = 1 # Finestra errore ammesso asse orientazione utensili inferiori 'vqZinf_StrictMaxPosErr'
+    vq2106 = 1 # [deg] Finestra errore ammesso asse orientazione pinza girapezzi 'vqZg_StrictMaxPosErr'
+    vq2107 = 1 # [deg] Finestra errore ammesso asse rotazione ventosa polmone 'vqZb_StrictMaxPosErr'
+    #vq21__ = 1 # [mm] Finestra errore ammesso asse piedino ausiliario rotazioni 'vqYb_StrictMaxPosErr'
+    vq2108 = 5 # [mm] Finestra errore ammesso asse carrello stampante 'vqYprn_StrictMaxPosErr'
+    vq2109 = 5 # [mm] Finestra errore ammesso asse cinghie carico 'vqCa_StrictMaxPosErr'
+    vq2110 = 5 # [mm] Finestra errore ammesso asse cinghie polmone 'vqCb_StrictMaxPosErr'
+    vq2111 = 5 # [mm] Finestra errore ammesso asse cinghie stacco 'vqCs_StrictMaxPosErr'
+    vq2112 = 5 # [mm] Finestra errore ammesso asse cinghie/rulli riscontro 'vqCr_StrictMaxPosErr'
+    vq2113 = 5 # [mm] Finestra errore ammesso asse cinghie uscita/scarico 'vqCo_StrictMaxPosErr'
+    #vq2114 = 5 # [mm] Finestra errore ammesso asse cinghie gemelle carico 'vqCa2_StrictMaxPosErr'
+    vq2119 = 20 # [mm] Finestra errore ammesso asse premilastra riscontro 'vqPr_StrictMaxPosErr'
+    vq2120 = 20 # [mm] Finestra errore ammesso asse premilastra stacco 'vqPs_StrictMaxPosErr'
+
+    vq2130 = 1 # [mm] Finestra errore rilevaz urti asse riscontri 'vqXr_LooseMaxPosErr'
+    vq2131 = 1 # [mm] Finestra errore rilevaz urti asse stacco 'vqXs_LooseMaxPosErr'
+    vq2132 = 1.5 # [mm] Finestra errore rilevaz urti asse carrello superiore 'vqYsup_LooseMaxPosErr'
+    vq2133 = 1.5 # [mm] Finestra errore rilevaz urti asse carrello inferiore 'vqYinf_LooseMaxPosErr'
+    vq2134 = 1 # [deg] Finestra errore rilevaz urti asse orientazione utensili superiori 'vqZsup_LooseMaxPosErr'
+    vq2135 = 1 # [deg] Finestra errore rilevaz urti asse orientazione utensili inferiori 'vqZinf_LooseMaxPosErr'
+    vq2136 = 1 # [deg] Finestra errore rilevaz urti asse orientazione pinza girapezzi 'vqZg_LooseMaxPosErr'
+    vq2137 = 1 # [deg] Finestra errore rilevaz urti asse rotazione ventosa polmone 'vqZb_LooseMaxPosErr'
+    #vq21__ = 1 # [mm] Finestra errore rilevaz urti asse piedino ausiliario rotazioni 'vqYb_LooseMaxPosErr'
+    vq2138 = 2.5 # [mm] Finestra errore rilevaz urti asse carrello stampante 'vqYprn_LooseMaxPosErr'
+    vq2139 = 2 # [mm] Finestra errore rilevaz urti asse cinghie carico 'vqCa_LooseMaxPosErr'
+    vq2140 = 2 # [mm] Finestra errore rilevaz urti asse cinghie polmone 'vqCb_LooseMaxPosErr'
+    vq2141 = 2 # [mm] Finestra errore rilevaz urti asse cinghie stacco 'vqCs_LooseMaxPosErr'
+    vq2142 = 2 # [mm] Finestra errore rilevaz urti asse cinghie/rulli riscontro 'vqCr_LooseMaxPosErr'
+    vq2143 = 2 # [mm] Finestra errore rilevaz urti asse cinghie uscita/scarico 'vqCo_LooseMaxPosErr'
+    #vq2144 = 2 # [mm] Finestra errore rilevaz urti asse cinghie gemelle carico 'vqCa2_LooseMaxPosErr'
+    vq2149 = 20 # [mm] Finestra errore rilevaz urti asse premilastra riscontro 'vqPr_LooseMaxPosErr'
+    vq2150 = 20 # [mm] Finestra errore rilevaz urti asse premilastra stacco 'vqPs_LooseMaxPosErr'
+
+    vq2160 = 5.39 # [Nm] Coppia nominale motore asse riscontri 'vqXr_RatedTorque'
+    vq2161 = 5.39 # [Nm] Coppia nominale motore asse stacco 'vqXs_RatedTorque'
+    vq2162 = 5.39 # [Nm] Coppia nominale motore asse carrello superiore 'vqYsup_RatedTorque'
+    vq2163 = 5.39 # [Nm] Coppia nominale motore asse carrello inferiore 'vqYinf_RatedTorque'
+    vq2164 = 5.39 # [Nm] Coppia nominale motore asse orientazione utensili superiori 'vqZsup_RatedTorque'
+    vq2165 = 5.39 # [Nm] Coppia nominale motore asse orientazione utensili inferiori 'vqZinf_RatedTorque'
+    vq2166 = 5.39 # [Nm] Coppia nominale motore asse orientazione pinza girapezzi 'vqZg_RatedTorque'
+    vq2167 = 5.39 # [Nm] Coppia nominale motore asse rotazione ventosa polmone 'vqZb_RatedTorque'
+    #vq21__ = 5.39 # [Nm] Coppia nominale motore asse piedino ausiliario rotazioni 'vqYb_RatedTorque'
+    vq2168 = 5.39 # [Nm] Coppia nominale motore asse carrello stampante 'vqYprn_RatedTorque'
+    vq2169 = 11.5 # [Nm] Coppia nominale motore asse cinghie carico 'vqCa_RatedTorque'
+    vq2170 = 5.39 # [Nm] Coppia nominale motore asse cinghie polmone 'vqCb_RatedTorque'
+    vq2171 = 5.39 # [Nm] Coppia nominale motore asse cinghie stacco 'vqCs_RatedTorque'
+    vq2172 = 5.39 # [Nm] Coppia nominale motore asse cinghie/rulli riscontro 'vqCr_RatedTorque'
+    vq2173 = 5.39 # [Nm] Coppia nominale motore asse cinghie uscita/scarico 'vqCo_RatedTorque'
+    #vq2174 = 5.39 # [Nm] Coppia nominale motore asse cinghie gemelle carico 'vqCa2_RatedTorque'
+    vq2179 = 5.39 # [Nm] Coppia nominale motore asse premilastra riscontro 'vqPr_RatedTorque'
+    vq2180 = 5.39 # [Nm] Coppia nominale motore asse premilastra stacco 'vqPs_RatedTorque'
+
+    vq2190 = 4000 # [N] Max sforzo strutturale asse riscontri 'vqXr_MaxForce'
+    vq2191 = 50000 # [N] Max sforzo strutturale asse stacco 'vqXs_MaxForce'
+    vq2192 = 2200 # [N] Max sforzo strutturale asse carrello superiore 'vqYsup_MaxForce'
+    vq2193 = 2200 # [N] Max sforzo strutturale asse carrello inferiore 'vqYinf_MaxForce'
+    vq2194 = 10000 # [Nmm/deg] Max sforzo strutturale asse orientazione utensili superiori 'vqZsup_MaxForce'
+    vq2195 = 10000 # [Nmm/deg] Max sforzo strutturale asse orientazione utensili inferiori 'vqZinf_MaxForce'
+    vq2196 = 14000 # [Nmm/deg] Max sforzo strutturale asse orientazione pinza girapezzi 'vqZg_MaxForce'
+    vq2197 = 19000 # [Nmm/deg] Max sforzo strutturale asse rotazione ventosa polmone 'vqZb_MaxForce'
+    #vq21__ = 5000 # [N] Max sforzo strutturale asse piedino ausiliario rotazioni 'vqYb_MaxForce'
+    vq2198 = 2000 # [N] Max sforzo strutturale asse carrello stampante 'vqYprn_MaxForce'
+    vq2199 = 10000 # [N] Max sforzo strutturale asse cinghie carico 'vqCa_MaxForce'
+    vq2200 = 10000 # [N] Max sforzo strutturale asse cinghie polmone 'vqCb_MaxForce'
+    vq2201 = 10000 # [N] Max sforzo strutturale asse cinghie stacco 'vqCs_MaxForce'
+    vq2202 = 10000 # [N] Max sforzo strutturale asse cinghie/rulli riscontro 'vqCr_MaxForce'
+    vq2203 = 10000 # [N] Max sforzo strutturale asse cinghie uscita/scarico 'vqCo_MaxForce'
+    #vq2204 = 10000 # [N] Max sforzo strutturale asse cinghie gemelle carico 'vqCa2_MaxForce'
+    vq2209 = 40000 # [N] Max sforzo strutturale asse premilastra riscontro (100%=33866N) 'vqPr_MaxForce'
+    vq2210 = 40000 # [N] Max sforzo strutturale asse premilastra stacco (100%=33866N) 'vqPs_MaxForce'
+    vq2213 = 500 # [Nmm/deg] Max sforzo strutturale asse mandrino mola 'vqSle_MaxForce'
+
+    vq2220 = 1100 # [Kg] Inerzia equivalente asse riscontri 'vqXr_Inertia'
+    vq2221 = 9000 # [Kg] Inerzia equivalente asse stacco 'vqXs_Inertia'
+    vq2222 = 100 # [Kg] Inerzia equivalente asse carrello superiore 'vqYsup_Inertia'
+    vq2223 = 115 # [Kg] Inerzia equivalente asse carrello inferiore 'vqYinf_Inertia'
+    vq2224 = 100 # [Kg m²/deg²] Inerzia equivalente asse orientazione utensili superiori 'vqZsup_Inertia'
+    vq2225 = 100 # [Kg m²/deg²] Inerzia equivalente asse orientazione utensili inferiori 'vqZinf_Inertia'
+    vq2226 = 600 # [Kg m²/deg²] Inerzia equivalente asse orientazione pinza girapezzi 'vqZg_Inertia'
+    vq2227 = 100 # [Kg m²/deg²] Inerzia equivalente asse rotazione ventosa polmone 'vqZb_Inertia'
+    #vq22__ = 100 # [Kg] Inerzia equivalente asse piedino ausiliario rotazioni 'vqYb_Inertia'
+    vq2228 = 150 # [Kg] Inerzia equivalente asse carrello stampante 'vqYprn_Inertia'
+    vq2229 = 900 # [Kg] Inerzia equivalente asse cinghie carico 'vqCa_Inertia'
+    vq2230 = 700 # [Kg] Inerzia equivalente asse cinghie polmone 'vqCb_Inertia'
+    vq2231 = 700 # [Kg] Inerzia equivalente asse cinghie stacco 'vqCs_Inertia'
+    vq2232 = 700 # [Kg] Inerzia equivalente asse cinghie/rulli riscontro 'vqCr_Inertia'
+    vq2233 = 700 # [Kg] Inerzia equivalente asse cinghie uscita/scarico 'vqCo_Inertia'
+    #vq2234 = 700 # [Kg] Inerzia equivalente asse cinghie gemelle carico 'vqCa2_Inertia'
+    vq2239 = 9000 # [Kg] Inerzia equivalente asse premilastra riscontro 'vqPr_Inertia'
+    vq2240 = 9000 # [Kg] Inerzia equivalente asse premilastra stacco 'vqPs_Inertia'
+
+    vq2250 = 300 # [N] Forza resistente/attriti asse riscontri 'vqXr_Friction'
+    vq2251 = 1500 # [N] Forza resistente/attriti asse stacco 'vqXs_Friction'
+    vq2252 = 350 # [N] Forza resistente/attriti asse carrello superiore 'vqYsup_Friction'
+    vq2253 = 350 # [N] Forza resistente/attriti asse carrello inferiore 'vqYinf_Friction'
+    vq2254 = 500 # [Nm/deg] Coppia resistente/attriti asse orientazione utensili superiori 'vqZsup_Friction'
+    vq2255 = 500 # [Nm/deg] Coppia resistente/attriti asse orientazione utensili inferiori 'vqZinf_Friction'
+    vq2256 = 1500 # [Nm/deg] Coppia resistente/attriti asse orientazione pinza girapezzi 'vqZg_Friction'
+    vq2257 = 1000 # [Nm/deg] Coppia resistente/attriti asse rotazione ventosa polmone 'vqZb_Friction'
+    #vq22__ = 500 # [N] Forza resistente/attriti asse piedino ausiliario rotazioni 'vqYb_Friction'
+    vq2258 = 150 # [N] Forza resistente/attriti asse carrello stampante 'vqYprn_Friction'
+    vq2259 = 800 # [N] Forza resistente/attriti asse cinghie carico 'vqCa_Friction'
+    vq2260 = 500 # [N] Forza resistente/attriti asse cinghie polmone 'vqCb_Friction'
+    vq2261 = 500 # [N] Forza resistente/attriti asse cinghie stacco 'vqCs_Friction'
+    vq2262 = 500 # [N] Forza resistente/attriti asse cinghie/rulli riscontro 'vqCr_Friction'
+    vq2263 = 500 # [N] Forza resistente/attriti asse cinghie uscita/scarico 'vqCo_Friction'
+    #vq2264 = 500 # [N] Forza resistente/attriti asse cinghie gemelle carico 'vqCa2_Friction'
+    vq2269 = 8000 # [N] Forza resistente/attriti asse premilastra riscontro 'vqPr_Friction'
+    vq2270 = 8000 # [N] Forza resistente/attriti asse premilastra stacco 'vqPs_Friction'
+
+    vq2280 = 3 # [N min/m] Attriti viscosi asse riscontri 'vqXr_Viscosity'
+    vq2281 = 2500 # [N min/m] Attriti viscosi asse stacco 'vqXs_Viscosity'
+    vq2282 = 2 # [N min/m] Attriti viscosi asse carrello superiore 'vqYsup_Viscosity'
+    vq2283 = 2 # [N min/m] Attriti viscosi asse carrello inferiore 'vqYinf_Viscosity'
+    vq2284 = 1 # [Nm min] Attriti viscosi asse orientazione utensili superiori 'vqZsup_Viscosity'
+    vq2285 = 1 # [Nm min] Attriti viscosi asse orientazione utensili inferiori 'vqZinf_Viscosity'
+    vq2286 = 50 # [Nm min] Attriti viscosi asse orientazione pinza girapezzi 'vqZg_Viscosity'
+    vq2287 = 50 # [Nm min] Attriti viscosi asse rotazione ventosa polmone 'vqZb_Viscosity'
+    #vq22__ = 10 # [N min/m] Attriti viscosi asse piedino ausiliario rotazioni 'vqYb_Viscosity'
+    vq2288 = 5 # [N min/m] Attriti viscosi asse carrello stampante 'vqYprn_Viscosity'
+    vq2289 = 10 # [N min/m] Attriti viscosi asse cinghie carico 'vqCa_Viscosity'
+    vq2290 = 10 # [N min/m] Attriti viscosi asse cinghie polmone 'vqCb_Viscosity'
+    vq2291 = 10 # [N min/m] Attriti viscosi asse cinghie stacco 'vqCs_Viscosity'
+    vq2292 = 10 # [N min/m] Attriti viscosi asse cinghie/rulli riscontro 'vqCr_Viscosity'
+    vq2293 = 10 # [N min/m] Attriti viscosi asse cinghie uscita/scarico 'vqCo_Viscosity'
+    #vq2294 = 10 # [N min/m] Attriti viscosi asse cinghie gemelle carico 'vqCa2_Viscosity'
+    vq2299 = 8000 # [N min/m] Attriti viscosi asse premilastra riscontro 'vqPr_Viscosity'
+    vq2300 = 8000 # [N min/m] Attriti viscosi asse premilastra stacco 'vqPs_Viscosity'
+
+
+    # [Finally]
+    vq1499 = 123456.789 # Controllo corruzione registri 'vqGuardMachPars'
+    vb30 = 1 # Settings read 'vbMachSettings'
+  [EndVars]
+
+[EndUdt]
