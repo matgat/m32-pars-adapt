@@ -33,7 +33,7 @@ int main( const int argc, const char* const argv[] )
                              args.options(),
                              verbose_print,
                              std::ref(issues) );
-            const auto template_file = app::empty_if_or(same_mach, args.job().target_file().path());
+            const auto template_file = app::empty_if_or(not same_mach, args.job().target_file().path());
             app::handle_output_file( args.quiet(), args.job().out_path(), args.job().db_file().path(), template_file );
            }
         else if( args.job().is_adapt_udt() )

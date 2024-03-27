@@ -211,7 +211,8 @@ ut::test("app::update_udt()") = []
     const auto out = tmp_dir.decl_file("updated.udt");
 
     issues_t update_issues;
-    app::update_udt( udt_new.path().string(), udt_old.path().string(), out.path().string(), {}, [](const std::string_view, const auto&...){}, std::ref(update_issues) );
+    const bool same_mach = app::update_udt( udt_new.path().string(), udt_old.path().string(), out.path().string(), {}, [](const std::string_view, const auto&...){}, std::ref(update_issues) );
+    ut::expect( not same_mach );
     ut::expect( ut::that % update_issues.num==0 ) << "no issues expected\n";
     ut::expect( ut::fatal(fs::exists(out.path())) );
     
