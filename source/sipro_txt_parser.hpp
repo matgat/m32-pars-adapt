@@ -409,7 +409,7 @@ ut::test("bad tag format") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==2u ) << "error should be at second line";
+        ut::expect( ut::that % e.line()==2u ) << "error on wrong line";
        }
    };
 
@@ -430,7 +430,7 @@ ut::test("bad tag name") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==3u ) << "error should be after second line";
+        ut::expect( ut::that % e.line()==3u ) << "error on wrong line";
        }
    };
 
@@ -451,7 +451,7 @@ ut::test("empty tag name") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==2u ) << "error should be at second line";
+        ut::expect( ut::that % e.line()==2u ) << "error on wrong line";
        }
    };
 
@@ -472,7 +472,7 @@ ut::test("random line") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==2u ) << "error should be at second line";
+        ut::expect( ut::that % e.line()==2u ) << "error on wrong line";
        }
    };
 
@@ -493,7 +493,7 @@ ut::test("bad assignment") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==2u ) << "error should be at second line";
+        ut::expect( ut::that % e.line()==2u ) << "error on wrong line";
        }
    };
 
@@ -514,7 +514,7 @@ ut::test("empty value") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==2u ) << "error should be at second line";
+        ut::expect( ut::that % e.line()==2u ) << "error on wrong line";
        }
    };
 
@@ -536,7 +536,7 @@ ut::test("Unclosed [StartNote]") = []
        }
     catch( parse::error& e )
        {
-        ut::expect( ut::that % e.line()==3u ) << "error should be after second line";
+        ut::expect( ut::that % e.line()==3u ) << "error on wrong line";
        }
    };
 
