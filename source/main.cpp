@@ -17,7 +17,7 @@ int main( const int argc, const char* const argv[] )
     try{
         args.parse(argc, argv);
 
-        const auto verbose_print = [verb=args.verbose()](const std::string_view msg, const auto&... args){ if(verb) std::vprint_unicode(msg, std::make_format_args(args...)); };
+        const auto verbose_print = [verb=args.verbose()](const std::string_view msg, const auto&... args){ if(verb) std::vprint_unicode_buffered(msg, std::make_format_args(args...)); };
 
         verbose_print("---- {} (build " __DATE__ ") ----\n", app::name);
 
